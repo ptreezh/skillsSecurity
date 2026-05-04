@@ -15,7 +15,45 @@ skillsSecurity/
 ├── B-technical-implementation.md # Solidity contracts (ERC20, SkillRegistry, DAO)
 ├── C-dao-governance.md          # DAO governance design (voting, proposals)
 ├── D-community-growth.md        # Community growth strategy (cold start, user tiers)
-└── paper-draft-en.md           # Main paper draft (RQ1/RQ2, literature, framework)
+├── paper-draft-en.md           # Main paper draft (RQ1/RQ2, literature, framework)
+├── .planning/
+│   ├── PHASE_0.md          # GSD Phase 0 plan (12 tasks, 4 waves)
+│   ├── CURRENT_PHASE.txt    # Current phase tracker (infinite loop)
+│   └── progress.log         # Progress log (whip-system)
+├── contracts/
+│   ├── ASKToken.sol           # ASK ERC20 token (1B supply, 4 distributions)
+│   ├── SkillRegistry.sol       # Skill registry + fingerprint (Constitution Art.3)
+│   ├── Attribution.sol         # Contribution tracking + test/like + anti-slash
+│   └── StakingManager.sol     # Staking + slash + anti-slash (Constitution Art.3)
+├── src/                           # Frontend MVP (React + Vite)
+│   ├── main.jsx                  # Entry point
+│   ├── components/
+│   │   └── SkillBrowser.jsx      # Skill browser (reputation sort, Art.3)
+│   ├── pages/
+│   │   ├── UserProfile.jsx        # User reputation center (Art.2)
+│   │   └── Leaderboard.jsx        # Global reputation board (Art.3)
+│   └── services/
+│       └── WalletService.js       # Embedded wallet (low-friction, Art.2)
+├── skills/                        # Seed skills (Wave 3)
+│   ├── email-sender.SKILL.md
+│   ├── web-search.SKILL.md
+│   ├── calendar-helper.SKILL.md
+│   ├── code-formatter.SKILL.md
+│   ├── file-organizer.SKILL.md
+│   ├── data-analyzer.SKILL.md
+│   ├── social-media-poster.SKILL.md
+│   ├── password-generator.SKILL.md
+│   ├── text-summarizer.SKILL.md
+│   └── translation-helper.SKILL.md
+├── community/                     # Community docs (Wave 3)
+│   ├── twitter-posts.md          # Twitter posts (constitution, tokenomics)
+│   └── discord-server.md         # Discord setup (roles, commands)
+├── scripts/                       # Automation scripts
+│   ├── airdrop.js                # Airdrop script (120 users, 12,000 ASK)
+│   ├── check-progress.sh          # Whip-system check (Monday 09:00)
+│   └── whip-system.ps1            # Windows scheduled task setup
+└── data/
+    └── test-users.json            # Airdrop user list (120 users)
 ```
 
 ## WHERE TO LOOK
