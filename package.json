@@ -14,7 +14,9 @@
     "vite-plugin-react": "^4.0.1"
   },
   "devDependencies": {
+    "@openzeppelin/contracts": "^5.6.1",
     "@vitejs/plugin-react": "^4.2.1",
+    "hardhat": "^3.4.4",
     "vite": "^5.1.0"
   }
 }

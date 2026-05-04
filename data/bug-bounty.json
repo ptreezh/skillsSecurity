@@ -1,0 +1,162 @@
+[
+  {
+    "id": "bug_1",
+    "reporter": "0x850d6270a0996",
+    "severity": "high",
+    "reward": 797,
+    "fixed": true,
+    "date": "2026-05-05T23:26:40.386Z"
+  },
+  {
+    "id": "bug_2",
+    "reporter": "0x81cc97caaff52",
+    "severity": "medium",
+    "reward": 126,
+    "fixed": true,
+    "date": "2026-05-06T23:26:40.387Z"
+  },
+  {
+    "id": "bug_3",
+    "reporter": "0x1944d725f8fda",
+    "severity": "critical",
+    "reward": 1077,
+    "fixed": true,
+    "date": "2026-05-07T23:26:40.387Z"
+  },
+  {
+    "id": "bug_4",
+    "reporter": "0xe0375abc42a73",
+    "severity": "high",
+    "reward": 533,
+    "fixed": false,
+    "date": "2026-05-08T23:26:40.387Z"
+  },
+  {
+    "id": "bug_5",
+    "reporter": "0xde174ca3b294a",
+    "severity": "medium",
+    "reward": 312,
+    "fixed": true,
+    "date": "2026-05-09T23:26:40.388Z"
+  },
+  {
+    "id": "bug_6",
+    "reporter": "0x98232bd668dd9",
+    "severity": "critical",
+    "reward": 4398,
+    "fixed": true,
+    "date": "2026-05-10T23:26:40.388Z"
+  },
+  {
+    "id": "bug_7",
+    "reporter": "0x2807f23536d7d",
+    "severity": "high",
+    "reward": 753,
+    "fixed": true,
+    "date": "2026-05-11T23:26:40.388Z"
+  },
+  {
+    "id": "bug_8",
+    "reporter": "0x674d27d5c3889",
+    "severity": "medium",
+    "reward": 152,
+    "fixed": false,
+    "date": "2026-05-12T23:26:40.388Z"
+  },
+  {
+    "id": "bug_9",
+    "reporter": "0x4a8f83396e4f4",
+    "severity": "critical",
+    "reward": 4993,
+    "fixed": true,
+    "date": "2026-05-13T23:26:40.388Z"
+  },
+  {
+    "id": "bug_10",
+    "reporter": "0xfaf4e308e20d7",
+    "severity": "high",
+    "reward": 794,
+    "fixed": true,
+    "date": "2026-05-14T23:26:40.388Z"
+  },
+  {
+    "id": "bug_11",
+    "reporter": "0x44ebb2cc9a842",
+    "severity": "medium",
+    "reward": 239,
+    "fixed": true,
+    "date": "2026-05-15T23:26:40.388Z"
+  },
+  {
+    "id": "bug_12",
+    "reporter": "0x5685134d7d779",
+    "severity": "critical",
+    "reward": 1371,
+    "fixed": false,
+    "date": "2026-05-16T23:26:40.388Z"
+  },
+  {
+    "id": "bug_13",
+    "reporter": "0x8923e73a8a4eb",
+    "severity": "high",
+    "reward": 611,
+    "fixed": true,
+    "date": "2026-05-17T23:26:40.388Z"
+  },
+  {
+    "id": "bug_14",
+    "reporter": "0xe8fc251500ec1",
+    "severity": "medium",
+    "reward": 172,
+    "fixed": true,
+    "date": "2026-05-18T23:26:40.388Z"
+  },
+  {
+    "id": "bug_15",
+    "reporter": "0x894b4fb6097d8",
+    "severity": "critical",
+    "reward": 1117,
+    "fixed": false,
+    "date": "2026-05-19T23:26:40.388Z"
+  },
+  {
+    "id": "bug_16",
+    "reporter": "0xab66c72b8cd07",
+    "severity": "high",
+    "reward": 568,
+    "fixed": true,
+    "date": "2026-05-20T23:26:40.388Z"
+  },
+  {
+    "id": "bug_17",
+    "reporter": "0xe568c50742277",
+    "severity": "medium",
+    "reward": 434,
+    "fixed": true,
+    "date": "2026-05-21T23:26:40.388Z"
+  },
+  {
+    "id": "bug_18",
+    "reporter": "0x1065c6dc32203",
+    "severity": "critical",
+    "reward": 1714,
+    "fixed": true,
+    "date": "2026-05-22T23:26:40.388Z"
+  },
+  {
+    "id": "bug_19",
+    "reporter": "0x29b8527c9099a",
+    "severity": "high",
+    "reward": 795,
+    "fixed": true,
+    "date": "2026-05-23T23:26:40.388Z"
+  },
+  {
+    "id": "bug_20",
+    "reporter": "0xb992824a3732",
+    "severity": "medium",
+    "reward": 125,
+    "fixed": true,
+    "date": "2026-05-24T23:26:40.388Z"
+  }
+]
