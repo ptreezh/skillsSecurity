@@ -4,6 +4,7 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Attribution is Ownable {
+    constructor() Ownable() {}
     struct Contribution {
         address contributor;
         uint256 share;        // percentage * 100 (e.g., 7000 = 70%)
@@ -40,7 +41,7 @@ contract Attribution is Ownable {
     // 新增：点赞记录 + 反噬
     mapping(uint256 => Like[]) public skillLikes;
     mapping(uint256 => uint256) public likeCount;
-    mapping(address => uint256) public userReputation;
+    mapping(address => int256) public userReputation;
     mapping(address => bool) public hasLiked;  // 防重复点赞
     
     // 分成验证
@@ -140,7 +141,7 @@ contract Attribution is Ownable {
     }
     
     // 新增：查询用户声誉（宪法第二条：渐进变现）
-    function getUserReputation(address _user) external view returns (uint256) {
+    function getUserReputation(address _user) external view returns (int256) {
         return userReputation[_user];
     }
     

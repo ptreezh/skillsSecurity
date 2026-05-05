@@ -3,6 +3,7 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
+import "./ASKToken.sol";
 
 struct Skill {
     address owner;
@@ -44,7 +45,7 @@ contract SkillRegistry is Ownable {
     
     ASKToken public immutable token;
     
-    constructor(address _token) Ownable(msg.sender) {
+    constructor(address _token) Ownable() {
         token = ASKToken(_token);
     }
     

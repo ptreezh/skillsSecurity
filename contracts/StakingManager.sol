@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./ASKToken.sol";  // 需要引用 ASKToken
+import "./ASKToken.sol";
 
 contract StakingManager is Ownable {
     struct StakeInfo {
@@ -26,7 +26,7 @@ contract StakingManager is Ownable {
     event Slash(address indexed user, uint256 skillId, uint256 amount);
     event AntiSlash(address indexed user, int256 penalty, string reason);  // 新增
     
-    constructor(address _token) Ownable(msg.sender) {
+    constructor(address _token) Ownable() {
         token = ASKToken(_token);
     }
     
@@ -47,23 +47,23 @@ contract StakingManager is Ownable {
     
     // 解除质押（锁定期后）
     function unstake(uint256 _skillId) external {
-        StakeInfo storage stake = stakes[msg.sender][_skillId];
-        require(stake.amount > 0, "No stake");
-        require(block.timestamp > stake.lockedUntil, "Still locked");
-        
-        uint256 amount = stake.amount;
-        stake.amount = 0;
-        
+        StakeInfo storage info = stakes[msg.sender][_skillId];
+        require(info.amount > 0, "No stake");
+        require(block.timestamp > info.lockedUntil, "Still locked");
+
+        uint256 amount = info.amount;
+        info.amount = 0;
+
         token.transfer(msg.sender, amount);
         emit Unstaked(msg.sender, _skillId, amount);
     }
     
     // Slash（仅admin）
     function slash(address _user, uint256 _skillId, uint256 _amount) external onlyOwner {
-        StakeInfo storage stake = stakes[_user][_skillId];
-        require(stake.amount >= _amount, "Insufficient stake");
+        StakeInfo storage info = stakes[_user][_skillId];
+        require(info.amount >= _amount, "Insufficient stake");
         
-        stake.amount -= _amount;
+        info.amount -= _amount;
         
         // 发送给举报者25%（宪法第三条）
         uint256 reporterReward = (_amount * 25) / 100;

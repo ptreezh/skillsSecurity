@@ -1,12 +1,23 @@
 {
   "name": "contracts",
   "version": "1.0.0",
+  "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "compile": "hardhat compile",
+    "deploy": "hardhat run scripts/deploy.js --network polygonMumbai",
+    "deploy:local": "hardhat run scripts/deploy.js --network hardhat"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "AgentSkills ASK Token Contracts",
+  "dependencies": {
+    "@openzeppelin/contracts": "4.9.6",
+    "hardhat": "2.19.4"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.5"
+  }
 }
