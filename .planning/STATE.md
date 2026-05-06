@@ -9,10 +9,10 @@ See: .planning/PROJECT.md (updated 2026-05-06)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 01 (文档结构完善) — context gathered
 Plan: —
-Status: Defining requirements
-Last activity: 2026-05-06 — Milestone v1.1 started
+Status: Ready for planning
+Last activity: 2026-05-06 — Phase 01 context captured via /gsd-discuss-phase
 
 ## Accumulated Context
 
