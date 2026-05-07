@@ -11,9 +11,10 @@
 **Goal:** Organize and structure SKILLS_STANDARD.md for v1.1 finalization
 
 **Requirements covered:**
-- DOCS-01: Status change to 正式版
-- DOCS-02: Consistent section numbering
-- DOCS-03: Table of contents
+- DOCS-01, DOCS-02, DOCS-03
+
+**Plans:**
+- [x] 01-01-PLAN.md - TOC, section numbering, cross-references
 
 **Success criteria:**
 1. Document status updated to "正式版 v1.1"
@@ -31,6 +32,10 @@
 - CLASS-01, CLASS-02, CLASS-03, CLASS-04
 - SEC-01, SEC-02, SEC-03, SEC-04
 
+**Plans:**
+- [ ] 02-01-PLAN.md - Section 2 updates (classification standards)
+- [ ] 02-02-PLAN.md - Section 3 updates (verification standards)
+
 **Success criteria:**
 1. 5+ concrete examples per risk level
 2. Risk assessment decision tree included
@@ -47,6 +52,9 @@
 **Requirements covered:**
 - TRACE-01, TRACE-02, TRACE-03, TRACE-04
 - PROC-01, PROC-02, PROC-03, PROC-04
+
+**Plans:**
+- [ ] 03-01-PLAN.md - (to be planned)
 
 **Success criteria:**
 1. Fingerprint algorithm fully documented
@@ -67,6 +75,9 @@
 - REP-01, REP-02, REP-03, REP-04
 - INT-01, INT-02, INT-03, INT-04
 
+**Plans:**
+- [ ] 04-01-PLAN.md - (to be planned)
+
 **Success criteria:**
 1. Evidence standards for accusations defined
 2. Review committee structure documented
@@ -82,12 +93,13 @@
 
 | Phase | Focus | Requirements | Status |
 |-------|-------|-------------|--------|
-| 1 | 文档结构完善 | 3 | ○ Pending |
-| 2 | 分类与验证标准 | 8 | ○ Pending |
-| 3 | 追溯与流程标准 | 8 | ○ Pending |
-| 4 | 反噬与声望系统 | 12 | ○ Pending |
+| 1 | 文档结构完善 | 3 | Completed |
+| 2 | 分类与验证标准 | 8 | Planning |
+| 3 | 追溯与流程标准 | 8 | Pending |
+| 4 | 反噬与声望系统 | 12 | Pending |
 
 **Total:** 31 requirements across 4 phases
 
 ---
 *Roadmap created: 2026-05-06*
+*Updated: 2026-05-07*
