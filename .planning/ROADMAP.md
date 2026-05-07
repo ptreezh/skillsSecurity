@@ -33,8 +33,8 @@
 - SEC-01, SEC-02, SEC-03, SEC-04
 
 **Plans:**
-- [ ] 02-01-PLAN.md - Section 2 updates (classification standards)
-- [ ] 02-02-PLAN.md - Section 3 updates (verification standards)
+- [x] 02-01-PLAN.md - Section 2 updates (classification standards)
+- [x] 02-02-PLAN.md - Section 3 updates (verification standards)
 
 **Success criteria:**
 1. 5+ concrete examples per risk level
