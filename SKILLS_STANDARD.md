@@ -1723,6 +1723,41 @@ interface IAttribution {
 ```json
 [
   {
+    "inputs": [],
+    "name": "stake",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{"internalType": "uint256", "name": "_skillId", "type": "uint256"}],
+    "name": "unstake",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{"internalType": "address", "name": "_user", "type": "address"}, {"internalType": "uint256", "name": "_skillId", "type": "uint256"}, {"internalType": "uint256", "name": "_amount", "type": "uint256"}],
+    "name": "slash",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{"internalType": "address", "name": "_liker", "type": "address"}, {"internalType": "int256", "name": "_penalty", "type": "int256"}, {"internalType": "string", "name": "_reason", "type": "string"}],
+    "name": "slashLiker",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{"internalType": "uint256", "name": "_skillId", "type": "uint256"}],
+    "name": "likeSkill",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [{"internalType": "address", "name": "_user", "type": "address"}],
     "name": "getUserReputation",
     "outputs": [{"internalType": "int256", "name": "", "type": "int256"}],
@@ -1730,14 +1765,16 @@ interface IAttribution {
     "type": "function"
   },
   {
-    "inputs": [{"internalType": "address", "name": "_user", "type": "address"}, {"internalType": "int256", "name": "_penalty", "type": "int256"}, {"internalType": "string", "name": "_reason", "type": "string"}, {"internalType": "string", "name": "_evidenceHash", "type": "string"}],
-    "name": "slashUser",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "inputs": [],
+    "name": "token",
+    "outputs": [{"internalType": "contract ASKToken", "name": "", "type": "address"}],
+    "stateMutability": "view",
     "type": "function"
   }
 ]
 ```
+
+**注意：** 实际合约没有 `slashUser` 函数（文档旧版错误引用）。
 
 #### Attribution.sol 主要接口
 
@@ -1757,10 +1794,12 @@ interface IAttribution {
 
 | 事件 | 签名 |
 |------|------|
-| SkillCreated | `SkillCreated(uint256,address,uint8)` |
-| SkillVerified | `SkillVerified(uint256,bool)` |
-| ReputationChanged | `ReputationChanged(address,int256)` |
+| Staked | `Staked(address,uint256,uint256)` |
+| Unstaked | `Unstaked(address,uint256,uint256)` |
+| Slash | `Slash(address,uint256,uint256)` |
 | AntiSlash | `AntiSlash(address,int256,string)` |
+
+**注意：** 实际合约没有 `ReputationChanged` 事件（文档旧版错误引用）。
 
 ### 9.3 参考实现 {#9-3-参考实现}
 
