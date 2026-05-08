@@ -62,6 +62,13 @@ Requirements for SKILLS_STANDARD.md v1.1 completion. Each maps to roadmap phases
 - [ ] **INT-03**: Create contract ABI reference appendix
 - [ ] **INT-04**: Define test coverage requirements per section
 
+### Gap Closure (v1.1 Audit)
+
+- [ ] **GAP-01**: Fix TOC section 9.2 anchor (should be "ABI参考" not "参考实现")
+- [ ] **GAP-02**: Standardize reputation penalty to -200 in Section 3.4
+- [ ] **GAP-03**: Add cross-reference from Section 3.4 to Section 6.1
+- [ ] **GAP-04**: Document recovery mechanism as future implementation in Section 6.4
+
 ## Traceability
 
 | Requirement | Phase | Status |
@@ -97,12 +104,17 @@ Requirements for SKILLS_STANDARD.md v1.1 completion. Each maps to roadmap phases
 | INT-02 | Phase 4 | Pending |
 | INT-03 | Phase 4 | Pending |
 | INT-04 | Phase 4 | Pending |
+| GAP-01 | Phase 5 | Pending |
+| GAP-02 | Phase 6 | Pending |
+| GAP-03 | Phase 6 | Pending |
+| GAP-04 | Phase 7 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 28 total
-- Mapped to phases: 28
+- Gap closure: 4
+- Mapped to phases: 32
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-05-06*
-*Last updated: 2026-05-06 after initial definition*
+*Last updated: 2026-05-09 after gap closure planning*

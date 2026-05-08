@@ -77,7 +77,7 @@
 
 **Plans:**
 - [x] 04-01-PLAN.md - Complete anti-slash and reputation sections
-- [ ] 04-02-PLAN.md - Fix contract reference mismatches (gap closure)
+- [x] 04-02-PLAN.md - Fix contract reference mismatches (gap closure)
 
 **Success criteria:**
 1. Evidence standards for accusations defined
@@ -90,6 +90,55 @@
 
 ---
 
+---
+
+## Phase 5: 文档修复
+
+**Goal:** Fix documentation inconsistencies identified in milestone audit
+
+**Requirements covered:**
+- DOCS-01, DOCS-02 (gap closure)
+
+**Plans:**
+- [ ] 05-01-PLAN.md - TOC and anchor fixes
+
+**Success criteria:**
+1. TOC section 9.2 entry updated to "ABI参考"
+
+---
+
+## Phase 6: 标准一致性
+
+**Goal:** Standardize cross-references and values across sections
+
+**Requirements covered:**
+- SEC-04, SLASH-01 (gap closure)
+
+**Plans:**
+- [ ] 06-01-PLAN.md - Reputation penalty and cross-reference fixes
+
+**Success criteria:**
+1. Section 3.4 reputation penalty standardized to -200
+2. Cross-reference from Section 3.4 to Section 6.1 added
+
+---
+
+## Phase 7: 合约对齐
+
+**Goal:** Align documentation with current contract capabilities
+
+**Requirements covered:**
+- SLASH-03, INT-02 (gap closure)
+
+**Plans:**
+- [ ] 07-01-PLAN.md - Document future implementation notes
+
+**Success criteria:**
+1. Section 6.4 notes that recovery functions are future implementation
+2. Section 6.2 compatibility table cross-referenced from Section 6.4
+
+---
+
 ## Summary
 
 | Phase | Focus | Requirements | Status |
@@ -97,9 +146,12 @@
 | 1 | 文档结构完善 | 3 | Completed |
 | 2 | 分类与验证标准 | 8 | Completed |
 | 3 | 追溯与流程标准 | 8 | Completed |
-| 4 | 反噬与声望系统 | 12 | Planning |
+| 4 | 反噬与声望系统 | 12 | Completed |
+| 5 | 文档修复 | 2 | Planned |
+| 6 | 标准一致性 | 2 | Planned |
+| 7 | 合约对齐 | 2 | Planned |
 
-**Total:** 31 requirements across 4 phases
+**Total:** 31 requirements across 7 phases (4 original + 3 gap closure)
 
 ---
 *Roadmap created: 2026-05-06*
