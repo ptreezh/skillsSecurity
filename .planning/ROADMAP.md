@@ -54,7 +54,7 @@
 - PROC-01, PROC-02, PROC-03, PROC-04
 
 **Plans:**
-- [ ] 03-01-PLAN.md - (to be planned)
+- [x] 03-01-PLAN.md - Sections 4 and 5 (tracing and process standards)
 
 **Success criteria:**
 1. Fingerprint algorithm fully documented
@@ -94,12 +94,12 @@
 | Phase | Focus | Requirements | Status |
 |-------|-------|-------------|--------|
 | 1 | 文档结构完善 | 3 | Completed |
-| 2 | 分类与验证标准 | 8 | Planning |
-| 3 | 追溯与流程标准 | 8 | Pending |
+| 2 | 分类与验证标准 | 8 | Completed |
+| 3 | 追溯与流程标准 | 8 | Planning |
 | 4 | 反噬与声望系统 | 12 | Pending |
 
 **Total:** 31 requirements across 4 phases
 
 ---
 *Roadmap created: 2026-05-06*
-*Updated: 2026-05-07*
+*Updated: 2026-05-08*
