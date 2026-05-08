@@ -1139,71 +1139,58 @@ npx hardhat test --grep "gas"
 
 ### 6.2 反噬执行合约 {#6-2-反噬执行合约}
 
+以下是 StakingManager.sol 中的实际反噬相关函数：
+
 ```solidity
 // contracts/StakingManager.sol
 
-// 声望冻结结构
-struct ReputationLock {
-    uint256 lockedAmount;    // 冻结金额
-    uint256 lockedUntil;     // 冻结截止时间
-    uint256 monthlyRecovery;  // 每月可恢复额度
-}
-
-// 声望冻结记录
-mapping(address => ReputationLock[]) public reputationLocks;
-
-// 反噬事件
-event AntiSlash(
-    address indexed user,
-    int256 penalty,
-    string reason,
-    string evidenceHash
-);
-
-// 反噬执行
-function slashUser(
+// 质押惩罚（仅admin）
+function slash(
     address _user,
-    int256 _penalty,
-    string memory _reason,
-    string memory _evidenceHash
+    uint256 _skillId,
+    uint256 _amount
 ) external onlyOwner {
-    // 记录惩罚
-    userReputation[_user] += _penalty;
+    StakeInfo storage info = stakes[_user][_skillId];
+    require(info.amount >= _amount, "Insufficient stake");
 
-    // 计算恢复额度（每月5%）
-    uint256 monthlyRecovery = uint256(-_penalty) / 20; // 5% per month
+    info.amount -= _amount;
 
-    // 设置冻结记录
-    reputationLocks[_user].push(ReputationLock({
-        lockedAmount: uint256(-_penalty),
-        lockedUntil: block.timestamp + 20 months,
-        monthlyRecovery: monthlyRecovery
-    }));
+    // 发送给举报者25%（宪法第三条）
+    uint256 reporterReward = (_amount * 25) / 100;
+    token.transfer(msg.sender, reporterReward);
 
-    emit AntiSlash(_user, _penalty, _reason, _evidenceHash);
+    emit Slash(_user, _skillId, _amount);
 }
 
-// 获取可恢复声望
-function getRecoverableReputation(address _user)
-    external view returns (uint256) {
-    ReputationLock[] storage locks = reputationLocks[_user];
-    uint256 totalRecoverable = 0;
-    for (uint256 i = 0; i < locks.length; i++) {
-        if (block.timestamp >= locks[i].lockedUntil) {
-            totalRecoverable += locks[i].lockedAmount;
-        }
-    }
-    return totalRecoverable;
+// 声望惩罚（仅admin）
+function slashLiker(
+    address _liker,
+    int256 _penalty,
+    string memory _reason
+) external onlyOwner {
+    userReputation[_liker] += _penalty;  // 可为正或负
+    hasLiked[_liker] = false;
+
+    emit AntiSlash(_liker, _penalty, _reason);
 }
 
-// 领取可恢复声望
-function claimRecoverableReputation(address _user) external {
-    uint256 recoverable = getRecoverableReputation(_user);
-    require(recoverable > 0, "No recoverable reputation");
-    userReputation[_user] += int256(recoverable);
-    emit ReputationChanged(_user, int256(recoverable), "Recovery claimed");
+// 查询声望
+function getUserReputation(address _user)
+    external view returns (int256) {
+    return userReputation[_user];
 }
 ```
+
+#### 接口兼容性说明 (INT-02)
+
+| 文档描述 | 实际合约 | 差异说明 |
+|----------|----------|----------|
+| slashUser() | 不存在 | 分为 slash() 和 slashLiker() 两个函数 |
+| ReputationLock struct | 不存在 | 当前版本使用简单的 userReputation mapping |
+| getRecoverableReputation() | 不存在 | 当前版本无自动恢复机制 |
+| claimRecoverableReputation() | 不存在 | 当前版本无领取机制 |
+
+**注意：** 当前合约实现采用简化的声望模型，使用 `mapping(address => int256) public userReputation` 直接存储声望值，无冻结或锁定机制。
 
 #### 惩罚执行流程 (SLASH-04)
 
