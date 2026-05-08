@@ -76,7 +76,8 @@
 - INT-01, INT-02, INT-03, INT-04
 
 **Plans:**
-- [ ] 04-01-PLAN.md - (to be planned)
+- [x] 04-01-PLAN.md - Complete anti-slash and reputation sections
+- [ ] 04-02-PLAN.md - Fix contract reference mismatches (gap closure)
 
 **Success criteria:**
 1. Evidence standards for accusations defined
@@ -95,8 +96,8 @@
 |-------|-------|-------------|--------|
 | 1 | 文档结构完善 | 3 | Completed |
 | 2 | 分类与验证标准 | 8 | Completed |
-| 3 | 追溯与流程标准 | 8 | Planning |
-| 4 | 反噬与声望系统 | 12 | Pending |
+| 3 | 追溯与流程标准 | 8 | Completed |
+| 4 | 反噬与声望系统 | 12 | Planning |
 
 **Total:** 31 requirements across 4 phases
 
