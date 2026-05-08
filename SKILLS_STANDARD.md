@@ -1101,33 +1101,128 @@ npx hardhat test --grep "gas"
 
 ### 6.1 反噬触发条件 {#6-1-反噬触发条件}
 
-| 违规类型 | 惩罚措施 | 声望损失 | 申诉期限 |
-|----------|---------|----------|----------|
-| 恶意技能（造成实际损害） | 100% 积分没收 | -500 | 7 天 |
-| 恶意技能（未造成损害） | 50% 积分没收 | -200 | 7 天 |
-| 验证者失职（通过恶意技能） | 100% 积分没收 | -300 | 7 天 |
-| 验证者失职（误判） | 25% 积分没收 | -50 | 7 天 |
-| 虚假举报 | 举报者积分没收 | -300 | 无 |
-| 重复创建相似恶意技能 | 100% 积分没收 + 封禁 | -1000 | 7 天 |
+| 违规类型 | 惩罚措施 | 声望损失 | 申诉期限 | 证据要求 |
+|----------|---------|----------|----------|----------|
+| 恶意技能（造成实际损害） | 100% 积分没收 | -500 | 7 天 | 多层证据 |
+| 恶意技能（未造成损害） | 50% 积分没收 | -200 | 7 天 | 多层证据 |
+| 验证者失职（通过恶意技能） | 100% 积分没收 | -300 | 7 天 | 多层证据 |
+| 验证者失职（误判） | 25% 积分没收 | -50 | 7 天 | 代码审查意见 |
+| 虚假举报 | 举报者积分没收 | -300 | 无 | 不接受申诉 |
+| 重复创建相似恶意技能 | 100% 积分没收 + 封禁 | -1000 | 7 天 | 多层证据 |
+
+#### 多层证据标准 (SLASH-01)
+
+所有需要上链惩罚的违规行为必须提供以下四层证据：
+
+**1. 代码审查意见**
+- 必须列出所有发现的漏洞
+- 必须包含具体代码行号引用
+- 必须说明漏洞的可利用性
+
+**2. 安全扫描报告**
+- 必须是 Slither 或同类工具的扫描结果
+- 必须包含扫描日期和工具版本
+- 必须声明无严重问题（或列出问题）
+
+**3. 签名声明**
+```
+我，[举报者地址]，确认以上证据真实有效，
+愿意对举报内容的准确性承担法律责任。
+签名：[签名]
+日期：[YYYY-MM-DD]
+```
+
+**4. 损害证明（如适用）**
+- 对于"造成实际损害"类别
+- 必须提供具体的损害证明材料
+- 包含损失金额，时间、受影响用户等信息
 
 ### 6.2 反噬执行合约 {#6-2-反噬执行合约}
 
 ```solidity
 // contracts/StakingManager.sol
-event AntiSlash(address indexed user, int256 penalty, string reason);
 
-// 反噬机制 - 惩罚点赞有害技能者
-function slashLiker(address _liker, int256 _penalty, string memory _reason)
-    external onlyOwner {
-    userReputation[_liker] += _penalty;  // 可为正或负
-    emit AntiSlash(_liker, _penalty, _reason);
+// 声望冻结结构
+struct ReputationLock {
+    uint256 lockedAmount;    // 冻结金额
+    uint256 lockedUntil;     // 冻结截止时间
+    uint256 monthlyRecovery;  // 每月可恢复额度
 }
 
-// 获取用户声誉
-function getUserReputation(address _user) external view returns (int256) {
-    return userReputation[_user];
+// 声望冻结记录
+mapping(address => ReputationLock[]) public reputationLocks;
+
+// 反噬事件
+event AntiSlash(
+    address indexed user,
+    int256 penalty,
+    string reason,
+    string evidenceHash
+);
+
+// 反噬执行
+function slashUser(
+    address _user,
+    int256 _penalty,
+    string memory _reason,
+    string memory _evidenceHash
+) external onlyOwner {
+    // 记录惩罚
+    userReputation[_user] += _penalty;
+
+    // 计算恢复额度（每月5%）
+    uint256 monthlyRecovery = uint256(-_penalty) / 20; // 5% per month
+
+    // 设置冻结记录
+    reputationLocks[_user].push(ReputationLock({
+        lockedAmount: uint256(-_penalty),
+        lockedUntil: block.timestamp + 20 months,
+        monthlyRecovery: monthlyRecovery
+    }));
+
+    emit AntiSlash(_user, _penalty, _reason, _evidenceHash);
+}
+
+// 获取可恢复声望
+function getRecoverableReputation(address _user)
+    external view returns (uint256) {
+    ReputationLock[] storage locks = reputationLocks[_user];
+    uint256 totalRecoverable = 0;
+    for (uint256 i = 0; i < locks.length; i++) {
+        if (block.timestamp >= locks[i].lockedUntil) {
+            totalRecoverable += locks[i].lockedAmount;
+        }
+    }
+    return totalRecoverable;
+}
+
+// 领取可恢复声望
+function claimRecoverableReputation(address _user) external {
+    uint256 recoverable = getRecoverableReputation(_user);
+    require(recoverable > 0, "No recoverable reputation");
+    userReputation[_user] += int256(recoverable);
+    emit ReputationChanged(_user, int256(recoverable), "Recovery claimed");
 }
 ```
+
+#### 惩罚执行流程 (SLASH-04)
+
+```
+1. 举报提交 ──▶ 2. 证据验证 ──▶ 3. 委员会审核 ──▶ 4. 执行惩罚
+                              │                         │
+                              ▼                         ▼
+                       证据不充分                  申诉通过
+                       → 拒绝举报                → 撤销惩罚
+```
+
+#### 证据验证标准 (SLASH-01)
+
+| 证据类型 | 验证要点 | 拒收标准 |
+|----------|----------|----------|
+| 代码审查 | 漏洞行号、影响范围 | 无具体行号引用 |
+| 安全扫描 | 工具版本、扫描日期 | 无扫描日期或版本 |
+| 签名声明 | 签名有效性、日期 | 签名与举报者不符 |
+| 损害证明 | 损失金额、因果关系 | 无法证明因果关系 |
 
 ### 6.3 申诉流程 {#6-3-申诉流程}
 
@@ -1225,7 +1320,54 @@ Day 0                Day 1-7             Day 8-10           Day 11
 | 申诉材料提交 | 委员会 | 站内消息 |
 | 申诉裁决发布 | 申诉人 + 验证者 | 链上事件 + 邮件 |
 
-### 6.4 技能重建与版本更新 {#6-4-技能重建与版本更新}
+### 6.4 惩罚恢复流程 {#6-4-惩罚恢复流程}
+
+被惩罚后，用户可通过持续贡献恢复声望。
+
+#### 恢复规则 (SLASH-03)
+
+**恢复机制：**
+- **无锁定期** — 惩罚后立即可开始恢复
+- **月度恢复** — 每月可恢复被惩罚声望的 5%
+- **活动要求** — 必须持续有正面贡献才能累积恢复
+
+**恢复计算公式：**
+```
+月度恢复额度 = 被惩罚声望 × 5%
+完全恢复等待期 = 20 个月
+```
+
+**示例：**
+- 用户被惩罚 -500 声望
+- 每月恢复额度：500 × 5% = 25 声望
+- 完全恢复需要：20 个月
+
+#### 恢复资格
+
+以下行为可计入恢复活动：
+- [x] 创建通过验证的技能
+- [x] 成功验证他人技能
+- [x] 报告有效漏洞
+- [x] 修复已有技能的问题
+
+以下行为不计入：
+- [ ] 点赞操作
+- [ ] 仅浏览行为
+
+#### 声望锁定机制
+
+虽然恢复无需等待，但惩罚金额会被"锁定"：
+- 锁定金额不计入可投票声望
+- 锁定金额不计入可解锁功能声望
+- 只有恢复后的金额才会解锁对应权限
+
+| 声望来源 | 可投票 | 可解锁功能 | 可提取质押 |
+|----------|--------|------------|------------|
+| 原始声望 | ✅ | ✅ | ✅ |
+| 恢复声望 | ✅ (恢复后) | ✅ (恢复后) | ✅ (恢复后) |
+| 锁定部分 | ❌ | ❌ | ❌ |
+
+### 6.5 技能重建与版本更新 {#6-4-技能重建与版本更新}
 
 技能重建（Fork）和版本更新是重要的生命周期管理机制，确保技能持续改进同时保持追溯性。
 
@@ -1316,46 +1458,186 @@ Day 0                Day 1-7             Day 8-10           Day 11
 
 ### 7.1 积分系统 {#7-1-积分系统}
 
+积分是用户在平台上贡献的直接量化指标。
+
+#### 积分获取
+
 | 行为 | 积分变化 | 说明 |
 |------|----------|------|
 | 创建技能（LOW） | +100 | 通过验证后发放 |
 | 创建技能（MEDIUM） | +200 | 通过验证后发放 |
 | 创建技能（HIGH） | +300 | 通过验证后发放 |
 | 创建技能（CRITICAL） | +500 | 通过验证后发放 |
-| 技能被调用 | +10 | 每次调用 |
+| 技能被调用 | +10 | 每次有效调用 |
+| 技能被点赞 | +5 | 每次点赞（宪法第三条） |
+| 技能被举报（确认有效） | +30 | 举报被采纳 |
 | 验证技能（LOW） | +20 | 通过验证 |
 | 验证技能（MEDIUM） | +50 | 通过验证 |
 | 验证技能（HIGH） | +100 | 通过验证 |
 | 验证技能（CRITICAL） | +200 | 通过验证 |
-| 报告 Bug | +50 | 确认有效 |
-| 修复 Bug | +100 | 被接受 |
-| 举报恶意技能 | +30 | 确认有效 |
-| 虚假举报 | -300 | 无故举报 |
+| 报告Bug（确认有效） | +50 | Bug被确认 |
+| 修复Bug（被接受） | +100 | 修复被采纳 |
+| 参与申诉（证人） | +20 | 提供有效证词 |
+
+#### 积分扣除
+
+| 行为 | 积分变化 | 说明 |
+|------|----------|------|
+| 技能被惩罚 | -声望损失×10 | 按声望惩罚比例扣除 |
+| 举报虚假信息 | -300 | 恶意举报 |
+| 验证超时 | -20 | 未在时限内完成验证 |
+
+#### 积分规则
+
+- **无上限** — 积分可以无限累积（REP-01）
+- **不可转让** — 积分只能在账户间转移，不可交易
+- **可转换** — 代币发行后，积分可1:1转换为代币（REP-04）
 
 ### 7.2 声望系统 {#7-2-声望系统}
 
-| 等级 | 声望要求 | 操作权限 |
-|------|----------|----------|
-| 观察者 | 0+ | 浏览公开技能 |
-| 贡献者 | 50+ | 创建 LOW 技能 |
-| 贡献者+ | 100+ | 创建 MEDIUM 技能 |
-| 验证者 | 500+ | 验证 LOW/MEDIUM |
-| 高级验证者 | 1000+ | 验证所有等级 |
-| 守护者 | 2000+ | 监督、举报 |
-| 长老 | 5000+ | 申诉裁决、参与治理 |
+声望是用户在平台上的信誉等级，影响权限和特权。
+
+#### 声望等级（REP-02）
+
+| 等级 | 声望要求 | 名称 | 权限 |
+|------|----------|------|------|
+| L1 | 0+ | 观察者 | 浏览公开技能、点赞 |
+| L2 | 100+ | 贡献者 | 创建LOW技能、评论 |
+| L3 | 500+ | 验证者 | 创建MEDIUM技能、验证LOW/MEDIUM |
+| L4 | 2000+ | 守护者 | 创建HIGH技能、验证HIGH、举报 |
+| L5 | 5000+ | 长老 | 创建CRITICAL技能、验证CRITICAL、申诉委员会 |
+
+#### 等级特权详解
+
+**L1 观察者 (0+声望)**
+- 浏览所有公开技能
+- 点赞技能（每日5次上限）
+- 举报可疑技能
+
+**L2 贡献者 (100+声望)**
+- L1 所有权限
+- 创建LOW风险技能
+- 评论技能
+- 参与讨论
+
+**L3 验证者 (500+声望)**
+- L2 所有权限
+- 创建MEDIUM风险技能
+- 验证LOW/MEDIUM技能
+- 获得验证奖励
+
+**L4 守护者 (2000+声望)**
+- L3 所有权限
+- 创建HIGH风险技能
+- 验证HIGH技能
+- 获得更多验证奖励
+- 可参与委员会投票
+
+**L5 长老 (5000+声望)**
+- L4 所有权限
+- 创建CRITICAL风险技能
+- 验证CRITICAL技能
+- **申诉委员会成员资格**
+- **治理投票权**
+- 最高验证奖励比例
+
+#### 声望稳定性 (REP-03)
+
+**无衰减规则：**
+- 声望不会因不活跃而衰减
+- 声望保持稳定，无论活动频率
+- 奖励长期贡献者，无需惩罚休息期
+
+#### 声望累积
+
+- **无上限** — 声望可以无限累积（REP-03）
+- 高级别自动包含低级别所有权限
+- 声望只升不降（除惩罚外）
 
 ### 7.3 声望计算 {#7-3-声望计算}
 
+#### 基础声望
+
 ```solidity
-// 基础声望
-int256 public constant BASE_REPUTATION = 0;
+// 声望结构
+struct ReputationRecord {
+    int256 balance;          // 当前声望
+    int256 lifetimeEarned;   // 累计获得声望
+    int256 lifetimeSlashed;  // 累计被惩罚声望
+    uint256 level;          // 当前等级
+    uint256 lockedAmount;    // 锁定金额（惩罚中）
+}
+
+// 用户声望记录
+mapping(address => ReputationRecord) public reputationRecords;
 
 // 声望变化事件
-event ReputationChanged(address indexed user, int256 change, string reason);
+event ReputationChanged(
+    address indexed user,
+    int256 change,
+    int256 newBalance,
+    string reason
+);
+```
 
-function updateReputation(address _user, int256 _change, string memory _reason) internal {
-    userReputation[_user] += _change;
-    emit ReputationChanged(_user, _change, _reason);
+#### 声望更新逻辑
+
+```solidity
+function updateReputation(
+    address _user,
+    int256 _change,
+    string memory _reason
+) internal {
+    ReputationRecord storage record = reputationRecords[_user];
+    record.balance += _change;
+    if (_change > 0) {
+        record.lifetimeEarned += _change;
+    } else {
+        record.lifetimeSlashed += -_change;
+        record.lockedAmount += uint256(-_change);
+    }
+    record.level = calculateLevel(record.balance);
+    emit ReputationChanged(_user, _change, record.balance, _reason);
+}
+
+function calculateLevel(int256 _balance) internal pure returns (uint256) {
+    if (_balance >= 5000) return 5;  // L5 长老
+    if (_balance >= 2000) return 4;  // L4 守护者
+    if (_balance >= 500) return 3;   // L3 验证者
+    if (_balance >= 100) return 2;   // L2 贡献者
+    return 1;                         // L1 观察者
+}
+```
+
+#### 代币迁移 (REP-04)
+
+有平台代币发行时，积分将按以下规则转换为代币：
+
+**转换比例：** 1积分 = 1代币
+
+**迁移规则：**
+- 无锁定期 — 转换后即可支配
+- 无限制 — 所有积分持有者均可转换
+- 无上限 — 转换数量无限制
+
+**迁移时间线：**
+```
+T+0: 代币发行公告
+T+7: 迁移门户开放
+T+30: 早期迁移奖励（+10%，可选）
+T+∞: 标准迁移继续
+```
+
+**迁移接口：**
+```solidity
+interface ITokenMigrator {
+    function migrateReputationToToken(
+        address _user,
+        uint256 _amount
+    ) external returns (uint256);
+
+    function getMigratableAmount(address _user)
+        external view returns (uint256);
 }
 ```
 
@@ -1416,9 +1698,84 @@ interface IAttribution {
 |------|------|----------|
 | v1.0 | 2026-05-05 | 初稿 |
 | v1.1 | 2026-05-05 | 完善流程图、增加示例 |
-| v1.1 | 2026-05-08 | Phase 3: 扩展指纹机制、审计追踪、IPFS格式、追溯测试、完整状态机、错误码、Gas估算、申诉流程、技能重建与版本更新 |
+| v1.1 | 2026-05-07 | Phase 2: 扩展指纹机制、审计追踪、IPFS格式、追溯测试、完整状态机、错误码、Gas估算、申诉流程、技能重建与版本更新 |
+| v1.1 | 2026-05-08 | Phase 4: 反噬机制增强（多层证据标准、惩罚恢复流程）、声望系统完善（5级特权、积分规则、代币迁移）、ABI参考附录 |
 
-### 9.2 参考实现 {#9-2-参考实现}
+### 9.2 ABI参考 {#9-2-abi参考}
+
+#### SkillRegistry.sol 主要接口
+
+```json
+[
+  {
+    "inputs": [],
+    "name": "registerSkill",
+    "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{"internalType": "uint256", "name": "_skillId", "type": "uint256"}, {"internalType": "bool", "name": "_pass", "type": "bool"}],
+    "name": "verifySkill",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{"internalType": "uint256", "name": "_skillId", "type": "uint256"}],
+    "name": "getSkill",
+    "outputs": [{"components": [{"internalType": "uint256", "name": "skillId", "type": "uint256"}, {"internalType": "string", "name": "name", "type": "string"}, {"internalType": "address", "name": "owner", "type": "address"}, {"internalType": "uint8", "name": "riskLevel", "type": "uint8"}, {"internalType": "bytes32", "name": "fingerprint", "type": "bytes32"}], "internalType": "struct SkillRegistry.Skill", "name": "", "type": "tuple"}],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]
+```
+
+#### StakingManager.sol 主要接口
+
+```json
+[
+  {
+    "inputs": [{"internalType": "address", "name": "_user", "type": "address"}],
+    "name": "getUserReputation",
+    "outputs": [{"internalType": "int256", "name": "", "type": "int256"}],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{"internalType": "address", "name": "_user", "type": "address"}, {"internalType": "int256", "name": "_penalty", "type": "int256"}, {"internalType": "string", "name": "_reason", "type": "string"}, {"internalType": "string", "name": "_evidenceHash", "type": "string"}],
+    "name": "slashUser",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]
+```
+
+#### Attribution.sol 主要接口
+
+```json
+[
+  {
+    "inputs": [{"internalType": "uint256", "name": "_skillId", "type": "uint256"}, {"internalType": "address", "name": "_contributor", "type": "address"}, {"internalType": "uint256", "name": "_share", "type": "uint256"}, {"internalType": "uint8", "name": "_ctype", "type": "uint8"}],
+    "name": "addContribution",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]
+```
+
+#### 事件签名
+
+| 事件 | 签名 |
+|------|------|
+| SkillCreated | `SkillCreated(uint256,address,uint8)` |
+| SkillVerified | `SkillVerified(uint256,bool)` |
+| ReputationChanged | `ReputationChanged(address,int256)` |
+| AntiSlash | `AntiSlash(address,int256,string)` |
+
+### 9.3 参考实现 {#9-3-参考实现}
 
 | 组件 | 文件路径 | 说明 |
 |------|---------|------|
@@ -1427,7 +1784,7 @@ interface IAttribution {
 | StakingManager | contracts/StakingManager.sol | 质押管理合约 |
 | ASKToken | contracts/ASKToken.sol | 代币合约（延迟发行） |
 
-### 9.3 术语表 {#9-3-术语表}
+### 9.4 术语表 {#9-4-术语表}
 
 | 术语 | 定义 |
 |------|------|
@@ -1440,7 +1797,7 @@ interface IAttribution {
 | Reputation | 用户在平台上的声望值 |
 | Points | 用户在平台上的积分 |
 
-### 9.4 反馈渠道 {#9-4-反馈渠道}
+### 9.5 反馈渠道 {#9-5-反馈渠道}
 
 如对本文档有建议，请通过以下方式反馈：
 - GitHub Issue
