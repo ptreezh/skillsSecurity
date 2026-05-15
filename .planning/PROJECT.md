@@ -10,29 +10,36 @@ Skills with accountability — every action is traceable, every contributor is c
 
 ## Requirements
 
-### Validated
+### Validated (v1.1)
 
-(None yet — Phase 1 in progress)
+- ✓ SKILLS_STANDARD.md v1.1 complete with full specifications — v1.1
+- ✓ Skill classification standards (LOW/MEDIUM/HIGH/CRITICAL) — v1.1
+- ✓ Security verification standards with checklists — v1.1
+- ✓ Accountability tracing with fingerprint mechanism — v1.1
+- ✓ Anti-slash mechanism with multi-layer evidence — v1.1
+- ✓ Reputation system with 5-tier privileges — v1.1
+- ✓ Contract ABI reference appendix — v1.1
 
-### Active
+### Active (v1.2)
 
-- [ ] Complete SKILLS_STANDARD.md v1.1 with full specifications
-- [ ] Align standards with existing contract implementations
-- [ ] Add formal verification checklists and examples
-- [ ] Define testing requirements for skill creators
+- [ ] Implement recovery functions in StakingManager.sol
+- [ ] Add automatic reputation lock mechanism
+- [ ] Testnet deployment
+- [ ] Community building
 
 ### Out of Scope
 
 - Token issuance (delayed per roadmap decision)
 - Mobile app
-- Non-English documentation (Phase 2+)
+- Non-English documentation
 
 ## Context
 
-**Current state:** Phase 1 (标准制定) in progress
-- Smart contracts deployed locally (ASKToken, SkillRegistry, Attribution, StakingManager)
-- SKILLS_STANDARD.md v1.1 draft exists (507 lines)
-- ROADMAP.md defines 3 phases
+**Current state:** v1.1 milestone complete (2026-05-15)
+- SKILLS_STANDARD.md v1.1 finalized with 32 requirements addressed
+- Smart contracts: ASKToken, SkillRegistry, Attribution, StakingManager
+- Full specification documented: classification, verification, tracing, anti-slash, reputation
+- Testnet deployment pending
 
 **Technical environment:**
 - Solidity smart contracts (Hardhat framework)
@@ -42,9 +49,9 @@ Skills with accountability — every action is traceable, every contributor is c
 ## Constraints
 
 - **Tech stack**: Solidity + Hardhat, no changes
-- **Timeline**: Phase 1 target July 2026
+- **Timeline**: Testnet deployment in next milestone
 - **Budget**: Zero cash (token incentives only)
-- **No token**: Standards must work without ASK token initially
+- **No token**: Standards work without ASK token initially
 
 ## Key Decisions
 
@@ -52,32 +59,21 @@ Skills with accountability — every action is traceable, every contributor is c
 |----------|-----------|---------|
 | Standard before token | Build trust before monetization | ✓ Good |
 | Polygon testnet first | Free deployment, real conditions | ✓ Good |
+| 5-tier reputation system | L1-L5 with clear privileges | ✓ Good |
+| Multi-layer evidence for slash | 4 types of evidence required | ✓ Good |
+| 2/3 approval threshold | Balance security and throughput | ✓ Good |
 
 ---
 
-## Current Milestone: v1.1 标准文档完善
+## Current Milestone: v1.2 (Planning Pending)
 
-**Goal:** Complete SKILLS_STANDARD.md v1.1 with full specifications
-
-**Target features:**
-- Complete Skills 分类标准 (risk levels, categories)
-- Complete 安全验证标准 (verification flow, auditor requirements)
-- Complete 责任追溯标准 (attribution, slashing mechanisms)
-- Complete 上链流程标准 (registration, audit, appeal)
-- Design 积分/声望系统 (token-free phase)
+**Goal:** TBD — planning pending
 
 ---
 
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
-
-**After each phase transition** (via `/gsd-transition`):
-1. Requirements invalidated? → Move to Out of Scope with reason
-2. Requirements validated? → Move to Validated with phase reference
-3. New requirements emerged? → Add to Active
-4. Decisions to log? → Add to Key Decisions
-5. "What This Is" still accurate? → Update if drifted
 
 **After each milestone** (via `/gsd-complete-milestone`):
 1. Full review of all sections
@@ -86,4 +82,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-06 after milestone v1.1 started*
+*Last updated: 2026-05-15 after v1.1 milestone completion*
