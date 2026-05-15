@@ -42,7 +42,7 @@
 - RECOV-01, RECOV-02, RECOV-03
 
 **Plans:**
-- [ ] 08-01-PLAN.md - ReputationLock struct, recovery functions
+- [x] 08-01-PLAN.md - ReputationLock struct, recovery functions
 
 **Success criteria:**
 1. `getRecoverableReputation()` returns locked amount and next claim time
