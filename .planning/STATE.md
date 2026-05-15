@@ -20,13 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-15)
 
 **Core value:** Skills with accountability — every action is traceable, every contributor is credited, every violation has consequences.
-**Current focus:** Planning next milestone (v1.2)
+**Current focus:** v1.2 milestone planning
 
 ## Current Position
 
-Milestone: v1.1 completed
-Phase: Planning next milestone
-Status: Ready for v1.2 planning
+Milestone: v1.2 (技术债补齐)
+Phase: Not started (defining requirements)
+Status: Defining requirements
+Last activity: 2026-05-15 — Milestone v1.2 started
 
 ## Accumulated Context
 
@@ -36,12 +37,12 @@ Status: Ready for v1.2 planning
 - Smart contracts: ASKToken, SkillRegistry, Attribution, StakingManager
 - Full specification: classification, verification, tracing, anti-slash, reputation
 
-### Open Items
+### Open Items (v1.2)
 
-- Recovery functions need contract implementation (future work)
-- Testnet deployment pending
-- v1.2 planning to start
+- Reputation recovery functions not implemented (getRecoverableReputation, claimRecoverableReputation)
+- Reputation lock mechanism not implemented
+- SKILLS_STANDARD.md notes these as future implementation
 
 ---
 
-*Last updated: 2026-05-15 after v1.1 milestone completion*
+*Last updated: 2026-05-15 after v1.2 milestone started*

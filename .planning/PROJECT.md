@@ -22,10 +22,9 @@ Skills with accountability — every action is traceable, every contributor is c
 
 ### Active (v1.2)
 
-- [ ] Implement recovery functions in StakingManager.sol
+- [ ] Implement reputation recovery functions in StakingManager.sol
 - [ ] Add automatic reputation lock mechanism
-- [ ] Testnet deployment
-- [ ] Community building
+- [ ] Update SKILLS_STANDARD.md to reflect implemented features
 
 ### Out of Scope
 
@@ -65,9 +64,15 @@ Skills with accountability — every action is traceable, every contributor is c
 
 ---
 
-## Current Milestone: v1.2 (Planning Pending)
+## Current Milestone: v1.2 技术债补齐
 
-**Goal:** TBD — planning pending
+**Goal:** 实现声望恢复函数和锁定机制，匹配 SKILLS_STANDARD.md v1.1 规范
+
+**Target features:**
+- 实现 `getRecoverableReputation()` 函数
+- 实现 `claimRecoverableReputation()` 函数
+- 添加 ReputationLock struct 和锁定机制
+- 更新文档以反映已实现的合约功能
 
 ---
 
@@ -82,4 +87,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-15 after v1.1 milestone completion*
+*Last updated: 2026-05-15 after v1.2 milestone started*
