@@ -20,9 +20,11 @@ Skills with accountability — every action is traceable, every contributor is c
 - ✓ Reputation system with 5-tier privileges — v1.1
 - ✓ Contract ABI reference appendix — v1.1
 
+### Validated (v1.2)
+
+- ✓ Implement reputation recovery functions in StakingManager.sol — Phase 8
 ### Active (v1.2)
 
-- [ ] Implement reputation recovery functions in StakingManager.sol
 - [ ] Add automatic reputation lock mechanism
 - [ ] Update SKILLS_STANDARD.md to reflect implemented features
 
