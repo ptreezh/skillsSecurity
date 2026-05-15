@@ -100,10 +100,11 @@
 - DOCS-01, DOCS-02 (gap closure)
 
 **Plans:**
-- [ ] 05-01-PLAN.md - TOC and anchor fixes
+- [x] 05-01-PLAN.md - TOC and anchor fixes
 
 **Success criteria:**
 1. TOC section 9.2 entry updated to "ABI参考"
+2. Section order: 9.3 before 9.4
 
 ---
 
@@ -115,7 +116,7 @@
 - SEC-04, SLASH-01 (gap closure)
 
 **Plans:**
-- [ ] 06-01-PLAN.md - Reputation penalty and cross-reference fixes
+- [x] 06-01-PLAN.md - Reputation penalty and cross-reference fixes
 
 **Success criteria:**
 1. Section 3.4 reputation penalty standardized to -200
