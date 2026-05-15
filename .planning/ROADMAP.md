@@ -41,6 +41,9 @@
 **Requirements covered:**
 - RECOV-01, RECOV-02, RECOV-03
 
+**Plans:**
+- [ ] 08-01-PLAN.md - ReputationLock struct, recovery functions
+
 **Success criteria:**
 1. `getRecoverableReputation()` returns locked amount and next claim time
 2. `claimRecoverableReputation()` transfers recovered reputation to user balance
@@ -54,6 +57,9 @@
 
 **Requirements covered:**
 - RECOV-04, RECOV-05, LOCK-01, LOCK-02, LOCK-03, LOCK-04
+
+**Plans:**
+- [ ] 09-01-PLAN.md — Lock mechanism and recovery integration
 
 **Success criteria:**
 1. Locked reputation excluded from voting power calculation
@@ -69,6 +75,9 @@
 
 **Requirements covered:**
 - DOCU-01, DOCU-02
+
+**Plans:**
+- [ ] 10-01-PLAN.md — Documentation updates
 
 **Success criteria:**
 1. Section 6.4 "future implementation" note removed
