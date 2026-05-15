@@ -132,7 +132,7 @@
 - SLASH-03, INT-02 (gap closure)
 
 **Plans:**
-- [ ] 07-01-PLAN.md - Document future implementation notes
+- [x] 07-01-PLAN.md - Document future implementation notes
 
 **Success criteria:**
 1. Section 6.4 notes that recovery functions are future implementation
