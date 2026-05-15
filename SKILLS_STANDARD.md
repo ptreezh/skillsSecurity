@@ -46,7 +46,7 @@
   - [8.1 核心接口](#8-1-核心接口)
 - [9. 附录](#9-附录)
   - [9.1 版本历史](#9-1-版本历史)
-  - [9.2 参考实现](#9-2-参考实现)
+  - [9.2 ABI参考](#9-2-abi参考)
   - [9.3 术语表](#9-3-术语表)
   - [9.4 参考实现](#9-4-参考实现)
   - [9.5 测试覆盖要求](#9-5-测试覆盖要求)
@@ -409,10 +409,12 @@ Verifiers who fail to perform their duties or deliberately violate rules, causin
 | 违规类型 | 惩罚措施 | 声望损失 | 证据要求 |
 |----------|---------|----------|----------|
 | 批准造成实际损害的恶意技能 | 100% 积分没收 | -500 | 代码审查意见、安全扫描报告、签名声明 |
-| 批准未造成损害的恶意技能 | 50% 积分没收 | -250 | 代码审查意见、安全扫描报告 |
+| 批准未造成损害的恶意技能 | 50% 积分没收 | -200 | 代码审查意见、安全扫描报告 |
 | 重复误判（3次及以上） | 声望冻结 30 天 | -100 | 3+ 次错误决策记录 |
 | 故意延迟验证（超时 2 次） | 暂停验证资格 7 天 | -50 | 超时记录截图 |
 | 泄露技能代码给第三方 | 永久取消验证资格 | -1000 | 证据截图、通信记录 |
+
+> **注意：** 详细反噬机制见 [6.1 反噬触发条件](#6-1-反噬触发条件)，申诉流程见 [6.3 申诉流程](#6-3-申诉流程)。
 
 #### 证据要求
 
@@ -1804,15 +1806,6 @@ interface IAttribution {
 
 **注意：** 实际合约没有 `ReputationChanged` 事件（文档旧版错误引用）。
 
-### 9.4 参考实现 {#9-4-参考实现}
-
-| 组件 | 文件路径 | 说明 |
-|------|---------|------|
-| SkillRegistry | contracts/SkillRegistry.sol | 技能注册合约 |
-| Attribution | contracts/Attribution.sol | 贡献归因合约 |
-| StakingManager | contracts/StakingManager.sol | 质押管理合约 |
-| ASKToken | contracts/ASKToken.sol | 代币合约（延迟发行） |
-
 ### 9.3 术语表 {#9-3-术语表}
 
 | 术语 | 定义 |
@@ -1825,6 +1818,15 @@ interface IAttribution {
 | Anti-Slash | 惩罚恶意行为的机制 |
 | Reputation | 用户在平台上的声望值 |
 | Points | 用户在平台上的积分 |
+
+### 9.4 参考实现 {#9-4-参考实现}
+
+| 组件 | 文件路径 | 说明 |
+|------|---------|------|
+| SkillRegistry | contracts/SkillRegistry.sol | 技能注册合约 |
+| Attribution | contracts/Attribution.sol | 贡献归因合约 |
+| StakingManager | contracts/StakingManager.sol | 质押管理合约 |
+| ASKToken | contracts/ASKToken.sol | 代币合约（延迟发行） |
 
 ### 9.5 测试覆盖要求 (INT-04)
 
