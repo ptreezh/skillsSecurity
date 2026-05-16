@@ -20,15 +20,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-15)
 
 **Core value:** Skills with accountability — every action is traceable, every contributor is credited, every violation has consequences.
-**Current focus:** Phase 08 — recovery-functions
+**Current focus:** Phase 09 — lock-mechanism
 
 ## Current Position
 
 Milestone: v1.2 (技术债补齐)
 Phase: 09
 Plan: Not started
-Status: Executing Phase 08
-Last activity: 2026-05-15
+Status: Context gathered
+Last activity: 2026-05-16
 
 ## Accumulated Context
 
