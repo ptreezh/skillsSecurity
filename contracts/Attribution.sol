@@ -2,9 +2,18 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "./StakingManager.sol";
 
 contract Attribution is Ownable {
     constructor() Ownable() {}
+
+    /// @notice 设置 StakingManager 地址（用于跨合约通知）
+    /// @dev 只能在初始化时或通过治理合约设置
+    /// @param _addr StakingManager 合约地址
+    function setStakingManager(address _addr) external onlyOwner {
+        stakingManager = StakingManager(_addr);
+    }
+
     struct Contribution {
         address contributor;
         uint256 share;        // percentage * 100 (e.g., 7000 = 70%)
@@ -43,6 +52,8 @@ contract Attribution is Ownable {
     mapping(uint256 => uint256) public likeCount;
     mapping(address => int256) public userReputation;
     mapping(address => bool) public hasLiked;  // 防重复点赞
+
+    StakingManager public stakingManager;
     
     // 分成验证
     function validateSplit(uint256 _skillId, uint256[] calldata _shares) 
@@ -91,9 +102,14 @@ contract Attribution is Ownable {
         
         skillTestReports[_skillId].push(report);
         testReportCount[_skillId]++;
-        
+
         // 更新用户声誉（测试者得分）
         userReputation[_reporter] += _score;
+
+        // 如果得分 > 0（发现有效漏洞），通知 StakingManager 设置正面贡献
+        if (_score > 0 && address(stakingManager) != address(0)) {
+            stakingManager.setPositiveContribution(_reporter);
+        }
     }
     
     // 新增：点赞技能（宪法第三条：反噬机制）
