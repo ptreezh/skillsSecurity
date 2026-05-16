@@ -41,6 +41,7 @@ contract StakingManager is Ownable {
     /// 恢复事件
     event RecoveryClaimed(address indexed user, uint256 amount, uint256 remainingLocked);
     event ReputationLocked(address indexed user, uint256 amount);
+    event PositiveContributionSet(address indexed user);
     
     // 事件
     event Staked(address indexed user, uint256 skillId, uint256 amount);
@@ -191,5 +192,14 @@ contract StakingManager is Ownable {
         userReputation[msg.sender] += int256(actualRecovery);
 
         emit RecoveryClaimed(msg.sender, actualRecovery, lock.lockedAmount);
+    }
+
+    /// @notice 设置用户有正面贡献（由贡献合约主动调用）
+    /// @dev 幂等性检查：已设置则 revert
+    /// @param _user 用户地址
+    function setPositiveContribution(address _user) external onlyOwner {
+        require(!hasPositiveContribution[_user], "Already set");
+        hasPositiveContribution[_user] = true;
+        emit PositiveContributionSet(_user);
     }
 }
