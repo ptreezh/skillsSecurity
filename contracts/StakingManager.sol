@@ -75,7 +75,10 @@ contract StakingManager is Ownable {
         require(block.timestamp > info.lockedUntil, "Still locked");
 
         uint256 amount = info.amount;
+        // Reset all fields to clean state
         info.amount = 0;
+        info.lockedUntil = 0;
+        info.slashed = false;
 
         token.transfer(msg.sender, amount);
         emit Unstaked(msg.sender, _skillId, amount);

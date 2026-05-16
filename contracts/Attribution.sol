@@ -11,6 +11,7 @@ contract Attribution is Ownable {
     /// @dev 只能在初始化时或通过治理合约设置
     /// @param _addr StakingManager 合约地址
     function setStakingManager(address _addr) external onlyOwner {
+        require(_addr != address(0), "Invalid address");
         stakingManager = StakingManager(_addr);
     }
 
@@ -50,10 +51,17 @@ contract Attribution is Ownable {
     // 新增：点赞记录 + 反噬
     mapping(uint256 => Like[]) public skillLikes;
     mapping(uint256 => uint256) public likeCount;
-    mapping(address => int256) public userReputation;
     mapping(address => bool) public hasLiked;  // 防重复点赞
 
     StakingManager public stakingManager;
+
+    /// @notice 查询用户声望（从 StakingManager 获取）
+    /// @dev 委托给 StakingManager 获取统一的声誉数据
+    /// @param _user 用户地址
+    /// @return 有效声望（扣除锁定部分）
+    function getUserReputation(address _user) external view returns (int256) {
+        return stakingManager.getUserReputation(_user);
+    }
     
     // 分成验证
     function validateSplit(uint256 _skillId, uint256[] calldata _shares) 
@@ -103,9 +111,6 @@ contract Attribution is Ownable {
         skillTestReports[_skillId].push(report);
         testReportCount[_skillId]++;
 
-        // 更新用户声誉（测试者得分）
-        userReputation[_reporter] += _score;
-
         // 如果得分 > 0（发现有效漏洞），通知 StakingManager 设置正面贡献
         if (_score > 0 && address(stakingManager) != address(0)) {
             stakingManager.setPositiveContribution(_reporter);
@@ -115,26 +120,22 @@ contract Attribution is Ownable {
     // 新增：点赞技能（宪法第三条：反噬机制）
     function likeSkill(uint256 _skillId) external {
         require(!hasLiked[msg.sender], "Already liked");
-        require(userReputation[msg.sender] >= 0, "Need reputation");  // 基本验证
-        
-        // 检查技能是否已被标记有害（反噬机制）
-        // 注意：这里简化了，实际需要查询 SkillRegistry
-        // 如果是，点赞者声誉 -5（反噬）
-        // 为简化，暂不实现完整反噬逻辑（需跨合约调用）
-        
+
+        // 检查用户有效声望（通过 StakingManager）
+        int256 effectiveRep = stakingManager.getUserReputation(msg.sender);
+        require(effectiveRep >= 0, "Need reputation");  // 基本验证
+
         Like memory likeRec = Like({
             user: msg.sender,
             skillId: _skillId,
             timestamp: block.timestamp
         });
-        
+
         skillLikes[_skillId].push(likeRec);
         likeCount[_skillId]++;
         hasLiked[msg.sender] = true;
-        
-        // 简单反噬：如果技能被标记（通过事件）
-        // 实际实现需在 SkillRegistry 中标记后回调
-        userReputation[msg.sender] += 2;  // 正常点赞 +2 声誉
+
+        emit SkillLiked(msg.sender, _skillId);
     }
     
     // 新增：计算收入分成
@@ -155,17 +156,14 @@ contract Attribution is Ownable {
         
         return (receivers, amounts);
     }
-    
-    // 新增：查询用户声誉（宪法第二条：渐进变现）
-    function getUserReputation(address _user) external view returns (int256) {
-        return userReputation[_user];
-    }
-    
+
     // 新增：反噬机制（宪法第三条）
-    function slashLiker(address _liker, int256 _penalty) external onlyOwner {
-        userReputation[_liker] += _penalty;  // 可为正或负
-        emit AntiSlash(_liker, _penalty, "Liked harmful skill");
+    function slashLiker(address _liker, int256 _penalty, string memory _reason) external onlyOwner {
+        if (address(stakingManager) != address(0)) {
+            stakingManager.slashLiker(_liker, _penalty, _reason);
+        }
     }
-    
+
     event AntiSlash(address indexed user, int256 penalty, string reason);
+    event SkillLiked(address indexed user, uint256 skillId);
 }
