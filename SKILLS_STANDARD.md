@@ -1,9 +1,9 @@
-# AgentSkills Skills 标准规范 v1.1
+# AgentSkills Skills 标准规范 v1.2
 
-**版本：** 1.1
+**版本：** 1.2
 **制定日期：** 2026-05-05
-**状态：** 正式版 v1.1
-**更新日期：** 2026-05-05
+**状态：** 正式版 v1.2
+**更新日期：** 2026-05-16
 
 ---
 
@@ -1191,11 +1191,11 @@ function getUserReputation(address _user)
 | 文档描述 | 实际合约 | 差异说明 |
 |----------|----------|----------|
 | slashUser() | 不存在 | 分为 slash() 和 slashLiker() 两个函数 |
-| ReputationLock struct | 不存在 | 当前版本使用简单的 userReputation mapping |
-| getRecoverableReputation() | 不存在 | 当前版本无自动恢复机制 |
-| claimRecoverableReputation() | 不存在 | 当前版本无领取机制 |
-
-**注意：** 当前合约实现采用简化的声望模型，使用 `mapping(address => int256) public userReputation` 直接存储声望值，无冻结或锁定机制。
+| ReputationLock struct | `StakingManager.ReputationLock { lockedAmount, lastClaimTime }` | 追踪每用户锁定状态 |
+| getRecoverableReputation() | `StakingManager.getRecoverableReputation(address _user)` | 返回 (lockedAmount, lastClaimTime) 元组 |
+| claimRecoverableReputation() | `StakingManager.claimRecoverableReputation()` | 5% 每月恢复，需正面贡献，距上次领取 >= 1个月 |
+| setPositiveContribution() | `StakingManager.setPositiveContribution(address _user)` | 仅 owner 可调用，幂等性检查 |
+| RECOVERY_RATE_PER_MONTH | `StakingManager.RECOVERY_RATE_PER_MONTH = 500` | 500 basis points = 5% 每月 |
 
 #### 惩罚执行流程 (SLASH-04)
 
@@ -1359,7 +1359,11 @@ Day 0                Day 1-7             Day 8-10           Day 11
 | 恢复声望 | ✅ (恢复后) | ✅ (恢复后) | ✅ (恢复后) |
 | 锁定部分 | ❌ | ❌ | ❌ |
 
-> **未来实现说明 (SLASH-03):** 本节描述的恢复机制 (`getRecoverableReputation()`、`claimRecoverableReputation()`) 和声望锁定功能为规划中的实现目标。当前合约版本使用简单的 `mapping(address => int256) public userReputation`，无自动恢复机制和锁定状态。详见 [6.2 反噬执行合约](#6-2-反噬执行合约) 的接口兼容性说明。
+> **实现状态 (v1.2):** 恢复机制已在 `StakingManager.sol` 中实现：
+> - `getRecoverableReputation(address _user)` 返回 `(lockedAmount, lastClaimTime)`
+> - `claimRecoverableReputation()` 执行 5% 每月恢复，需有正面贡献（D-03）
+> - `ReputationLock` struct 追踪每用户锁定状态
+> - 跨合约调用：正面归因时 `Attribution.sol` 调用 `setPositiveContribution()`
 
 ### 6.5 技能重建与版本更新 {#6-5-技能重建与版本更新}
 
@@ -1694,6 +1698,7 @@ interface IAttribution {
 | v1.1 | 2026-05-05 | 完善流程图、增加示例 |
 | v1.1 | 2026-05-07 | Phase 2: 扩展指纹机制、审计追踪、IPFS格式、追溯测试、完整状态机、错误码、Gas估算、申诉流程、技能重建与版本更新 |
 | v1.1 | 2026-05-08 | Phase 4: 反噬机制增强（多层证据标准、惩罚恢复流程）、声望系统完善（5级特权、积分规则、代币迁移）、ABI参考附录 |
+| v1.2 | 2026-05-16 | Phase 8-10: 实现声望恢复函数和锁定机制文档更新 |
 
 ### 9.2 ABI参考 {#9-2-abi参考}
 
@@ -1891,4 +1896,4 @@ interface IAttribution {
 - v1.2：整合社区反馈
 - v2.0：正式发布
 
-**文档状态**：正式版 v1.1
+**文档状态**：正式版 v1.2
