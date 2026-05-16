@@ -4,6 +4,7 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "./ASKToken.sol";
+import "./StakingManager.sol";
 
 struct Skill {
     address owner;
@@ -44,9 +45,11 @@ contract SkillRegistry is Ownable {
     uint256 public constant MIN_STAKE_CRITICAL = 200 ether;
     
     ASKToken public immutable token;
-    
-    constructor(address _token) Ownable() {
+    StakingManager public stakingManager;
+
+    constructor(address _token, address _stakingManager) Ownable() {
         token = ASKToken(_token);
+        stakingManager = StakingManager(_stakingManager);
     }
     
     // 计算指纹（宪法第三条：全链条追溯）
@@ -70,7 +73,23 @@ contract SkillRegistry is Ownable {
         
         uint256 stakeAmount = _getStakeAmount(_riskLevel);
         require(token.transferFrom(msg.sender, address(this), stakeAmount), "Stake failed");
-        
+
+        // Check effective reputation (exclude locked) based on risk level
+        int256 effectiveRep = stakingManager.getUserReputation(msg.sender);
+
+        // MEDIUM skill requires 500+ effective reputation
+        if (_riskLevel == RiskLevel.MEDIUM && effectiveRep < 500) {
+            revert("Insufficient effective reputation for MEDIUM skill");
+        }
+        // HIGH skill requires 2000+ effective reputation
+        if (_riskLevel == RiskLevel.HIGH && effectiveRep < 2000) {
+            revert("Insufficient effective reputation for HIGH skill");
+        }
+        // CRITICAL skill requires 5000+ effective reputation
+        if (_riskLevel == RiskLevel.CRITICAL && effectiveRep < 5000) {
+            revert("Insufficient effective reputation for CRITICAL skill");
+        }
+
         uint256 skillId = nextSkillId++;
         Skill storage skill = skills[skillId];
         skill.owner = msg.sender;
@@ -98,10 +117,32 @@ contract SkillRegistry is Ownable {
     
     function verifySkill(uint256 _skillId, bool _pass) external {
         require(_skillId < nextSkillId, "Invalid skill");
-        
+
+        // Check effective reputation of verifier based on skill risk level
+        int256 effectiveRep = stakingManager.getUserReputation(msg.sender);
+
+        Skill storage skill = skills[_skillId];
+        uint256 requiredRep;
+        if (skill.riskLevel == RiskLevel.LOW) {
+            requiredRep = 100;  // L2 contributor level
+        } else if (skill.riskLevel == RiskLevel.MEDIUM) {
+            requiredRep = 500;  // L3 verifier level
+        } else if (skill.riskLevel == RiskLevel.HIGH) {
+            requiredRep = 1000; // L4 guardian level
+        } else {
+            requiredRep = 2000; // L5 elder level for CRITICAL
+        }
+
+        require(effectiveRep >= int256(requiredRep), "Insufficient effective reputation");
+
         verifiedSkills[_skillId] = _pass;
         skills[_skillId].verified = _pass;
-        
+
+        // On successful verification, notify StakingManager for positive contribution
+        if (_pass) {
+            stakingManager.setPositiveContribution(msg.sender);
+        }
+
         emit SkillVerified(msg.sender, _skillId);
     }
     
