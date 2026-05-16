@@ -1,9 +1,10 @@
-# AgentSkills Roadmap
+# Roadmap: AgentSkills
 
 ## Milestones
 
-- ✅ **v1.1 标准文档完善** — Phases 1-7 (shipped 2026-05-15)
-- 🚧 **v1.2 技术债补齐** — Phases 8-10 (in progress)
+- ✅ **v1.1 标准文档完善** - Phases 1-7 (shipped 2026-05-15)
+- ✅ **v1.2 技术债补齐** - Phases 8-10 (shipped 2026-05-16)
+- 🚧 **v1.3 测试与部署** - Phases 11-16 (in progress)
 
 ---
 
@@ -14,87 +15,170 @@
 **Shipped:** 2026-05-15
 **Requirements:** 32/32 complete
 
-**Tech Debt (Resolved in v1.2):**
-- Recovery functions not implemented → v1.2
-- Reputation lock mechanism → v1.2
+---
+
+### ✅ v1.2 技术债补齐 (Phases 8-10)
+
+**Shipped:** 2026-05-16
+**Requirements:** 11/11 complete
+
+**Resolved:**
+- Recovery functions implemented
+- Reputation lock mechanism complete
 
 ---
 
-### 🚧 v1.2 技术债补齐 (Phases 8-10)
+### 🚧 v1.3 测试与部署 (Phases 11-16)
 
-**Started:** 2026-05-15
-**Goal:** 实现声望恢复函数和锁定机制
+**Started:** 2026-05-16
+**Goal:** 建立测试环境、编写合约测试、部署到 Polygon 测试网
 
-**Requirements:**
-- RECOV-01 ~ RECOV-05: 恢复函数
-- LOCK-01 ~ LOCK-04: 锁定机制
-- DOCU-01 ~ DOCU-02: 文档更新
+**Requirements:** 28/28 defined
 
 ---
 
 ## Phases
 
-### Phase 8: 恢复函数实现
-
-**Goal:** 实现 getRecoverableReputation() 和 claimRecoverableReputation()
-
-**Requirements covered:**
-- RECOV-01, RECOV-02, RECOV-03
-
-**Plans:**
-- [x] 08-01-PLAN.md - ReputationLock struct, recovery functions
-
-**Success criteria:**
-1. `getRecoverableReputation()` returns locked amount and next claim time
-2. `claimRecoverableReputation()` transfers recovered reputation to user balance
-3. `ReputationLock` struct tracks per-user lock state
+- [ ] **Phase 11: 测试基础设施** - Hardhat 环境配置、测试框架、fixtures
+- [ ] **Phase 12: ASKToken 单元测试** - 代币功能完整测试
+- [ ] **Phase 13: StakingManager 单元测试** - 质押/惩罚/恢复测试
+- [ ] **Phase 14: SkillRegistry + Attribution 单元测试** - 声望/归因功能测试
+- [ ] **Phase 15: 集成测试** - 跨合约流程端到端验证
+- [ ] **Phase 16: Polygon Amoy 部署** - 配置、部署、验证
 
 ---
 
-### Phase 9: 锁定机制实现
+## Phase Details
 
-**Goal:** 完成声望锁定和恢复逻辑
+### Phase 11: 测试基础设施
 
-**Requirements covered:**
-- RECOV-04, RECOV-05, LOCK-01, LOCK-02, LOCK-03, LOCK-04
+**Goal**: 测试环境就绪，测试框架和 fixtures 可用
 
-**Plans:**
-- [x] 09-01-PLAN.md — Lock mechanism and recovery integration
+**Depends on**: Nothing
 
-**Success criteria:**
-1. Locked reputation excluded from voting power calculation
-2. Locked reputation excluded from feature unlock calculation
-3. 5% monthly recovery rate implemented
-4. Recovery eligibility verified before claim
+**Requirements**: TEST-01, TEST-02, TEST-03
 
----
+**Success Criteria** (what must be TRUE):
+  1. Hardhat chai-matchers, network-helpers, verify 插件安装并正常工作
+  2. Test fixtures 按正确顺序部署: ASKToken → StakingManager → SkillRegistry → Attribution
+  3. Mocha 测试运行器配置覆盖报告功能
+  4. 覆盖率报告可以为所有合约生成
 
-### Phase 10: 文档更新
-
-**Goal:** 更新 SKILLS_STANDARD.md 反映已实现的功能
-
-**Requirements covered:**
-- DOCU-01, DOCU-02
-
-**Plans:**
-1/1 plans complete
-
-**Success criteria:**
-1. Section 6.4 "future implementation" note removed
-2. Section 6.2 compatibility table updated with implemented functions
+**Plans**: TBD
 
 ---
 
-## Phase Progress
+### Phase 12: ASKToken 单元测试
 
-| Phase | Focus | Requirements | Status |
-|-------|-------|-------------|--------|
-| 1-7 | v1.1 标准文档完善 | 32 | ✅ Complete |
-| 8 | 恢复函数实现 | 3 | ✅ Complete |
-| 9 | 锁定机制实现 | 6 | ✅ Complete |
-| 10 | 1/1 | Complete    | 2026-05-16 |
+**Goal**: ASKToken 代币合约功能完整覆盖
+
+**Depends on**: Phase 11
+
+**Requirements**: ASKT-01, ASKT-02, ASKT-03, ASKT-04
+
+**Success Criteria** (what must be TRUE):
+  1. Only owner/minter can mint tokens (access control verified)
+  2. Burning tokens correctly reduces user balance
+  3. Delegation updates vote weight tracking
+  4. Mint, Burn, Delegate events emit with correct parameters
+
+**Plans**: TBD
 
 ---
 
-*Roadmap created: 2026-05-06*
-*Last updated: 2026-05-16 after phase 10 planned*
+### Phase 13: StakingManager 单元测试
+
+**Goal**: StakingManager 质押合约功能完整覆盖
+
+**Depends on**: Phase 12
+
+**Requirements**: STAK-01, STAK-02, STAK-03, STAK-04, STAK-05
+
+**Success Criteria** (what must be TRUE):
+  1. Stake locks tokens for configured period
+  2. Unstake releases tokens after lock expires
+  3. Slash mechanism validates evidence before penalizing
+  4. Reputation lock excludes locked amount from voting power
+  5. Time-based unlock (90-day period) works with evm_increaseTime + evm_mine
+
+**Plans**: TBD
+**UI hint**: yes
+
+---
+
+### Phase 14: SkillRegistry + Attribution 单元测试
+
+**Goal**: SkillRegistry 和 Attribution 合约功能完整覆盖
+
+**Depends on**: Phase 13
+
+**Requirements**: SKIL-01, SKIL-02, SKIL-03, SKIL-04, ATTR-01, ATTR-02, ATTR-03, ATTR-04
+
+**Success Criteria** (what must be TRUE):
+  1. Reputation tier gates (L1-L5) enforce correctly based on thresholds
+  2. Fingerprint generation produces consistent hashes for verification
+  3. Skill verification request → approval flow completes end-to-end
+  4. Attribution creation tracks contributor and contribution value
+  5. Like mechanism prevents double-liking same contribution
+  6. Cross-contract notification triggers StakingManager correctly
+  7. setPositiveContribution() marks contribution and triggers recovery
+
+**Plans**: TBD
+
+---
+
+### Phase 15: 集成测试
+
+**Goal**: 跨合约流程端到端验证完成
+
+**Depends on**: Phase 14
+
+**Requirements**: INTG-01, INTG-02, INTG-03, INTG-04
+
+**Success Criteria** (what must be TRUE):
+  1. Full deployment with correct dependency wiring verifies all contracts
+  2. Reputation flow: register → verify → positive contribution → recovery works end-to-end
+  3. Anti-slash flow: like → slash → lock → recover completes successfully
+  4. Cross-contract state synchronization maintains consistency
+
+**Plans**: TBD
+
+---
+
+### Phase 16: Polygon Amoy 部署
+
+**Goal**: 合约部署到 Polygon Amoy 测试网并验证
+
+**Depends on**: Phase 15
+
+**Requirements**: DEPL-01, DEPL-02, DEPL-03, DEPL-04
+
+**Success Criteria** (what must be TRUE):
+  1. hardhat.config.js configured for Polygon Amoy (chainId 80002, Mumbai removed)
+  2. deploy-all.js script deploys all contracts with correct order and wiring
+  3. Contracts deployed and accessible on Polygon Amoy testnet
+  4. Contracts verified on Polygonscan using hardhat-verify
+
+**Plans**: TBD
+
+---
+
+## Progress
+
+| Phase | Milestone | Plans Complete | Status | Completed |
+|-------|-----------|----------------|--------|-----------|
+| 1-7 | v1.1 | 100% | Complete | 2026-05-15 |
+| 8 | v1.2 | 100% | Complete | 2026-05-16 |
+| 9 | v1.2 | 100% | Complete | 2026-05-16 |
+| 10 | v1.2 | 100% | Complete | 2026-05-16 |
+| 11 | v1.3 | 0/TBD | Not started | - |
+| 12 | v1.3 | 0/TBD | Not started | - |
+| 13 | v1.3 | 0/TBD | Not started | - |
+| 14 | v1.3 | 0/TBD | Not started | - |
+| 15 | v1.3 | 0/TBD | Not started | - |
+| 16 | v1.3 | 0/TBD | Not started | - |
+
+---
+
+*Roadmap created: 2026-05-16*
+*Last updated: 2026-05-16 for v1.3*

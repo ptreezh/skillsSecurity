@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: 测试与部署
-status: defining_requirements
-last_updated: "2026-05-16T13:35:00.000Z"
-last_activity: 2026-05-16
+status: roadmap_created
+last_updated: "2026-05-16T14:00:00.000Z"
+last_activity: 2026-05-16 — Roadmap created for v1.3
 progress:
-  total_phases: 0
-  completed_phases: 0
+  total_phases: 16
+  completed_phases: 10
   total_plans: 0
   completed_plans: 0
   percent: 0
@@ -20,15 +20,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-16)
 
 **Core value:** Skills with accountability — every action is traceable, every contributor is credited, every violation has consequences.
-**Current focus:** Defining requirements for v1.3
+**Current focus:** Phase 11 - Test Infrastructure (v1.3)
 
 ## Current Position
 
 Milestone: v1.3 (测试与部署)
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-05-16 — Milestone v1.3 started
+Phase: 11 of 16 (Test Infrastructure)
+Plan: TBD
+Status: Ready to plan
+Last activity: 2026-05-16 — Roadmap created for v1.3
+
+Progress: [░░░░░░░░░░] 0% (v1.3)
 
 ## Accumulated Context
 
@@ -40,13 +42,23 @@ Last activity: 2026-05-16 — Milestone v1.3 started
 - Reputation lock mechanism implemented
 - Effective reputation checks in SkillRegistry
 
-### v1.3 Goals
+### v1.3 Phase Structure
 
-- Hardhat test environment setup
-- Contract unit tests
-- Cross-contract integration tests
-- Polygon Amoy testnet deployment
+| Phase | Name | Requirements |
+|-------|------|--------------|
+| 11 | Test Infrastructure | TEST-01, TEST-02, TEST-03 |
+| 12 | ASKToken Tests | ASKT-01, ASKT-02, ASKT-03, ASKT-04 |
+| 13 | StakingManager Tests | STAK-01 ~ STAK-05 |
+| 14 | SkillRegistry + Attribution Tests | SKIL-01 ~ SKIL-04, ATTR-01 ~ ATTR-04 |
+| 15 | Integration Tests | INTG-01 ~ INTG-04 |
+| 16 | Polygon Amoy Deployment | DEPL-01 ~ DEPL-04 |
+
+### Key Technical Decisions
+
+- Deployment order: ASKToken → StakingManager → SkillRegistry → Attribution
+- Polygon Amoy chainId: 80002 (Mumbai deprecated)
+- Time manipulation: evm_increaseTime + evm_mine for unlock testing
 
 ---
 
-*Last updated: 2026-05-16 after v1.3 started*
+*Last updated: 2026-05-16 after v1.3 roadmap created*
