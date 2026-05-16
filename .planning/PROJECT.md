@@ -25,7 +25,6 @@ Skills with accountability — every action is traceable, every contributor is c
 - ✓ Implement reputation recovery functions in StakingManager.sol — Phase 8
 ### Active (v1.2)
 
-- [ ] Add automatic reputation lock mechanism
 - [ ] Update SKILLS_STANDARD.md to reflect implemented features
 
 ### Out of Scope
@@ -89,4 +88,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-15 after v1.2 milestone started*
+*Last updated: 2026-05-16 after phase 09 complete*
