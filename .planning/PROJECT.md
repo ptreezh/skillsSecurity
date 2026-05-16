@@ -23,9 +23,8 @@ Skills with accountability — every action is traceable, every contributor is c
 ### Validated (v1.2)
 
 - ✓ Implement reputation recovery functions in StakingManager.sol — Phase 8
-### Active (v1.2)
-
-- [ ] Update SKILLS_STANDARD.md to reflect implemented features
+- ✓ Implement reputation lock mechanism and effective reputation checks — Phases 9
+- ✓ Update SKILLS_STANDARD.md to v1.2 — Phase 10
 
 ### Out of Scope
 
@@ -65,15 +64,16 @@ Skills with accountability — every action is traceable, every contributor is c
 
 ---
 
-## Current Milestone: v1.2 技术债补齐
+## Current Milestone: v1.3 测试与部署
 
-**Goal:** 实现声望恢复函数和锁定机制，匹配 SKILLS_STANDARD.md v1.1 规范
+**Goal:** 建立测试环境、编写合约测试、部署到 Polygon 测试网
 
 **Target features:**
-- 实现 `getRecoverableReputation()` 函数
-- 实现 `claimRecoverableReputation()` 函数
-- 添加 ReputationLock struct 和锁定机制
-- 更新文档以反映已实现的合约功能
+- 创建 hardhat.config.js 和测试环境
+- 编写合约单元测试（ASKToken、SkillRegistry、Attribution、StakingManager）
+- 编写跨合约集成测试
+- 部署到 Polygon Amoy 测试网
+- 验证合约交互和功能
 
 ---
 
@@ -88,4 +88,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-16 after phase 09 complete*
+*Last updated: 2026-05-16 after v1.2 complete*

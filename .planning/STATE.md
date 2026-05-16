@@ -1,49 +1,52 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.2
-milestone_name: 技术债补齐
-status: executing
-last_updated: "2026-05-16T11:32:36.424Z"
+milestone: v1.3
+milestone_name: 测试与部署
+status: defining_requirements
+last_updated: "2026-05-16T13:35:00.000Z"
 last_activity: 2026-05-16
 progress:
-  total_phases: 3
-  completed_phases: 3
-  total_plans: 3
-  completed_plans: 3
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # AgentSkills - Current State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-15)
+See: .planning/PROJECT.md (updated 2026-05-16)
 
 **Core value:** Skills with accountability — every action is traceable, every contributor is credited, every violation has consequences.
-**Current focus:** Phase 10 — documentation-update
+**Current focus:** Defining requirements for v1.3
 
 ## Current Position
 
-Milestone: v1.2 (技术债补齐)
-Phase: 10
-Plan: Not started
-Status: Executing Phase 10
-Last activity: 2026-05-16
+Milestone: v1.3 (测试与部署)
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-16 — Milestone v1.3 started
 
 ## Accumulated Context
 
-### Completed Work
+### Completed Work (v1.1 + v1.2)
 
-- v1.1: SKILLS_STANDARD.md v1.1 complete with 32 requirements
+- SKILLS_STANDARD.md v1.2 complete with 32+ requirements
 - Smart contracts: ASKToken, SkillRegistry, Attribution, StakingManager
-- Full specification: classification, verification, tracing, anti-slash, reputation
+- Reputation recovery functions implemented
+- Reputation lock mechanism implemented
+- Effective reputation checks in SkillRegistry
 
-### Open Items (v1.2)
+### v1.3 Goals
 
-- Reputation recovery functions not implemented (getRecoverableReputation, claimRecoverableReputation)
-- Reputation lock mechanism not implemented
-- SKILLS_STANDARD.md notes these as future implementation
+- Hardhat test environment setup
+- Contract unit tests
+- Cross-contract integration tests
+- Polygon Amoy testnet deployment
 
 ---
 
-*Last updated: 2026-05-15 after v1.2 milestone started*
+*Last updated: 2026-05-16 after v1.3 started*
