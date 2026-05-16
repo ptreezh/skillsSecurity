@@ -59,7 +59,7 @@
 - RECOV-04, RECOV-05, LOCK-01, LOCK-02, LOCK-03, LOCK-04
 
 **Plans:**
-- [ ] 09-01-PLAN.md — Lock mechanism and recovery integration
+- [x] 09-01-PLAN.md — Lock mechanism and recovery integration
 
 **Success criteria:**
 1. Locked reputation excluded from voting power calculation
