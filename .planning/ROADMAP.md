@@ -77,7 +77,7 @@
 - DOCU-01, DOCU-02
 
 **Plans:**
-- [ ] 10-01-PLAN.md — Documentation updates
+1/1 plans complete
 
 **Success criteria:**
 1. Section 6.4 "future implementation" note removed
@@ -90,11 +90,11 @@
 | Phase | Focus | Requirements | Status |
 |-------|-------|-------------|--------|
 | 1-7 | v1.1 标准文档完善 | 32 | ✅ Complete |
-| 8 | 恢复函数实现 | 3 | 📋 Planned |
-| 9 | 锁定机制实现 | 6 | 📋 Planned |
-| 10 | 文档更新 | 2 | 📋 Planned |
+| 8 | 恢复函数实现 | 3 | ✅ Complete |
+| 9 | 锁定机制实现 | 6 | ✅ Complete |
+| 10 | 1/1 | Complete    | 2026-05-16 |
 
 ---
 
 *Roadmap created: 2026-05-06*
-*Last updated: 2026-05-15 after v1.2 started*
+*Last updated: 2026-05-16 after phase 10 planned*
