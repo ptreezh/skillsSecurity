@@ -2,22 +2,22 @@
 
 ## Milestones
 
-- ✅ **v1.1 标准文档完善** - Phases 1-7 (shipped 2026-05-15)
-- ✅ **v1.2 技术债补齐** - Phases 8-10 (shipped 2026-05-16)
-- 🚧 **v1.3 测试与部署** - Phases 11-16 (in progress)
+- [x] **v1.1 标准文档完善** - Phases 1-7 (shipped 2026-05-15)
+- [x] **v1.2 技术债补齐** - Phases 8-10 (shipped 2026-05-16)
+- [ ] **v1.3 测试与部署** - Phases 11-16 (in progress)
 
 ---
 
 ## Milestones Summary
 
-### ✅ v1.1 标准文档完善 (Phases 1-7)
+### v1.1 标准文档完善 (Phases 1-7)
 
 **Shipped:** 2026-05-15
 **Requirements:** 32/32 complete
 
 ---
 
-### ✅ v1.2 技术债补齐 (Phases 8-10)
+### v1.2 技术债补齐 (Phases 8-10)
 
 **Shipped:** 2026-05-16
 **Requirements:** 11/11 complete
@@ -28,7 +28,7 @@
 
 ---
 
-### 🚧 v1.3 测试与部署 (Phases 11-16)
+### v1.3 测试与部署 (Phases 11-16)
 
 **Started:** 2026-05-16
 **Goal:** 建立测试环境、编写合约测试、部署到 Polygon 测试网
@@ -39,7 +39,7 @@
 
 ## Phases
 
-- [ ] **Phase 11: 测试基础设施** - Hardhat 环境配置、测试框架、fixtures
+- [x] **Phase 11: 测试基础设施** - Hardhat 环境配置、测试框架、fixtures (completed 2026-05-17)
 - [ ] **Phase 12: ASKToken 单元测试** - 代币功能完整测试
 - [ ] **Phase 13: StakingManager 单元测试** - 质押/惩罚/恢复测试
 - [ ] **Phase 14: SkillRegistry + Attribution 单元测试** - 声望/归因功能测试
@@ -60,15 +60,15 @@
 
 **Success Criteria** (what must be TRUE):
   1. Hardhat chai-matchers, network-helpers, verify 插件安装并正常工作
-  2. Test fixtures 按正确顺序部署: ASKToken → StakingManager → SkillRegistry → Attribution
+  2. Test fixtures 按正确顺序部署: ASKToken -> StakingManager -> SkillRegistry -> Attribution
   3. Mocha 测试运行器配置覆盖报告功能
   4. 覆盖率报告可以为所有合约生成
 
 **Plans**: 2 plans in 2 waves
 
 Plan list:
-- [ ] 11-01-PLAN.md — Install plugins and update network config
-- [ ] 11-02-PLAN.md — Create test fixtures with deployment order
+- [x] 11-01-PLAN.md - Install plugins and update network config
+- [x] 11-02-PLAN.md - Create test fixtures with deployment order
 
 ---
 
@@ -86,11 +86,10 @@ Plan list:
   3. Delegation updates vote weight tracking
   4. Mint, Burn, Delegate events emit with correct parameters
 
-**Plans**: 2 plans in 2 waves
+**Plans**: 1 plan in 1 wave
 
 Plan list:
-- [ ] 11-01-PLAN.md — Install plugins and update network config
-- [ ] 11-02-PLAN.md — Create test fixtures with deployment order
+- [ ] 12-01-PLAN.md - ASKToken unit tests (Mint, Burn, Delegate, Events)
 
 ---
 
@@ -112,8 +111,8 @@ Plan list:
 **Plans**: 2 plans in 2 waves
 
 Plan list:
-- [ ] 11-01-PLAN.md — Install plugins and update network config
-- [ ] 11-02-PLAN.md — Create test fixtures with deployment order
+- [ ] 13-01-PLAN.md - Install plugins and update network config
+- [ ] 13-02-PLAN.md - Create test fixtures with deployment order
 **UI hint**: yes
 
 ---
@@ -129,7 +128,7 @@ Plan list:
 **Success Criteria** (what must be TRUE):
   1. Reputation tier gates (L1-L5) enforce correctly based on thresholds
   2. Fingerprint generation produces consistent hashes for verification
-  3. Skill verification request → approval flow completes end-to-end
+  3. Skill verification request -> approval flow completes end-to-end
   4. Attribution creation tracks contributor and contribution value
   5. Like mechanism prevents double-liking same contribution
   6. Cross-contract notification triggers StakingManager correctly
@@ -138,8 +137,8 @@ Plan list:
 **Plans**: 2 plans in 2 waves
 
 Plan list:
-- [ ] 11-01-PLAN.md — Install plugins and update network config
-- [ ] 11-02-PLAN.md — Create test fixtures with deployment order
+- [ ] 14-01-PLAN.md - Install plugins and update network config
+- [ ] 14-02-PLAN.md - Create test fixtures with deployment order
 
 ---
 
@@ -153,15 +152,15 @@ Plan list:
 
 **Success Criteria** (what must be TRUE):
   1. Full deployment with correct dependency wiring verifies all contracts
-  2. Reputation flow: register → verify → positive contribution → recovery works end-to-end
-  3. Anti-slash flow: like → slash → lock → recover completes successfully
+  2. Reputation flow: register -> verify -> positive contribution -> recovery works end-to-end
+  3. Anti-slash flow: like -> slash -> lock -> recover completes successfully
   4. Cross-contract state synchronization maintains consistency
 
 **Plans**: 2 plans in 2 waves
 
 Plan list:
-- [ ] 11-01-PLAN.md — Install plugins and update network config
-- [ ] 11-02-PLAN.md — Create test fixtures with deployment order
+- [ ] 15-01-PLAN.md - Install plugins and update network config
+- [ ] 15-02-PLAN.md - Create test fixtures with deployment order
 
 ---
 
@@ -182,8 +181,8 @@ Plan list:
 **Plans**: 2 plans in 2 waves
 
 Plan list:
-- [ ] 11-01-PLAN.md — Install plugins and update network config
-- [ ] 11-02-PLAN.md — Create test fixtures with deployment order
+- [ ] 16-01-PLAN.md - Install plugins and update network config
+- [ ] 16-02-PLAN.md - Create test fixtures with deployment order
 
 ---
 
@@ -195,8 +194,8 @@ Plan list:
 | 8 | v1.2 | 100% | Complete | 2026-05-16 |
 | 9 | v1.2 | 100% | Complete | 2026-05-16 |
 | 10 | v1.2 | 100% | Complete | 2026-05-16 |
-| 11 | v1.3 | 0/TBD | Not started | - |
-| 12 | v1.3 | 0/TBD | Not started | - |
+| 11 | v1.3 | 2/2 | Complete    | 2026-05-17 |
+| 12 | v1.3 | 0/1 | Not started | - |
 | 13 | v1.3 | 0/TBD | Not started | - |
 | 14 | v1.3 | 0/TBD | Not started | - |
 | 15 | v1.3 | 0/TBD | Not started | - |
@@ -205,4 +204,4 @@ Plan list:
 ---
 
 *Roadmap created: 2026-05-16*
-*Last updated: 2026-05-16 for v1.3*
+*Last updated: 2026-05-17 for v1.3 Phase 12 planning*
