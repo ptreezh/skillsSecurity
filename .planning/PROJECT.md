@@ -26,6 +26,10 @@ Skills with accountability — every action is traceable, every contributor is c
 - ✓ Implement reputation lock mechanism and effective reputation checks — Phases 9
 - ✓ Update SKILLS_STANDARD.md to v1.2 — Phase 10
 
+### Validated (v1.3)
+
+- ✓ Integration tests for deployment wiring and cross-contract interactions — Phase 15
+
 ### Out of Scope
 
 - Token issuance (delayed per roadmap decision)
@@ -34,11 +38,11 @@ Skills with accountability — every action is traceable, every contributor is c
 
 ## Context
 
-**Current state:** v1.1 milestone complete (2026-05-15)
-- SKILLS_STANDARD.md v1.1 finalized with 32 requirements addressed
+**Current state:** v1.3 milestone in progress (2026-05-17)
+- SKILLS_STANDARD.md v1.1-1.2 finalized with 32+ requirements addressed
 - Smart contracts: ASKToken, SkillRegistry, Attribution, StakingManager
-- Full specification documented: classification, verification, tracing, anti-slash, reputation
-- Testnet deployment pending
+- Full test suite: 20 integration tests covering deployment, reputation flow, anti-slash, and cross-contract sync
+- Testnet deployment pending (Polygon Amoy)
 
 **Technical environment:**
 - Solidity smart contracts (Hardhat framework)
@@ -88,4 +92,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-16 after v1.2 complete*
+*Last updated: 2026-05-17 after phase 15 complete*
