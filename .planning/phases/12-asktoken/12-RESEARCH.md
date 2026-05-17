@@ -247,18 +247,15 @@ describe("Events", function() {
 | Test isolation | Manual beforeEach cleanup | loadFixture from fixtures.cjs | Snapshot isolation, auto-cleanup |
 | Balance comparisons | String comparison | ethers.parseEther / expect().to.equal() | Handles BigInt precision |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **OpenZeppelin Ownable Error Format**
-   - What we know: Ownable has an `OwnableUnauthorizedAccount` custom error (v5.x) and "Ownable: caller is not the owner" string (v4.x)
-   - What's unclear: Which version OpenZeppelin 4.9.6 uses
-   - Recommendation: Write both patterns in test, let it fail to reveal correct format
-   - **Mitigation:** Code now uses `to.be.revertedWithCustomError(token, "OwnableUnauthorizedAccount")` with fallback comment
+1. **OpenZeppelin Ownable Error Format** (RESOLVED)
+   - Decision: Write both `OwnableUnauthorizedAccount` custom error AND `"Ownable: caller is not the owner"` string fallback
+   - Code example in plan uses `revertedWithCustomError` with fallback comment
 
-2. **Mint Max Supply Revert**
-   - What we know: Contract has `require(totalSupply() + amount <= MAX_SUPPLY, "Max supply exceeded")`
-   - What's unclear: Exact error message string
-   - Recommendation: Test this explicitly to verify the revert message
+2. **Mint Max Supply Revert** (RESOLVED)
+   - Decision: Test explicitly with `to.be.revertedWith("Max supply exceeded")`
+   - Plan includes dedicated test case for this
 
 ## Environment Availability
 
