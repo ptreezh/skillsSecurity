@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: 标准文档完善
 status: executing
-last_updated: "2026-05-17T02:47:24.823Z"
+last_updated: "2026-05-17T04:08:58.932Z"
 last_activity: 2026-05-17
 progress:
-  total_phases: 2
-  completed_phases: 2
-  total_plans: 3
-  completed_plans: 3
+  total_phases: 3
+  completed_phases: 3
+  total_plans: 5
+  completed_plans: 5
   percent: 100
 ---
 
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-16)
 
 **Core value:** Skills with accountability — every action is traceable, every contributor is credited, every violation has consequences.
-**Current focus:** Phase 12 — ASKToken 单元测试
+**Current focus:** Phase 13 — StakingManager 单元测试
 
 ## Current Position
 
 Milestone: v1.3 (测试与部署)
-Phase: 12
+Phase: 13
 Plan: Not started
-Status: Executing Phase 12
+Status: Executing Phase 13
 Last activity: 2026-05-17
 
 Progress: [░░░░░░░░░░] 0% (v1.3)
