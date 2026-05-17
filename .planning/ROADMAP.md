@@ -64,7 +64,11 @@
   3. Mocha 测试运行器配置覆盖报告功能
   4. 覆盖率报告可以为所有合约生成
 
-**Plans**: TBD
+**Plans**: 2 plans in 2 waves
+
+Plan list:
+- [ ] 11-01-PLAN.md — Install plugins and update network config
+- [ ] 11-02-PLAN.md — Create test fixtures with deployment order
 
 ---
 
@@ -82,7 +86,11 @@
   3. Delegation updates vote weight tracking
   4. Mint, Burn, Delegate events emit with correct parameters
 
-**Plans**: TBD
+**Plans**: 2 plans in 2 waves
+
+Plan list:
+- [ ] 11-01-PLAN.md — Install plugins and update network config
+- [ ] 11-02-PLAN.md — Create test fixtures with deployment order
 
 ---
 
@@ -101,7 +109,11 @@
   4. Reputation lock excludes locked amount from voting power
   5. Time-based unlock (90-day period) works with evm_increaseTime + evm_mine
 
-**Plans**: TBD
+**Plans**: 2 plans in 2 waves
+
+Plan list:
+- [ ] 11-01-PLAN.md — Install plugins and update network config
+- [ ] 11-02-PLAN.md — Create test fixtures with deployment order
 **UI hint**: yes
 
 ---
@@ -123,7 +135,11 @@
   6. Cross-contract notification triggers StakingManager correctly
   7. setPositiveContribution() marks contribution and triggers recovery
 
-**Plans**: TBD
+**Plans**: 2 plans in 2 waves
+
+Plan list:
+- [ ] 11-01-PLAN.md — Install plugins and update network config
+- [ ] 11-02-PLAN.md — Create test fixtures with deployment order
 
 ---
 
@@ -141,7 +157,11 @@
   3. Anti-slash flow: like → slash → lock → recover completes successfully
   4. Cross-contract state synchronization maintains consistency
 
-**Plans**: TBD
+**Plans**: 2 plans in 2 waves
+
+Plan list:
+- [ ] 11-01-PLAN.md — Install plugins and update network config
+- [ ] 11-02-PLAN.md — Create test fixtures with deployment order
 
 ---
 
@@ -159,7 +179,11 @@
   3. Contracts deployed and accessible on Polygon Amoy testnet
   4. Contracts verified on Polygonscan using hardhat-verify
 
-**Plans**: TBD
+**Plans**: 2 plans in 2 waves
+
+Plan list:
+- [ ] 11-01-PLAN.md — Install plugins and update network config
+- [ ] 11-02-PLAN.md — Create test fixtures with deployment order
 
 ---
 
