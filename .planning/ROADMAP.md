@@ -111,9 +111,8 @@ Plan list:
 **Plans**: 2 plans in 2 waves
 
 Plan list:
-- [ ] 13-01-PLAN.md - Install plugins and update network config
-- [ ] 13-02-PLAN.md - Create test fixtures with deployment order
-**UI hint**: yes
+- [ ] 13-01-PLAN.md - StakingManager stake/unstake tests (STAK-01, STAK-05)
+- [ ] 13-02-PLAN.md - Slash/reputation lock/recovery tests (STAK-02, STAK-03, STAK-04)
 
 ---
 
