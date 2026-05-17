@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: 标准文档完善
+milestone: v1.3
+milestone_name: 测试与部署
 status: executing
-last_updated: "2026-05-17T05:52:13Z"
-last_activity: 2026-05-17 -- Phase 15 plan 01 complete (INTG-01, INTG-02)
+last_updated: "2026-05-17T05:57:00Z"
+last_activity: 2026-05-17 -- Phase 15 plan 02 complete (INTG-03, INTG-04)
 progress:
   total_phases: 5
   completed_phases: 4
-  total_plans: 9
-  completed_plans: 8
-  percent: 78
+  total_plans: 10
+  completed_plans: 10
+  percent: 100
 ---
 
 # AgentSkills - Current State
@@ -20,17 +20,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-16)
 
 **Core value:** Skills with accountability — every action is traceable, every contributor is credited, every violation has consequences.
-**Current focus:** Phase 14 — skill-attribution-tests
+**Current focus:** Phase 15 - Integration Tests COMPLETE
 
 ## Current Position
 
 Milestone: v1.3 (测试与部署)
-Phase: 14 (skill-attribution-tests) — EXECUTING
-Plan: 1 of 2
-Status: Ready to execute
-Last activity: 2026-05-17 -- Phase 15 planning complete
+Phase: 15 (integration-tests) — COMPLETE
+Plan: 2 of 2
+Status: Ready to proceed to Phase 16
 
-Progress: [░░░░░░░░░░] 0% (v1.3)
+Progress: [████████████████████] 100% (v1.3)
 
 ## Accumulated Context
 
@@ -58,7 +57,8 @@ Progress: [░░░░░░░░░░] 0% (v1.3)
 - Deployment order: ASKToken → StakingManager → SkillRegistry → Attribution
 - Polygon Amoy chainId: 80002 (Mumbai deprecated)
 - Time manipulation: evm_increaseTime + evm_mine for unlock testing
+- Integration tests cover cross-contract flows (20 tests total)
 
 ---
 
-*Last updated: 2026-05-16 after v1.3 roadmap created*
+*Last updated: 2026-05-17 after Phase 15 completion*
