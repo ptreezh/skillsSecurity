@@ -40,7 +40,7 @@
 ## Phases
 
 - [x] **Phase 11: 测试基础设施** - Hardhat 环境配置、测试框架、fixtures (completed 2026-05-17)
-- [ ] **Phase 12: ASKToken 单元测试** - 代币功能完整测试
+- [x] **Phase 12: ASKToken 单元测试** - 代币功能完整测试 (completed 2026-05-17)
 - [ ] **Phase 13: StakingManager 单元测试** - 质押/惩罚/恢复测试
 - [ ] **Phase 14: SkillRegistry + Attribution 单元测试** - 声望/归因功能测试
 - [ ] **Phase 15: 集成测试** - 跨合约流程端到端验证
@@ -89,7 +89,7 @@ Plan list:
 **Plans**: 1 plan in 1 wave
 
 Plan list:
-- [ ] 12-01-PLAN.md - ASKToken unit tests (Mint, Burn, Delegate, Events)
+- [x] 12-01-PLAN.md - ASKToken unit tests (Mint, Burn, Delegate, Events)
 
 ---
 
@@ -195,7 +195,7 @@ Plan list:
 | 9 | v1.2 | 100% | Complete | 2026-05-16 |
 | 10 | v1.2 | 100% | Complete | 2026-05-16 |
 | 11 | v1.3 | 2/2 | Complete    | 2026-05-17 |
-| 12 | v1.3 | 0/1 | Not started | - |
+| 12 | v1.3 | 1/1 | Complete    | 2026-05-17 |
 | 13 | v1.3 | 0/TBD | Not started | - |
 | 14 | v1.3 | 0/TBD | Not started | - |
 | 15 | v1.3 | 0/TBD | Not started | - |

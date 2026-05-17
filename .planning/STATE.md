@@ -1,15 +1,15 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.3
-milestone_name: 测试与部署
+milestone: v1.1
+milestone_name: 标准文档完善
 status: executing
-last_updated: "2026-05-17T01:57:56.448Z"
+last_updated: "2026-05-17T02:47:24.823Z"
 last_activity: 2026-05-17
 progress:
-  total_phases: 6
-  completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
+  total_phases: 2
+  completed_phases: 2
+  total_plans: 3
+  completed_plans: 3
   percent: 100
 ---
 
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-16)
 
 **Core value:** Skills with accountability — every action is traceable, every contributor is credited, every violation has consequences.
-**Current focus:** Phase 11 — test-infrastructure
+**Current focus:** Phase 12 — ASKToken 单元测试
 
 ## Current Position
 
 Milestone: v1.3 (测试与部署)
 Phase: 12
 Plan: Not started
-Status: Executing Phase 11
+Status: Executing Phase 12
 Last activity: 2026-05-17
 
 Progress: [░░░░░░░░░░] 0% (v1.3)
