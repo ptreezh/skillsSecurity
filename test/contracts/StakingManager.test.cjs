@@ -245,4 +245,218 @@ describe("StakingManager", function() {
         .to.emit(staking, "Unstaked");
     });
   });
+
+  describe("Slash", function() {
+    it("should slash tokens and reward reporter 25%", async function() {
+      const { token, staking, owner, user1 } = await deploy();
+      const skillId = 1;
+      const stakeAmount = ethers.parseEther("100");
+      const slashAmount = ethers.parseEther("40");
+
+      // Setup: user1 stakes
+      await staking.connect(user1).stake(skillId, stakeAmount);
+
+      // Fund StakingManager for slash rewards (25% of slashAmount)
+      await token.transfer(staking.target, ethers.parseEther("100"));
+
+      const ownerInitialBalance = await token.balanceOf(owner.address);
+
+      // Slash 40 tokens, reporter gets 10 (25%)
+      await expect(staking.slash(user1.address, skillId, slashAmount))
+        .to.emit(staking, "Slash")
+        .withArgs(user1.address, skillId, slashAmount);
+
+      // Verify reporter reward
+      const expectedReward = slashAmount * 25n / 100n;
+      expect(await token.balanceOf(owner.address))
+        .to.equal(ownerInitialBalance + expectedReward);
+
+      // Verify stake amount reduced
+      const stakeInfo = await staking.stakes(user1.address, skillId);
+      expect(stakeInfo.amount).to.equal(stakeAmount - slashAmount);
+    });
+
+    it("should revert when insufficient stake", async function() {
+      const { staking, owner, user1 } = await deploy();
+      // User has no stake
+      await expect(
+        staking.slash(user1.address, 1, ethers.parseEther("100"))
+      ).to.be.revertedWith("Insufficient stake");
+    });
+
+    it("should revert when non-owner tries to slash", async function() {
+      const { staking, user1, user2 } = await deploy();
+      await staking.connect(user1).stake(1, ethers.parseEther("100"));
+      // user2 is not owner
+      await expect(
+        staking.connect(user2).slash(user1.address, 1, ethers.parseEther("50"))
+      ).to.be.revertedWith("Ownable: caller is not the owner");
+    });
+  });
+
+  describe("Reputation Lock", function() {
+    it("should lock reputation on slashLiker", async function() {
+      const { staking, owner, user1 } = await deploy();
+      const penalty = -10;
+
+      await expect(staking.slashLiker(user1.address, penalty, "Liked harmful skill"))
+        .to.emit(staking, "ReputationLocked")
+        .withArgs(user1.address, 10);
+
+      const lockInfo = await staking.reputationLocks(user1.address);
+      expect(lockInfo.lockedAmount).to.equal(10);
+      expect(lockInfo.lastClaimTime).to.be.gt(0);
+    });
+
+    it("should return effective reputation (total - locked)", async function() {
+      const { staking, owner, user1 } = await deploy();
+      // First, give user some positive reputation via slashLiker with positive value
+      // Actually, we can't set positive reputation directly - let's test with negative from start
+      // Start: userReputation = 0, lockedAmount = 0
+      // After slashLiker with -5: userReputation = -5, lockedAmount = 5
+      // effective = 0 - 5 = -5, capped to 0
+      await staking.slashLiker(user1.address, -5, "Test");
+
+      const effective = await staking.getUserReputation(user1.address);
+      expect(effective).to.equal(0);
+    });
+
+    it("should revert when non-owner tries to slashLiker", async function() {
+      const { staking, user1, user2 } = await deploy();
+      await expect(
+        staking.connect(user2).slashLiker(user1.address, -10, "Test")
+      ).to.be.revertedWith("Ownable: caller is not the owner");
+    });
+  });
+
+  describe("Recovery", function() {
+    it("should calculate 5% monthly recovery based on originalSlashAmount", async function() {
+      const { staking, token, owner, user1 } = await deploy();
+      const penalty = -100; // 100 locked
+
+      // Slash and lock reputation
+      await staking.slashLiker(user1.address, penalty, "Test slash");
+
+      // Set positive contribution and advance 1 month
+      await staking.setPositiveContribution(user1.address);
+      await time.increase(30 * 24 * 60 * 60);
+      await mine();
+
+      // Claim recovery: 100 * 5% = 5 (from user1's perspective)
+      await expect(staking.connect(user1).claimRecoverableReputation())
+        .to.emit(staking, "RecoveryClaimed")
+        .withArgs(user1.address, 5, 95); // 5 recovered, 95 remaining
+
+      const lockInfo = await staking.reputationLocks(user1.address);
+      expect(lockInfo.lockedAmount).to.equal(95);
+    });
+
+    it("should calculate recovery for multiple months", async function() {
+      const { staking, token, owner, user1 } = await deploy();
+      const penalty = -100; // 100 locked
+
+      await staking.slashLiker(user1.address, penalty, "Test slash");
+      await staking.setPositiveContribution(user1.address);
+
+      // Advance 3 months
+      await time.increase(90 * 24 * 60 * 60);
+      await mine();
+
+      // 100 * 5% * 3 = 15 (capped at 100 locked)
+      await expect(staking.connect(user1).claimRecoverableReputation())
+        .to.emit(staking, "RecoveryClaimed")
+        .withArgs(user1.address, 15, 85);
+    });
+
+    it("should revert without positive contribution", async function() {
+      const { staking, owner, user1 } = await deploy();
+      await staking.slashLiker(user1.address, -50, "Test slash");
+      await time.increase(30 * 24 * 60 * 60);
+      await mine();
+
+      // User1 calling claim but has no positive contribution
+      await expect(staking.connect(user1).claimRecoverableReputation())
+        .to.be.revertedWith("No positive contribution");
+    });
+
+    it("should revert when wait period not met", async function() {
+      const { staking, owner, user1 } = await deploy();
+      await staking.slashLiker(user1.address, -50, "Test slash");
+      await staking.setPositiveContribution(user1.address);
+      // Only 15 days passed
+      await time.increase(15 * 24 * 60 * 60);
+      await mine();
+
+      await expect(staking.connect(user1).claimRecoverableReputation())
+        .to.be.revertedWith("Must wait at least 1 month");
+    });
+
+    it("should revert when no locked reputation", async function() {
+      const { staking, user1 } = await deploy();
+      // user1 has no locked reputation
+      await expect(staking.connect(user1).claimRecoverableReputation())
+        .to.be.revertedWith("No locked reputation");
+    });
+
+    it("should reset positive contribution after claim", async function() {
+      const { staking, owner, user1 } = await deploy();
+      await staking.slashLiker(user1.address, -100, "Test slash");
+      await staking.setPositiveContribution(user1.address);
+      await time.increase(30 * 24 * 60 * 60);
+      await mine();
+
+      // user1 claims reputation
+      await staking.connect(user1).claimRecoverableReputation();
+
+      // hasPositiveContribution should be false now
+      expect(await staking.hasPositiveContribution(user1.address)).to.be.false;
+
+      // Set again for second claim
+      await staking.setPositiveContribution(user1.address);
+      await time.increase(30 * 24 * 60 * 60);
+      await mine();
+      await staking.connect(user1).claimRecoverableReputation();
+    });
+
+    it("should set positive contribution", async function() {
+      const { staking, owner, user1 } = await deploy();
+      await expect(staking.setPositiveContribution(user1.address))
+        .to.emit(staking, "PositiveContributionSet")
+        .withArgs(user1.address);
+      expect(await staking.hasPositiveContribution(user1.address)).to.be.true;
+    });
+
+    it("should revert when non-owner sets positive contribution", async function() {
+      const { staking, user1, user2 } = await deploy();
+      await expect(
+        staking.connect(user2).setPositiveContribution(user1.address)
+      ).to.be.revertedWith("Ownable: caller is not the owner");
+    });
+  });
+
+  describe("LikeSkill", function() {
+    it("should increase reputation on likeSkill", async function() {
+      const { staking, owner, user1 } = await deploy();
+      const skillId = 1;
+
+      // likeSkill increases reputation by +2
+      await staking.connect(user1).likeSkill(skillId);
+
+      // User should have +2 reputation from liking
+      const effective = await staking.getUserReputation(user1.address);
+      expect(effective).to.equal(2);
+    });
+
+    it("should not allow double liking same skill", async function() {
+      const { staking, owner, user1 } = await deploy();
+      const skillId = 1;
+
+      await staking.connect(user1).likeSkill(skillId);
+
+      // Second like should revert
+      await expect(
+        staking.connect(user1).likeSkill(skillId)
+      ).to.be.revertedWith("Already liked");
+    });
+  });
 });
