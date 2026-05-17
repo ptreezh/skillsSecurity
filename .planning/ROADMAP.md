@@ -136,8 +136,8 @@ Plan list:
 **Plans**: 2 plans in 2 waves
 
 Plan list:
-- [ ] 14-01-PLAN.md - Install plugins and update network config
-- [ ] 14-02-PLAN.md - Create test fixtures with deployment order
+- [ ] 14-01-PLAN.md - SkillRegistry unit tests (SKIL-01 to SKIL-04)
+- [ ] 14-02-PLAN.md - Attribution unit tests (ATTR-01 to ATTR-04)
 
 ---
 
@@ -196,11 +196,11 @@ Plan list:
 | 11 | v1.3 | 2/2 | Complete    | 2026-05-17 |
 | 12 | v1.3 | 1/1 | Complete    | 2026-05-17 |
 | 13 | v1.3 | 2/2 | Complete    | 2026-05-17 |
-| 14 | v1.3 | 0/TBD | Not started | - |
+| 14 | v1.3 | 0/2 | Not started | - |
 | 15 | v1.3 | 0/TBD | Not started | - |
 | 16 | v1.3 | 0/TBD | Not started | - |
 
 ---
 
 *Roadmap created: 2026-05-16*
-*Last updated: 2026-05-17 for v1.3 Phase 12 planning*
+*Last updated: 2026-05-17 for v1.3 Phase 14 planning*
