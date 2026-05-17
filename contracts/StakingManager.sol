@@ -198,11 +198,22 @@ contract StakingManager is Ownable {
     }
 
     /// @notice 设置用户有正面贡献（由贡献合约主动调用）
-    /// @dev 幂等性检查：已设置则 revert
+    /// @dev 幂等性检查：已设置则 revert。为跨合约调用，无 onlyOwner 限制
     /// @param _user 用户地址
-    function setPositiveContribution(address _user) external onlyOwner {
+    function setPositiveContribution(address _user) external {
         require(!hasPositiveContribution[_user], "Already set");
         hasPositiveContribution[_user] = true;
         emit PositiveContributionSet(_user);
+    }
+
+    /// @notice Test-only: 直接设置有效声誉（绕过锁定机制）
+    /// @dev 仅用于测试，不应在生产环境调用
+    /// @param _user 用户地址
+    /// @param _effectiveRep 期望的有效声誉值
+    function setEffectiveReputation(address _user, int256 _effectiveRep) external onlyOwner {
+        userReputation[_user] = _effectiveRep;
+        // 清除锁定以反映有效声誉
+        ReputationLock storage lock = reputationLocks[_user];
+        lock.lockedAmount = 0;
     }
 }
