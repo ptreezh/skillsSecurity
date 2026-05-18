@@ -11,6 +11,7 @@ import ASKToken from '../abi/ASKToken.json'
 import SkillRegistry from '../abi/SkillRegistry.json'
 import StakingManager from '../abi/StakingManager.json'
 import Attribution from '../abi/Attribution.json'
+import DeployerRewards from '../abi/DeployerRewards.json'
 
 // Network configuration
 const AMOY_CONFIG = {
@@ -24,7 +25,8 @@ const CONTRACT_ABIS = {
   ASKToken: ASKToken.abi,
   SkillRegistry: SkillRegistry.abi,
   StakingManager: StakingManager.abi,
-  Attribution: Attribution.abi
+  Attribution: Attribution.abi,
+  DeployerRewards: DeployerRewards.abi
 }
 
 // Contract addresses (loaded from deployments.json when available)
@@ -32,7 +34,8 @@ let CONTRACT_ADDRESSES = {
   ASKToken: null,
   SkillRegistry: null,
   StakingManager: null,
-  Attribution: null
+  Attribution: null,
+  DeployerRewards: null
 }
 
 // Contract instances (initialized on connect)
@@ -40,7 +43,8 @@ let contractInstances = {
   ASKToken: null,
   SkillRegistry: null,
   StakingManager: null,
-  Attribution: null
+  Attribution: null,
+  DeployerRewards: null
 }
 
 // Provider and signer state
@@ -571,6 +575,123 @@ export async function getLeaderboard() {
   return []
 }
 
+// ============================================
+// DeployerRewards functions
+// ============================================
+
+/**
+ * Get DeployerRewards contract instance
+ * @returns {ethers.Contract|null}
+ */
+function getDeployerRewardsContract() {
+  return contractInstances.DeployerRewards || null
+}
+
+/**
+ * Check if an address is a registered deployer
+ * @param {string} address - Deployer address
+ * @returns {Promise<boolean>}
+ */
+export async function isDeployer(address) {
+  const contract = getDeployerRewardsContract()
+  if (!contract) {
+    return false
+  }
+
+  try {
+    return await contract.isDeployer(address)
+  } catch (error) {
+    console.error('Error checking deployer status:', error)
+    return false
+  }
+}
+
+/**
+ * Get deployer statistics
+ * @param {string} address - Deployer address
+ * @returns {Promise<Object|null>}
+ */
+export async function getDeployerStats(address) {
+  const contract = getDeployerRewardsContract()
+  if (!contract) {
+    return null
+  }
+
+  try {
+    const stats = await contract.getDeployerStats(address)
+    return {
+      domain: stats[0],
+      tier: stats[1],
+      totalUsers: stats[2],
+      activeUsers: stats[3],
+      totalRewards: stats[4],
+      pendingRewards: stats[5],
+      monthlyCount: stats[6]
+    }
+  } catch (error) {
+    console.error('Error fetching deployer stats:', error)
+    return null
+  }
+}
+
+/**
+ * Get referral link for a deployer
+ * @param {string} address - Deployer address
+ * @returns {Promise<string>}
+ */
+export async function getReferralLink(address) {
+  const contract = getDeployerRewardsContract()
+  if (!contract) {
+    return ''
+  }
+
+  try {
+    return await contract.getReferralLink(address)
+  } catch (error) {
+    console.error('Error fetching referral link:', error)
+    return ''
+  }
+}
+
+/**
+ * Register as a deployer
+ * @param {string} domain - Deployment domain
+ * @returns {Promise<Object>}
+ */
+export async function registerDeployer(domain) {
+  const contract = getDeployerRewardsContract()
+  if (!contract) {
+    return { success: false, error: 'Contract not initialized' }
+  }
+
+  if (!currentSigner) {
+    return { success: false, error: 'Wallet not connected' }
+  }
+
+  try {
+    const tx = await contract.registerDeployer(domain)
+    await tx.wait()
+    return { success: true, tx }
+  } catch (error) {
+    console.error('Error registering deployer:', error)
+    return { success: false, error: error.message }
+  }
+}
+
+/**
+ * Get tier information
+ * @param {number} tier - Tier level (0-2)
+ * @returns {Object}
+ */
+export function getTierInfo(tier) {
+  const tiers = {
+    0: { name: '青铜', color: '#94a3b8', bg: '#f1f5f9', threshold: 0 },
+    1: { name: '白银', color: '#60a5fa', bg: '#dbeafe', threshold: 50 },
+    2: { name: '黄金', color: '#fbbf24', bg: '#fef3c7', threshold: 100 }
+  }
+  return tiers[tier] || tiers[0]
+}
+
 /**
  * Reset/clear all contract state (for disconnect)
  */
@@ -581,13 +702,15 @@ export function resetContracts() {
     ASKToken: null,
     SkillRegistry: null,
     StakingManager: null,
-    Attribution: null
+    Attribution: null,
+    DeployerRewards: null
   }
   CONTRACT_ADDRESSES = {
     ASKToken: null,
     SkillRegistry: null,
     StakingManager: null,
-    Attribution: null
+    Attribution: null,
+    DeployerRewards: null
   }
 }
 
@@ -619,5 +742,10 @@ export default {
   unstake,
   slashSkill,
   getLeaderboard,
+  isDeployer,
+  getDeployerStats,
+  getReferralLink,
+  registerDeployer,
+  getTierInfo,
   resetContracts
 }
