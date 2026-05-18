@@ -1,8 +1,68 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import '../styles/components.css'
+import ContractService from '../services/ContractService.jsx'
 
 export default function UserProfile({ user }) {
-  const [vestingPercent, setVestingPercent] = useState(0)
+  const [userProfile, setUserProfile] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  // Fetch user profile from contract
+  useEffect(() => {
+    async function fetchProfile() {
+      if (!user?.address) {
+        setLoading(false)
+        return
+      }
+
+      setLoading(true)
+      setError(null)
+
+      try {
+        // Try to fetch from contract
+        if (ContractService.isInitialized()) {
+          const [reputation, stakes, effective, locked] = await Promise.all([
+            ContractService.getReputation(user.address),
+            ContractService.getStakes(user.address),
+            ContractService.getEffectiveReputation(user.address),
+            ContractService.getLockedReputation(user.address)
+          ])
+
+          setUserProfile({
+            reputation,
+            stakes,
+            effective,
+            locked,
+            fromContract: true
+          })
+        } else {
+          // Fallback to local user data
+          setUserProfile({
+            reputation: user.reputation,
+            stakes: [],
+            effective: user.reputation,
+            locked: { lockedAmount: 0, lastClaimTime: 0 },
+            fromContract: false
+          })
+        }
+      } catch (err) {
+        console.error('Error fetching profile:', err)
+        setError(err.message)
+        // Fallback to local user data
+        setUserProfile({
+          reputation: user.reputation,
+          stakes: [],
+          effective: user.reputation,
+          locked: { lockedAmount: 0, lastClaimTime: 0 },
+          fromContract: false
+        })
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchProfile()
+  }, [user?.address])
 
   if (!user) return (
     <div className="container" style={{ padding: 'var(--space-5)' }}>
@@ -12,6 +72,20 @@ export default function UserProfile({ user }) {
     </div>
   )
 
+  // Loading state
+  if (loading) {
+    return (
+      <div className="container" style={{ padding: 'var(--space-5)' }}>
+        <div style={{ textAlign: 'center', color: 'var(--color-text-secondary)', padding: 'var(--space-6)' }}>
+          加载用户资料中...
+        </div>
+      </div>
+    )
+  }
+
+  const profile = userProfile || { reputation: user.reputation, effective: user.reputation, stakes: [], locked: { lockedAmount: 0, lastClaimTime: 0 }, fromContract: false }
+  const effectiveRep = profile.effective || profile.reputation || 0
+
   const getLevel = (rep) => {
     if (rep >= 5000) return { level: 5, name: '长者', color: '#d97706', bg: '#fef3c7' }
     if (rep >= 2000) return { level: 4, name: '守护者', color: '#7c3aed', bg: '#f3e8ff' }
@@ -20,13 +94,13 @@ export default function UserProfile({ user }) {
     return { level: 1, name: '观察员', color: '#64748b', bg: '#f1f5f9' }
   }
 
-  const levelInfo = getLevel(user.reputation)
-  const userRank = Math.max(1, Math.floor(10000 / (user.reputation + 1)))
-  const vestingProgress = Math.min((user.reputation / 1000) * 30, 100)
+  const levelInfo = getLevel(effectiveRep)
+  const userRank = Math.max(1, Math.floor(10000 / (effectiveRep + 1)))
+  const vestingProgress = Math.min((effectiveRep / 1000) * 30, 100)
 
   const handleVest = () => {
-    if (user.reputation < 1000) {
-      alert(`需声誉 >= 1000 才可变现（当前：${user.reputation}）\n宪法第二条：渐进变现`)
+    if (effectiveRep < 1000) {
+      alert(`需声誉 >= 1000 才可变现（当前：${effectiveRep}）\n宪法第二条：渐进变现`)
       return
     }
     alert(`变现申请已提交！\n可提取：30%（月度上限 500 ASK）\n宪法第二条：防早期 rush`)
@@ -37,6 +111,13 @@ export default function UserProfile({ user }) {
       <h2 style={{ fontSize: '1.5rem', fontWeight: '600', marginBottom: 'var(--space-5)', color: 'var(--color-text-primary)' }}>
         用户声誉中心
       </h2>
+
+      {/* Contract status indicator */}
+      {profile.fromContract && (
+        <div className="badge badge-success" style={{ marginBottom: 'var(--space-4)' }}>
+          已连接到合约
+        </div>
+      )}
 
       {/* User Info Card */}
       <div className="card" style={{ marginBottom: 'var(--space-4)', padding: 'var(--space-5)' }}>
@@ -62,7 +143,7 @@ export default function UserProfile({ user }) {
       <div className="grid-stats">
         <div className="card stat" style={{ textAlign: 'center' }}>
           <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-2)' }}>声誉积分</div>
-          <div style={{ fontSize: 'var(--text-3xl)', fontWeight: 'var(--font-bold)', color: 'var(--color-primary)' }}>{user.reputation}</div>
+          <div style={{ fontSize: 'var(--text-3xl)', fontWeight: 'var(--font-bold)', color: 'var(--color-primary)' }}>{effectiveRep}</div>
           <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', marginTop: 'var(--space-1)' }}>不可转让</div>
         </div>
 
@@ -91,19 +172,19 @@ export default function UserProfile({ user }) {
         <div className="progress" style={{ marginBottom: 'var(--space-3)' }}>
           <div className="progress-bar" style={{ width: `${vestingProgress}%` }} />
         </div>
-        <p style={{ color: user.reputation < 1000 ? '#92400e' : 'var(--color-success)', margin: '0 0 var(--space-4) 0' }}>
-          {user.reputation < 1000
-            ? `距离解锁变现还需 ${1000 - user.reputation} 声誉`
+        <p style={{ color: effectiveRep < 1000 ? '#92400e' : 'var(--color-success)', margin: '0 0 var(--space-4) 0' }}>
+          {effectiveRep < 1000
+            ? `距离解锁变现还需 ${1000 - effectiveRep} 声誉`
             : '已解锁 30% 变现权限（月度上限 500 ASK）'
           }
         </p>
         <button
-          className={user.reputation >= 1000 ? 'btn btn-primary' : 'btn btn-secondary'}
+          className={effectiveRep >= 1000 ? 'btn btn-primary' : 'btn btn-secondary'}
           onClick={handleVest}
-          disabled={user.reputation < 1000}
+          disabled={effectiveRep < 1000}
           style={{ width: '100%' }}
         >
-          {user.reputation >= 1000 ? '申请变现' : `需 ${1000 - user.reputation} 声誉解锁`}
+          {effectiveRep >= 1000 ? '申请变现' : `需 ${1000 - effectiveRep} 声誉解锁`}
         </button>
         <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', marginTop: 'var(--space-3)', textAlign: 'center' }}>
           宪法第二条：达到 1000 声誉后才可变现
@@ -150,6 +231,13 @@ export default function UserProfile({ user }) {
           ))}
         </div>
       </div>
+
+      {/* Error display */}
+      {error && (
+        <div className="card" style={{ marginTop: 'var(--space-4)', background: 'var(--color-danger-light)' }}>
+          <p style={{ color: 'var(--color-danger)', margin: 0 }}>错误: {error}</p>
+        </div>
+      )}
     </div>
   )
 }
