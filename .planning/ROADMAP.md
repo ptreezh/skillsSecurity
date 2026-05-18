@@ -39,7 +39,7 @@
 ### v1.4 自主运营 (Phases 20-22)
 
 **In progress**
-**Goal:** 部署者激励系统完善、TreasuryManager 分红系统、ReferralManager 推广追踪、Governance 治理集成
+**Goal:** 完善已部署的四自系统组件，添加前端面板、测试覆盖和集成验证
 
 ---
 
@@ -54,9 +54,9 @@
 - [x] **Phase 17: 前端 UI 设计** - 设计系统、组件库 (completed 2026-05-18)
 - [x] **Phase 18: 合约连接** - 接入真实合约 (completed 2026-05-18)
 - [x] **Phase 19: 四自系统集成** - DeployerRewards × 自运营/自推广/自进化/自运维 (completed 2026-05-18)
-- [ ] **Phase 20: TreasuryManager 分红系统** - 自动收入分配给部署者
-- [ ] **Phase 21: ReferralManager 推广追踪** - 追踪推广效果并奖励
-- [ ] **Phase 22: Governance 治理集成** - 部署者投票权重和否决权
+- [ ] **Phase 20: DeployerRewards 完善** - 前端面板 + 测试覆盖
+- [ ] **Phase 21: 四自系统 UI 完善** - 数据可视化 + 交互优化
+- [ ] **Phase 22: HealthReporter + 集成测试** - 完整测试 + 部署脚本
 
 ---
 
@@ -233,55 +233,55 @@ Plan list:
 
 ---
 
-### Phase 20: TreasuryManager 分红系统
+### Phase 20: DeployerRewards + RevenueDistributor 完善
 
-**Goal**: 自动将协议收入分配给部署者
+**Goal**: 完善已部署的激励合约，添加前端面板和测试
 
 **Depends on**: Phase 19
 
-**Requirements**: TREAS-01, TREAS-02, TREAS-03, TREAS-04
+**Requirements**: OPS-01, OPS-02, OPS-03
 
 **Success Criteria** (what must be TRUE):
-  1. RevenueDistributor 自动分配收入（50% 部署者 / 30% 财政库 / 20% 质押池）
-  2. 按等级（青铜/白银/黄金）分配分红份额
-  3. 黄金部署者优先分配
-  4. 部署者可通过 TreasuryManager 查询累计分红
+  1. RevenueDistributor 前端面板（显示分红历史、待领取金额）
+  2. DeployerRewards 完整测试（覆盖率 > 80%）
+  3. 分红计算器（预估月收入）
 
-**Plans**: 1 plan in 1 wave
+**Plans**: 2 plans in 1 wave
 
 ---
 
-### Phase 21: ReferralManager 推广追踪
+### Phase 21: 四自系统 UI 完善
 
-**Goal**: 追踪推广效果，奖励活跃推广者
+**Goal**: 完善 SelfOpsPanel 前端组件，添加数据可视化
 
 **Depends on**: Phase 20
 
-**Requirements**: REFL-01, REFL-02, REFL-03
+**Requirements**: OPS-04, OPS-05, OPS-06
 
 **Success Criteria** (what must be TRUE):
-  1. 追踪每个部署者的推广效果（用户注册数、有效staking）
-  2. 自动计算推广奖励
-  3. 活跃推广者进入"每周精选"获得额外曝光
+  1. 自运营面板（收益图表、分红历史）
+  2. 自推广面板（推广效果追踪、排名）
+  3. 自进化面板（提案列表、投票历史）
+  4. 自运维面板（报告记录、奖励统计）
 
-**Plans**: 1 plan in 1 wave
+**Plans**: 2 plans in 1 wave
 
 ---
 
-### Phase 22: Governance 治理集成
+### Phase 22: HealthReporter + 集成测试
 
-**Goal**: 部署者拥有治理权重，可参与协议决策
+**Goal**: 完成 HealthReporter 合约并测试四自系统集成
 
 **Depends on**: Phase 21
 
-**Requirements**: GOV-01, GOV-02, GOV-03
+**Requirements**: OPS-07, OPS-08, OPS-09
 
 **Success Criteria** (what must be TRUE):
-  1. 部署者治理权重（用户数 × 等级加成）
-  2. 黄金部署者拥有否决权（30% 反对票可暂停提案）
-  3. 部署者可参与协议参数投票
+  1. HealthReporter 完整单元测试
+  2. 四自系统端到端测试
+  3. 部署脚本更新（包含所有新合约）
 
-**Plans**: 1 plan in 1 wave
+**Plans**: 2 plans in 1 wave
 
 ---
 
