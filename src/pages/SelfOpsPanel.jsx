@@ -7,6 +7,14 @@
 
 import React, { useState, useEffect } from 'react';
 import './SelfOpsPanel.css';
+import DividendCalculator from '../components/DividendCalculator';
+import DistributionHistory from '../components/DistributionHistory';
+import {
+  getCumulativeDividends,
+  getPendingDividends,
+  getDeployerStats,
+  getTierInfo
+} from '../services/ContractService';
 
 const SELF_OPS_CONFIG = {
   features: [
@@ -48,24 +56,35 @@ export default function SelfOpsPanel({ user, deployerStats }) {
 
   // Fetch revenue data when tab is active
   useEffect(() => {
-    if (activeTab === 'revenue') {
+    if (activeTab === 'revenue' && user?.address) {
       fetchRevenueData();
     }
-  }, [activeTab, user]);
+  }, [activeTab, user?.address]);
 
   async function fetchRevenueData() {
     setLoading(true);
     try {
-      // TODO: Fetch from RevenueDistributor contract
-      // Mock data for demo
+      // Fetch real data from RevenueDistributor contract
+      const [cumulative, pending] = await Promise.all([
+        getCumulativeDividends(user.address),
+        getPendingDividends()
+      ]);
+
       setRevenueData({
-        totalDividends: 1250,
-        pendingDividends: 450,
-        lastDistribution: '2026-05-15',
-        distributionCount: 12
+        totalDividends: parseFloat(cumulative || 0).toFixed(2),
+        pendingDividends: parseFloat(pending || 0).toFixed(2),
+        lastDistribution: new Date().toISOString().split('T')[0],
+        distributionCount: parseFloat(cumulative || 0) > 0 ? 'Multiple' : '0'
       });
     } catch (error) {
       console.error('Failed to fetch revenue data:', error);
+      // Fallback to zeros on error
+      setRevenueData({
+        totalDividends: 0,
+        pendingDividends: 0,
+        lastDistribution: null,
+        distributionCount: 0
+      });
     }
     setLoading(false);
   }
@@ -132,6 +151,13 @@ export default function SelfOpsPanel({ user, deployerStats }) {
                 </li>
               </ul>
             </div>
+
+            {user?.address && (
+              <>
+                <DividendCalculator address={user.address} tier={deployerStats?.tier || 0} />
+                <DistributionHistory address={user.address} />
+              </>
+            )}
           </div>
         )}
 
