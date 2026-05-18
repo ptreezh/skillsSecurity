@@ -1,0 +1,23 @@
+{
+  "tasks": [
+    {
+      "id": "ee2f1e6b",
+      "cron": "47 9 * * *",
+      "prompt": "cd F:/skillsSecurity && node scripts/auto-tasks.js",
+      "createdAt": 1777958122914,
+      "lastFiredAt": 1778293020200,
+      "recurring": true,
+      "createdBySessionId": "4254b5ee-bb4e-4765-8ef4-f8785bd5b428",
+      "createdByPid": 24744
+    },
+    {
+      "id": "25ddf052",
+      "cron": "17 9 1 * *",
+      "prompt": "cd F:/skillsSecurity && node scripts/auto-tasks.js && echo \"=== 月度评估报告 ===\" >> progress.log && date >> progress.log",
+      "createdAt": 1777958131473,
+      "recurring": true,
+      "createdBySessionId": "4254b5ee-bb4e-4765-8ef4-f8785bd5b428",
+      "createdByPid": 24744
+    }
+  ]
+}

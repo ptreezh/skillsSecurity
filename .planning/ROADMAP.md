@@ -4,7 +4,8 @@
 
 - [x] **v1.1 标准文档完善** - Phases 1-7 (shipped 2026-05-15)
 - [x] **v1.2 技术债补齐** - Phases 8-10 (shipped 2026-05-16)
-- [ ] **v1.3 测试与部署** - Phases 11-16 (in progress)
+- [x] **v1.3 测试与部署** - Phases 11-18 (in progress)
+- [ ] **v1.4 自主运营** - Phases 19 (planning)
 
 ---
 
@@ -45,6 +46,8 @@
 - [ ] **Phase 14: SkillRegistry + Attribution 单元测试** - 声望/归因功能测试
 - [x] **Phase 15: 集成测试** - 跨合约流程端到端验证 (completed 2026-05-17)
 - [ ] **Phase 16: Polygon Amoy 部署** - 配置、部署、验证
+- [ ] **Phase 17: 前端 UI 设计** - 设计系统、组件库 (completed 2026-05-18)
+- [x] **Phase 18: 合约连接** - 接入真实合约 (ASKToken, SkillRegistry, StakingManager, Attribution) (completed 2026-05-18)
 
 ---
 

@@ -9,31 +9,17 @@
  *
  * Usage: npx hardhat run contracts/scripts/deploy-all.cjs --network polygonAmoy
  */
-require("dotenv").config();
+const path = require("path");
+require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 const hre = require("hardhat");
 const fs = require("fs");
-const path = require("path");
-const readline = require("readline");
 
-// D-05: Hybrid approach - use .env file if exists, CLI prompt fallback if not
+// D-05: Hybrid approach - use .env file if exists
 let PRIVATE_KEY = process.env.PRIVATE_KEY;
 if (!PRIVATE_KEY) {
-  console.log("\nNOTE: PRIVATE_KEY not found in .env file.");
-  console.log("Per D-05: Using CLI prompt fallback...");
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  });
-  PRIVATE_KEY = await new Promise((resolve) => {
-    rl.question("Enter your deployer wallet private key (0x...): ", (answer) => {
-      rl.close();
-      resolve(answer.trim());
-    });
-  });
-  if (!PRIVATE_KEY || !PRIVATE_KEY.startsWith("0x")) {
-    console.error("ERROR: Invalid PRIVATE_KEY format. Must start with 0x");
-    process.exit(1);
-  }
+  console.error("ERROR: PRIVATE_KEY not found in .env file.");
+  console.error("Please set PRIVATE_KEY in contracts/.env");
+  process.exit(1);
 }
 
 const POLYGONSCAN_API_KEY = process.env.POLYGONSCAN_API_KEY;
@@ -45,15 +31,18 @@ async function main() {
   console.log("Network:", hre.network.name);
   console.log("Chain ID:", hre.network.config.chainId);
 
-  const [deployer] = await hre.ethers.getSigners();
-  console.log("Deployer:", deployer.address);
+  const provider = new hre.ethers.JsonRpcProvider(
+    process.env.POLYGON_AMOY_RPC || "https://rpc-amoy.polygon.technology"
+  );
+  const wallet = new hre.ethers.Wallet(PRIVATE_KEY, provider);
+  console.log("Deployer:", wallet.address);
   console.log("=".repeat(60));
 
   const deployed = {};
 
   // 1. Deploy ASKToken (D-03: deployment order)
   console.log("\n[1/4] Deploying ASKToken...");
-  const ASKToken = await hre.ethers.getContractFactory("ASKToken");
+  const ASKToken = await hre.ethers.getContractFactory("ASKToken", wallet);
   const askToken = await ASKToken.deploy();
   await askToken.waitForDeployment();
   const askTokenAddress = await askToken.getAddress();
@@ -62,7 +51,7 @@ async function main() {
 
   // 2. Deploy StakingManager
   console.log("\n[2/4] Deploying StakingManager...");
-  const StakingManager = await hre.ethers.getContractFactory("StakingManager");
+  const StakingManager = await hre.ethers.getContractFactory("StakingManager", wallet);
   const stakingManager = await StakingManager.deploy(askTokenAddress);
   await stakingManager.waitForDeployment();
   const stakingManagerAddress = await stakingManager.getAddress();
@@ -71,7 +60,7 @@ async function main() {
 
   // 3. Deploy SkillRegistry
   console.log("\n[3/4] Deploying SkillRegistry...");
-  const SkillRegistry = await hre.ethers.getContractFactory("SkillRegistry");
+  const SkillRegistry = await hre.ethers.getContractFactory("SkillRegistry", wallet);
   const skillRegistry = await SkillRegistry.deploy(askTokenAddress, stakingManagerAddress);
   await skillRegistry.waitForDeployment();
   const skillRegistryAddress = await skillRegistry.getAddress();
@@ -80,7 +69,7 @@ async function main() {
 
   // 4. Deploy Attribution (no constructor args)
   console.log("\n[4/4] Deploying Attribution...");
-  const Attribution = await hre.ethers.getContractFactory("Attribution");
+  const Attribution = await hre.ethers.getContractFactory("Attribution", wallet);
   const attribution = await Attribution.deploy();
   await attribution.waitForDeployment();
   const attributionAddress = await attribution.getAddress();
@@ -107,7 +96,7 @@ async function main() {
     network: hre.network.name,
     chainId: hre.network.config.chainId,
     timestamp: new Date().toISOString(),
-    deployer: deployer.address,
+    deployer: wallet.address,
     contracts: deployed
   };
 

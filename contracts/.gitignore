@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Build artifacts
+cache/
+artifacts/
+
+# Environment files (NEVER commit these!)
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

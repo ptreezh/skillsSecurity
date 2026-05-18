@@ -1,0 +1,12 @@
+{
+  "network": "hardhat",
+  "chainId": 31337,
+  "timestamp": "2026-05-05T04:12:19.562Z",
+  "deployer": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
+  "contracts": {
+    "ASKToken": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+    "SkillRegistry": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+    "StakingManager": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+    "Attribution": "0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9"
+  }
+}

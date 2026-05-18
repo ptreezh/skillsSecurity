@@ -65,7 +65,7 @@ None - Phase 16 scope covers complete deployment to Polygon Amoy
 
 ### Configuration
 | File | Purpose | Status |
-|------|---------|--------|
+|------|---------|-------|
 | hardhat.config.js | Network configs, plugins | Already configured for polygonAmoy |
 | contracts/.env | Secrets (PRIVATE_KEY, RPC, API_KEY) | Exists but needs Amoy update |
 | contracts/.env.example | Template for new users | Needs creation/update |
@@ -99,21 +99,33 @@ contracts/
 ```javascript
 // scripts/deploy-all.cjs (following D-01 through D-19)
 
-// 1. Load environment (hybrid approach)
+// 1. Load environment (hybrid approach per D-05)
 require('dotenv').config();
-const PRIVATE_KEY = process.env.PRIVATE_KEY;
-const POLYGONSCAN_API_KEY = process.env.POLYGONSCAN_API_KEY;
+const readline = require('readline');
 
-// 2. Validate wallet configuration (D-08)
+// D-05: Hybrid approach - use .env or CLI prompt fallback
+let PRIVATE_KEY = process.env.PRIVATE_KEY;
 if (!PRIVATE_KEY) {
-  console.error('ERROR: PRIVATE_KEY not configured in .env file');
-  process.exit(1);
+  // CLI prompt fallback using readline
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  PRIVATE_KEY = await new Promise((resolve) => {
+    rl.question("Enter your private key: ", (answer) => {
+      rl.close();
+      resolve(answer.trim());
+    });
+  });
+  if (!PRIVATE_KEY.startsWith("0x")) {
+    console.error("Invalid format");
+    process.exit(1);
+  }
 }
 
-// 3. Get network from CLI args or default to polygonAmoy
+const POLYGONSCAN_API_KEY = process.env.POLYGONSCAN_API_KEY;
+
+// 2. Get network from CLI args or default to polygonAmoy
 const network = process.env.HARDHAT_NETWORK || 'polygonAmoy';
 
-// 4. Async deployment with hre
+// 3. Async deployment with hre
 async function main() {
   const [deployer] = await ethers.getSigners();
 
@@ -179,14 +191,26 @@ async function verifyContract(address, constructorArgs) {
 
 ## Code Examples
 
-### Environment Validation Pattern (D-05, D-08)
+### Environment Validation Pattern (D-05: Hybrid with CLI fallback)
 ```javascript
-// From hardhat.config.js pattern
-const PRIVATE_KEY = process.env.PRIVATE_KEY;
+// D-05: Hybrid approach - use .env or CLI prompt fallback
+require('dotenv').config();
+const readline = require('readline');
+
+let PRIVATE_KEY = process.env.PRIVATE_KEY;
 if (!PRIVATE_KEY) {
-  console.error('ERROR: PRIVATE_KEY not configured');
-  console.error('Create .env file with PRIVATE_KEY or set it as environment variable');
-  process.exit(1);
+  console.log("NOTE: PRIVATE_KEY not found in .env file. Using CLI prompt fallback...");
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  PRIVATE_KEY = await new Promise((resolve) => {
+    rl.question("Enter your deployer wallet private key (0x...): ", (answer) => {
+      rl.close();
+      resolve(answer.trim());
+    });
+  });
+  if (!PRIVATE_KEY.startsWith("0x")) {
+    console.error("ERROR: Invalid PRIVATE_KEY format. Must start with 0x");
+    process.exit(1);
+  }
 }
 ```
 
@@ -246,6 +270,7 @@ POLYGONSCAN_API_KEY=your_api_key_here
 | Mumbai testnet | Polygon Amoy (chainId 80002) | 2024 | Mumbai deprecated, Amoy is successor |
 | Manual Etherscan verification | hardhat-verify plugin | Phase 11 | Automated, reproducible |
 | Hard-coded private key | Environment variables | Phase 11 | Security, flexibility |
+| No CLI fallback | Hybrid .env + CLI prompt | Phase 16 | Better UX, per D-05 |
 
 **Deprecated/outdated:**
 - POLYGON_MUMBAI_RPC environment variable: no longer valid
@@ -265,17 +290,17 @@ POLYGONSCAN_API_KEY=your_api_key_here
 
 **If this table is empty:** All claims in this research were verified or cited - no user confirmation needed.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should deployer address be logged for verification?**
    - What we know: ASKToken and Attribution use Ownable(msg.sender)
    - What's unclear: Whether deployer should be the final owner or just a deployer
-   - Recommendation: Log deployer address, document in script comments
+   - [RESOLVED] Log deployer address, document in script comments. Script logs deployer address for verification purposes.
 
 2. **What happens if Attribution.setStakingManager is called twice?**
    - What we know: Function uses require(_addr != address(0), "Invalid address")
    - What's unclear: Whether calling twice with same address works or reverts
-   - Recommendation: Document behavior, wrap in try-catch for safety
+   - [RESOLVED] Document behavior: calling twice with same address should work (doesn't revert), calling with different address after first call will revert with "Invalid address"
 
 ## Environment Availability
 
@@ -285,12 +310,14 @@ POLYGONSCAN_API_KEY=your_api_key_here
 | hardhat-verify | Contract verification | Yes | ^3.0.17 [VERIFIED] | Graceful skip |
 | ethers | Contract deployment | Yes | ^6.16.0 | N/A |
 | dotenv | Environment loading | Yes | ^17.4.2 | Inline parsing |
+| readline | CLI fallback | Yes | Node.js built-in | N/A |
 | Node.js | Script execution | Assumed | - | - |
 
 **Missing dependencies with no fallback:** None identified - all required tools available.
 
 **Missing dependencies with fallback:**
 - POLYGONSCAN_API_KEY: Optional - verification can be skipped with warning (D-12)
+- PRIVATE_KEY: Optional - CLI fallback via readline if .env missing (D-05)
 
 ## Validation Architecture
 
@@ -304,7 +331,7 @@ POLYGONSCAN_API_KEY=your_api_key_here
 | Quick run command | `npx hardhat test --no-compile` |
 | Full suite command | `npx hardhat test` |
 
-### Phase Requirements → Test Map
+### Phase Requirements -> Test Map
 | Req ID | Behavior | Test Type | Automated Command | File Exists? |
 |--------|----------|-----------|-------------------|-------------|
 | DEPL-01 | Hardhat config has polygonAmoy network | Manual | Inspect hardhat.config.js | YES |
@@ -328,7 +355,7 @@ POLYGONSCAN_API_KEY=your_api_key_here
 ### Applicable ASVS Categories
 
 | ASVS Category | Applies | Standard Control |
-|---------------|---------|-----------------|
+|---------------|---------|------------------|
 | V2 Authentication | No | N/A - no auth in contracts |
 | V3 Session Management | No | N/A - no sessions |
 | V4 Access Control | Yes | Ownable pattern (already in contracts) |
@@ -340,6 +367,7 @@ POLYGONSCAN_API_KEY=your_api_key_here
 | Pattern | STRIDE | Standard Mitigation |
 |---------|--------|---------------------|
 | Private key exposure in .env | Information Disclosure | Never commit .env, use .gitignore, provide .env.example |
+| Private key input via CLI | Information Disclosure | Script never logs PRIVATE_KEY value, only validates format |
 | Wrong network deployment | Tampering | Explicit --network flag, verify chainId before deploy |
 | Verification mismatch | Repudiation | Match compiler version, license type (MIT), constructor args |
 
@@ -347,8 +375,9 @@ POLYGONSCAN_API_KEY=your_api_key_here
 
 1. **Private Key Handling:**
    - .env file must be in .gitignore
-   - Never log PRIVATE_KEY value
-   - Warn if .env is missing (D-08)
+   - Never log PRIVATE_KEY value (script only checks format starts with 0x)
+   - CLI fallback warns user about security (D-05)
+   - Script exits cleanly if no valid wallet configuration (D-08)
 
 2. **Network Safety:**
    - Explicit network selection (--network polygonAmoy)
