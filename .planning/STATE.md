@@ -1,63 +1,67 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: 标准文档完善
+milestone: v1.3
+milestone_name: 测试与部署
 status: executing
-last_updated: "2026-05-18T06:26:27.479Z"
+last_updated: "2026-05-18T11:50:00Z"
 progress:
-  total_phases: 9
-  completed_phases: 8
-  total_plans: 18
-  completed_plans: 17
-  percent: 94
+  total_phases: 19
+  completed_phases: 19
+  total_plans: 19
+  completed_plans: 19
+  percent: 100
 ---
 
 # AgentSkills - Current State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-16)
+See: .planning/PROJECT.md (updated 2026-05-18)
 
 **Core value:** Skills with accountability — every action is traceable, every contributor is credited, every violation has consequences.
-**Current focus:** Phase 18 — contract-integration
+**Current focus:** Phase 19 Complete - Four-Self System Integration
 
 ## Current Position
 
-Milestone: v1.3 (测试与部署)
+Milestone: v1.3 (测试与部署) - COMPLETE
 Phase: 19
-Plan: Not started
-Status: Executing Phase 18
+Plan: deployer-rewards-selfops-integration - COMPLETE
+Status: All phases complete
 
 Progress: [████████████████████] 100% (v1.3)
 
-## Accumulated Context
+## Phase 19 Results
 
-### Completed Work (v1.1 + v1.2)
+**Plan:** Deployer Rewards × Four-Self Integration
 
-- SKILLS_STANDARD.md v1.2 complete with 32+ requirements
-- Smart contracts: ASKToken, SkillRegistry, Attribution, StakingManager
-- Reputation recovery functions implemented
-- Reputation lock mechanism implemented
-- Effective reputation checks in SkillRegistry
+| Task | Commit | Status |
+|------|--------|--------|
+| 1. Extend DeployerRewards (dividend + governance) | `d092c60` | COMPLETE |
+| 2. Create RevenueDistributor | `0597b64` | COMPLETE |
+| 3. Extend Governance (deployer voting) | `c9970fb` | COMPLETE |
+| 4. Create HealthReporter | `be2e9f5` | COMPLETE |
+| 5. Create SelfOpsPanel frontend | `b47d471` | COMPLETE |
+| 6. Add E2E tests | `e46493c` | COMPLETE |
 
-### v1.3 Phase Structure
+### Four-Self System Components
 
-| Phase | Name | Requirements |
-|-------|------|--------------|
-| 11 | Test Infrastructure | TEST-01, TEST-02, TEST-03 |
-| 12 | ASKToken Tests | ASKT-01, ASKT-02, ASKT-03, ASKT-04 |
-| 13 | StakingManager Tests | STAK-01 ~ STAK-05 |
-| 14 | SkillRegistry + Attribution Tests | SKIL-01 ~ SKIL-04, ATTR-01 ~ ATTR-04 |
-| 15 | Integration Tests | INTG-01 ~ INTG-04 |
-| 16 | Polygon Amoy Deployment | DEPL-01 ~ DEPL-04 |
+1. **自运营 (Revenue)**: RevenueDistributor with tiered distribution (50% deployers, 30% treasury, 20% staking)
+2. **自推广 (Promotion)**: DeployerRewards with referral tracking and tier upgrades
+3. **自进化 (Governance)**: Governance with deployer voting weight and Gold veto power
+4. **自运维 (Health)**: HealthReporter with bug/status/stress test incentives
 
-### Key Technical Decisions
+## Completed Work (All Phases)
 
-- Deployment order: ASKToken → StakingManager → SkillRegistry → Attribution
-- Polygon Amoy chainId: 80002 (Mumbai deprecated)
-- Time manipulation: evm_increaseTime + evm_mine for unlock testing
-- Integration tests cover cross-contract flows (20 tests total)
+### v1.1 - Standard Documentation
+- SKILLS_STANDARD.md v1.2 with 32+ requirements
+
+### v1.2 - Core Contracts
+- ASKToken, SkillRegistry, Attribution, StakingManager
+- Reputation recovery and lock mechanisms
+
+### v1.3 - Testing & Deployment
+- Phase 11-16: Full test coverage + Polygon Amoy deployment
+- Phase 17-19: Deployer rewards and four-self system
 
 ---
-
-*Last updated: 2026-05-17 after Phase 15 completion*
+*Last updated: 2026-05-18 after Phase 19 completion*
