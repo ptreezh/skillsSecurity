@@ -5,7 +5,7 @@
 - [x] **v1.1 标准文档完善** - Phases 1-7 (shipped 2026-05-15)
 - [x] **v1.2 技术债补齐** - Phases 8-10 (shipped 2026-05-16)
 - [x] **v1.3 测试与部署** - Phases 11-19 (shipped 2026-05-18)
-- [ ] **v1.4 自主运营** - Future phases (planning)
+- [ ] **v1.4 自主运营** - Phases 20-22 (planning)
 
 ---
 
@@ -29,12 +29,17 @@
 
 ---
 
-### v1.3 测试与部署 (Phases 11-16)
+### v1.3 测试与部署 (Phases 11-19)
 
-**Started:** 2026-05-16
-**Goal:** 建立测试环境、编写合约测试、部署到 Polygon 测试网
+**Shipped:** 2026-05-18
+**Requirements:** 28/28 complete
 
-**Requirements:** 28/28 defined
+---
+
+### v1.4 自主运营 (Phases 20-22)
+
+**In progress**
+**Goal:** 部署者激励系统完善、TreasuryManager 分红系统、ReferralManager 推广追踪、Governance 治理集成
 
 ---
 
@@ -43,12 +48,15 @@
 - [x] **Phase 11: 测试基础设施** - Hardhat 环境配置、测试框架、fixtures (completed 2026-05-17)
 - [x] **Phase 12: ASKToken 单元测试** - 代币功能完整测试 (completed 2026-05-17)
 - [x] **Phase 13: StakingManager 单元测试** - 质押/惩罚/恢复测试 (completed 2026-05-17)
-- [ ] **Phase 14: SkillRegistry + Attribution 单元测试** - 声望/归因功能测试
+- [x] **Phase 14: SkillRegistry + Attribution 单元测试** - 声望/归因功能测试 (completed 2026-05-18)
 - [x] **Phase 15: 集成测试** - 跨合约流程端到端验证 (completed 2026-05-17)
 - [ ] **Phase 16: Polygon Amoy 部署** - 配置、部署、验证
-- [ ] **Phase 17: 前端 UI 设计** - 设计系统、组件库 (completed 2026-05-18)
-- [x] **Phase 18: 合约连接** - 接入真实合约 (ASKToken, SkillRegistry, StakingManager, Attribution) (completed 2026-05-18)
+- [x] **Phase 17: 前端 UI 设计** - 设计系统、组件库 (completed 2026-05-18)
+- [x] **Phase 18: 合约连接** - 接入真实合约 (completed 2026-05-18)
 - [x] **Phase 19: 四自系统集成** - DeployerRewards × 自运营/自推广/自进化/自运维 (completed 2026-05-18)
+- [ ] **Phase 20: TreasuryManager 分红系统** - 自动收入分配给部署者
+- [ ] **Phase 21: ReferralManager 推广追踪** - 追踪推广效果并奖励
+- [ ] **Phase 22: Governance 治理集成** - 部署者投票权重和否决权
 
 ---
 
@@ -140,8 +148,8 @@ Plan list:
 **Plans**: 2 plans in 2 waves
 
 Plan list:
-- [ ] 14-01-PLAN.md - SkillRegistry unit tests (SKIL-01 to SKIL-04)
-- [ ] 14-02-PLAN.md - Attribution unit tests (ATTR-01 to ATTR-04)
+- [x] 14-01-PLAN.md - SkillRegistry unit tests (SKIL-01 to SKIL-04)
+- [x] 14-02-PLAN.md - Attribution unit tests (ATTR-01 to ATTR-04)
 
 ---
 
@@ -162,8 +170,8 @@ Plan list:
 **Plans**: 2 plans in 2 waves
 
 Plan list:
-- [x] 15-01-PLAN.md - Install plugins and update network config
-- [x] 15-02-PLAN.md - Create test fixtures with deployment order
+- [x] 15-01-PLAN.md - Integration test fixtures
+- [x] 15-02-PLAN.md - End-to-end integration tests
 
 ---
 
@@ -184,8 +192,96 @@ Plan list:
 **Plans**: 2 plans in 2 waves
 
 Plan list:
-- [ ] 16-01-PLAN.md - Install plugins and update network config
-- [ ] 16-02-PLAN.md - Create test fixtures with deployment order
+- [ ] 16-01-PLAN.md - Configure Polygon Amoy network
+- [ ] 16-02-PLAN.md - Deploy and verify contracts
+
+---
+
+### Phase 17: 前端 UI 设计
+
+**Goal**: 设计系统、组件库
+
+**Depends on**: Phase 16
+
+**Success Criteria**: Design system complete, components built
+
+**Plans**: Complete (6/6)
+
+---
+
+### Phase 18: 合约连接
+
+**Goal**: 接入真实合约
+
+**Depends on**: Phase 17
+
+**Success Criteria**: Frontend connects to real contracts on Polygon Amoy
+
+**Plans**: Complete (1/1)
+
+---
+
+### Phase 19: 四自系统集成
+
+**Goal**: DeployerRewards × 自运营/自推广/自进化/自运维
+
+**Depends on**: Phase 18
+
+**Success Criteria**: Four-self system components implemented
+
+**Plans**: Complete (5/5)
+
+---
+
+### Phase 20: TreasuryManager 分红系统
+
+**Goal**: 自动将协议收入分配给部署者
+
+**Depends on**: Phase 19
+
+**Requirements**: TREAS-01, TREAS-02, TREAS-03, TREAS-04
+
+**Success Criteria** (what must be TRUE):
+  1. RevenueDistributor 自动分配收入（50% 部署者 / 30% 财政库 / 20% 质押池）
+  2. 按等级（青铜/白银/黄金）分配分红份额
+  3. 黄金部署者优先分配
+  4. 部署者可通过 TreasuryManager 查询累计分红
+
+**Plans**: 1 plan in 1 wave
+
+---
+
+### Phase 21: ReferralManager 推广追踪
+
+**Goal**: 追踪推广效果，奖励活跃推广者
+
+**Depends on**: Phase 20
+
+**Requirements**: REFL-01, REFL-02, REFL-03
+
+**Success Criteria** (what must be TRUE):
+  1. 追踪每个部署者的推广效果（用户注册数、有效staking）
+  2. 自动计算推广奖励
+  3. 活跃推广者进入"每周精选"获得额外曝光
+
+**Plans**: 1 plan in 1 wave
+
+---
+
+### Phase 22: Governance 治理集成
+
+**Goal**: 部署者拥有治理权重，可参与协议决策
+
+**Depends on**: Phase 21
+
+**Requirements**: GOV-01, GOV-02, GOV-03
+
+**Success Criteria** (what must be TRUE):
+  1. 部署者治理权重（用户数 × 等级加成）
+  2. 黄金部署者拥有否决权（30% 反对票可暂停提案）
+  3. 部署者可参与协议参数投票
+
+**Plans**: 1 plan in 1 wave
 
 ---
 
@@ -194,16 +290,15 @@ Plan list:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 1-7 | v1.1 | 100% | Complete | 2026-05-15 |
-| 8 | v1.2 | 100% | Complete | 2026-05-16 |
-| 9 | v1.2 | 100% | Complete | 2026-05-16 |
-| 10 | v1.2 | 100% | Complete | 2026-05-16 |
-| 11 | v1.3 | 2/2 | Complete    | 2026-05-17 |
-| 12 | v1.3 | 1/1 | Complete    | 2026-05-17 |
-| 13 | v1.3 | 2/2 | Complete    | 2026-05-17 |
-| 14 | v1.3 | 0/2 | Not started | - |
-| 15 | v1.3 | 2/2 | Complete    | 2026-05-17 |
-| 16 | v1.3 | 0/TBD | Not started | - |
-| 17-19 | v1.3 | 6/6 | Complete    | 2026-05-18 |
+| 8-10 | v1.2 | 100% | Complete | 2026-05-16 |
+| 11 | v1.3 | 2/2 | Complete | 2026-05-17 |
+| 12 | v1.3 | 1/1 | Complete | 2026-05-17 |
+| 13 | v1.3 | 2/2 | Complete | 2026-05-17 |
+| 14 | v1.3 | 2/2 | Complete | 2026-05-18 |
+| 15 | v1.3 | 2/2 | Complete | 2026-05-17 |
+| 16 | v1.3 | 0/2 | Not started | - |
+| 17-19 | v1.3 | 6/6 | Complete | 2026-05-18 |
+| 20-22 | v1.4 | 0/3 | Planning | - |
 
 ---
 
