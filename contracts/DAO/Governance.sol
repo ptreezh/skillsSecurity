@@ -3,8 +3,8 @@ pragma solidity ^0.8.20;
 
 /**
  * @title Governance
- * @notice On-chain voting with reputation-weighted power
- * @dev Voting power: L4+ (1 per 1000 rep) + Token holders (1 per 10000 ASK)
+ * @notice On-chain voting with reputation-weighted power + deployer governance
+ * @dev Voting power: L4+ (1 per 1000 rep) + Token holders (1 per 10000 ASK) + Deployer weight
  */
 interface IStakingManager {
     function getUserReputation(address account) external view returns (int256);
@@ -14,6 +14,11 @@ interface IERC20 {
     function balanceOf(address account) external view returns (uint256);
     function transfer(address to, uint256 amount) external returns (bool);
     function transferFrom(address from, address to, uint256 amount) external returns (bool);
+}
+
+interface IDeployerRewards {
+    function getGovernanceWeight(address deployer) external view returns (uint256);
+    function isGoldTier(address deployer) external view returns (bool);
 }
 
 contract Governance {
@@ -35,11 +40,13 @@ contract Governance {
     uint256 public constant TIMELOCK = 48 hours;
     uint256 public constant MAJORITY = 5001; // 50.01%
     uint256 public constant MIN_VOTING_POWER = 100;
+    uint256 public constant GOLD_VETO_THRESHOLD = 3000; // 30% gold opposition can pause proposal
 
     Proposal[] public proposals;
     address public timelock;
     address public stakingManager;
     address public askToken;
+    address public deployerRewards; // DeployerRewards contract for governance integration
 
     mapping(address => uint256) public votingPowerCache;
     uint256 public lastTotalPowerRecalculation;
@@ -50,6 +57,8 @@ contract Governance {
     event ProposalExecuted(uint256 id);
     event ProposalCanceled(uint256 id);
     event VotingPowerRecalculated(uint256 totalPower);
+    event GoldVeto(uint256 indexed proposalId, address deployer, uint256 vetoPower);
+    event DeployerRewardsSet(address deployerRewards);
 
     modifier onlyTimelock() {
         require(msg.sender == timelock, "Not timelock");
@@ -59,6 +68,13 @@ contract Governance {
     constructor(address _stakingManager, address _askToken) {
         stakingManager = _stakingManager;
         askToken = _askToken;
+    }
+
+    function setDeployerRewards(address _deployerRewards) external {
+        // Only allow setting once or by owner (simplified for demo)
+        require(deployerRewards == address(0), "Already set");
+        deployerRewards = _deployerRewards;
+        emit DeployerRewardsSet(_deployerRewards);
     }
 
     function createProposal(string memory description, bytes memory callData) external {
@@ -136,16 +152,24 @@ contract Governance {
     }
 
     function getVotingPower(address account) public view returns (uint256) {
-        // L4+: 1 vote per 1000 reputation
+        // 1. Reputation votes (L4+: 1 vote per 1000 reputation)
         int256 reputation = IStakingManager(stakingManager).getUserReputation(account);
         uint256 repVotes = reputation > 0 ? uint256(reputation / 1000) * 1e18 : 0;
 
-        // Token holders: 1 vote per 10000 ASK
+        // 2. Token votes (1 vote per 10000 ASK)
         uint256 tokenBalance = IERC20(askToken).balanceOf(account);
         uint256 tokenVotes = (tokenBalance / 10000) * 1e18;
 
-        // Combine and cap at 10% of total
-        uint256 total = repVotes + tokenVotes;
+        // 3. Deployer weight (new: from DeployerRewards)
+        uint256 deployerVotes;
+        if (deployerRewards != address(0)) {
+            deployerVotes = IDeployerRewards(deployerRewards).getGovernanceWeight(account);
+        }
+
+        // Calculate total weight
+        uint256 total = repVotes + tokenVotes + deployerVotes;
+
+        // Apply cap at 10% of total
         uint256 cap = getTotalVotingPower() / 10;
         return total > cap ? cap : total;
     }
@@ -195,5 +219,25 @@ contract Governance {
 
     function getProposalCount() external view returns (uint256) {
         return proposals.length;
+    }
+
+    /// @notice Gold tier deployers can cast veto (自进化治理)
+    /// @param proposalId Proposal ID to veto
+    function castGoldVeto(uint256 proposalId) external {
+        require(proposalId < proposals.length, "Invalid proposal");
+        require(deployerRewards != address(0), "DeployerRewards not set");
+
+        bool isGold = IDeployerRewards(deployerRewards).isGoldTier(msg.sender);
+        require(isGold, "Not a Gold deployer");
+
+        Proposal storage proposal = proposals[proposalId];
+        require(!proposal.hasVoted[msg.sender], "Already voted");
+        require(!proposal.executed, "Already executed");
+
+        uint256 weight = getVotingPower(msg.sender);
+        proposal.hasVoted[msg.sender] = true;
+        proposal.againstVotes += weight; // Count as against
+
+        emit GoldVeto(proposalId, msg.sender, weight);
     }
 }
