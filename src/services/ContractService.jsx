@@ -12,6 +12,7 @@ import SkillRegistry from '../abi/SkillRegistry.json'
 import StakingManager from '../abi/StakingManager.json'
 import Attribution from '../abi/Attribution.json'
 import DeployerRewards from '../abi/DeployerRewards.json'
+import RevenueDistributor from '../abi/RevenueDistributor.json'
 
 // Network configuration
 const AMOY_CONFIG = {
@@ -26,7 +27,8 @@ const CONTRACT_ABIS = {
   SkillRegistry: SkillRegistry.abi,
   StakingManager: StakingManager.abi,
   Attribution: Attribution.abi,
-  DeployerRewards: DeployerRewards.abi
+  DeployerRewards: DeployerRewards.abi,
+  RevenueDistributor: RevenueDistributor.abi
 }
 
 // Contract addresses (loaded from deployments.json when available)
@@ -35,7 +37,8 @@ let CONTRACT_ADDRESSES = {
   SkillRegistry: null,
   StakingManager: null,
   Attribution: null,
-  DeployerRewards: null
+  DeployerRewards: null,
+  RevenueDistributor: null
 }
 
 // Contract instances (initialized on connect)
@@ -44,7 +47,8 @@ let contractInstances = {
   SkillRegistry: null,
   StakingManager: null,
   Attribution: null,
-  DeployerRewards: null
+  DeployerRewards: null,
+  RevenueDistributor: null
 }
 
 // Provider and signer state
@@ -692,6 +696,81 @@ export function getTierInfo(tier) {
   return tiers[tier] || tiers[0]
 }
 
+// ============================================
+// RevenueDistributor functions
+// ============================================
+
+/**
+ * Get RevenueDistributor contract instance
+ * @returns {ethers.Contract|null}
+ */
+function getRevenueDistributorContract() {
+  return contractInstances.RevenueDistributor || null
+}
+
+/**
+ * Get deployer cumulative dividends
+ * @param {string} address - Deployer address
+ * @returns {Promise<string>} Dividend amount in ASK
+ */
+export async function getCumulativeDividends(address) {
+  const contract = getRevenueDistributorContract()
+  if (!contract) {
+    return '0'
+  }
+
+  try {
+    const dividends = await contract.getCumulativeDividends(address)
+    return ethers.formatEther(dividends)
+  } catch (error) {
+    console.error('Error fetching cumulative dividends:', error)
+    return '0'
+  }
+}
+
+/**
+ * Get pending dividends (contract balance)
+ * @returns {Promise<string>} Pending amount in ASK
+ */
+export async function getPendingDividends() {
+  const contract = getRevenueDistributorContract()
+  if (!contract) {
+    return '0'
+  }
+
+  try {
+    const pending = await contract.getPendingDividends()
+    return ethers.formatEther(pending)
+  } catch (error) {
+    console.error('Error fetching pending dividends:', error)
+    return '0'
+  }
+}
+
+/**
+ * Trigger revenue distribution (anyone can call)
+ * @returns {Promise<Object>}
+ */
+export async function triggerDistribution() {
+  const contract = getRevenueDistributorContract()
+  if (!contract) {
+    return { success: false, error: 'Contract not initialized' }
+  }
+
+  if (!currentSigner) {
+    return { success: false, error: 'Wallet not connected' }
+  }
+
+  try {
+    const tx = await contract.distribute()
+    await tx.wait()
+    return { success: true, tx }
+  } catch (error) {
+    console.error('Error triggering distribution:', error)
+    return { success: false, error: error.message }
+  }
+}
+
 /**
  * Reset/clear all contract state (for disconnect)
  */
@@ -703,14 +782,16 @@ export function resetContracts() {
     SkillRegistry: null,
     StakingManager: null,
     Attribution: null,
-    DeployerRewards: null
+    DeployerRewards: null,
+    RevenueDistributor: null
   }
   CONTRACT_ADDRESSES = {
     ASKToken: null,
     SkillRegistry: null,
     StakingManager: null,
     Attribution: null,
-    DeployerRewards: null
+    DeployerRewards: null,
+    RevenueDistributor: null
   }
 }
 
@@ -747,5 +828,8 @@ export default {
   getReferralLink,
   registerDeployer,
   getTierInfo,
+  getCumulativeDividends,
+  getPendingDividends,
+  triggerDistribution,
   resetContracts
 }
