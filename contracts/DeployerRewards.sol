@@ -353,13 +353,12 @@ contract DeployerRewards is Ownable {
         b[0] = "0";
         b[1] = "x";
         for (uint256 i = 0; i < 20; i++) {
-            b[42 - 1 - i] = bytes1(uint8(uint256(uint160(x)) / (2 ** (8 * i))) % 16);
-            uint8 byteVal = uint8(b[42 - 1 - i]);
-            if (byteVal < 10) {
-                b[42 - 1 - i] = bytes1(byteVal + 48);
-            } else {
-                b[42 - 1 - i] = bytes1(byteVal + 87);
-            }
+            // Extract byte from most significant to least significant
+            uint256 byteVal = uint256(uint160(x)) / (2 ** (8 * (19 - i))) % 256;
+            uint8 hi = uint8(byteVal / 16);
+            uint8 lo = uint8(byteVal % 16);
+            b[2 + i * 2] = hi < 10 ? bytes1(hi + 48) : bytes1(hi + 87);
+            b[2 + i * 2 + 1] = lo < 10 ? bytes1(lo + 48) : bytes1(lo + 87);
         }
         return string(b);
     }
