@@ -6,8 +6,8 @@
  * Schedule: Daily check, execute at low-traffic window
  */
 
-const https = require('https')
-const http = require('http')
+import https from 'https'
+import http from 'http'
 
 class UpgradeScheduler {
   constructor(config = {}) {
@@ -462,4 +462,4 @@ Please vote YES to proceed with this upgrade, or NO to reject.
   }
 }
 
-module.exports = { UpgradeScheduler }
+export { UpgradeScheduler }

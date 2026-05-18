@@ -6,7 +6,7 @@
  * Logging: All actions logged for audit
  */
 
-const { EventEmitter } = require('events')
+import { EventEmitter } from 'events'
 
 class AutoFixer extends EventEmitter {
   constructor(config = {}) {
@@ -355,4 +355,4 @@ class AutoFixer extends EventEmitter {
   }
 }
 
-module.exports = { AutoFixer }
+export { AutoFixer }

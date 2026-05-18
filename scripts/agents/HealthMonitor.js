@@ -291,4 +291,4 @@ class HealthMonitor {
   }
 }
 
-module.exports = { HealthMonitor }
+export { HealthMonitor }
