@@ -697,6 +697,45 @@ export function getTierInfo(tier) {
 }
 
 // ============================================
+/**
+ * Get deployer governance weight from DeployerRewards
+ * @param {string} address - Deployer address
+ * @returns {Promise<number>}
+ */
+export async function getGovernanceWeight(address) {
+  const contract = getDeployerRewardsContract()
+  if (!contract) {
+    return 0
+  }
+
+  try {
+    const weight = await contract.getGovernanceWeight(address)
+    return Number(weight)
+  } catch (error) {
+    console.error('Error fetching governance weight:', error)
+    return 0
+  }
+}
+
+/**
+ * Check if deployer is Gold tier
+ * @param {string} address - Deployer address
+ * @returns {Promise<boolean>}
+ */
+export async function isGoldTier(address) {
+  const contract = getDeployerRewardsContract()
+  if (!contract) {
+    return false
+  }
+
+  try {
+    return await contract.isGoldTier(address)
+  } catch (error) {
+    console.error('Error checking Gold tier:', error)
+    return false
+  }
+}
+
 // RevenueDistributor functions
 // ============================================
 
