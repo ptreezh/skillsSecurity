@@ -491,4 +491,118 @@ describe("DeployerRewards", function () {
             ).to.be.revertedWithCustomError(deployerRewards, "InvalidTier");
         });
     });
+
+    describe("getDividend", function () {
+        beforeEach(async function () {
+            await deployerRewards.connect(deployer).registerDeployer("test.com");
+            await mockToken.transfer(
+                await deployerRewards.getAddress(),
+                ethers.parseEther("100000")
+            );
+        });
+
+        it("should return pending rewards for registered deployer", async function () {
+            const stakeAmount = ethers.parseEther("1000");
+            await deployerRewards.connect(deployer).onUserRegistered(user.address, stakeAmount);
+
+            const dividend = await deployerRewards.getDividend(deployer.address);
+            expect(dividend).to.be.gt(0);
+        });
+
+        it("should return 0 for non-registered address", async function () {
+            const dividend = await deployerRewards.getDividend(other.address);
+            expect(dividend).to.equal(0);
+        });
+    });
+
+    describe("getGovernanceWeight", function () {
+        beforeEach(async function () {
+            await deployerRewards.connect(deployer).registerDeployer("test.com");
+        });
+
+        it("should return base weight for Bronze", async function () {
+            const stakeAmount = ethers.parseEther("100");
+            for (let i = 0; i < 10; i++) {
+                await deployerRewards.connect(deployer).onUserRegistered(
+                    ethers.Wallet.createRandom().address,
+                    stakeAmount
+                );
+            }
+
+            const weight = await deployerRewards.getGovernanceWeight(deployer.address);
+            expect(weight).to.equal(10n * 10n**18n);
+        });
+
+        it("should return 0 for non-registered address", async function () {
+            const weight = await deployerRewards.getGovernanceWeight(other.address);
+            expect(weight).to.equal(0);
+        });
+    });
+
+    describe("isGoldTier", function () {
+        beforeEach(async function () {
+            await deployerRewards.connect(deployer).registerDeployer("test.com");
+            await mockToken.transfer(
+                await deployerRewards.getAddress(),
+                ethers.parseEther("100000")
+            );
+        });
+
+        it("should return false for Bronze deployer", async function () {
+            expect(await deployerRewards.isGoldTier(deployer.address)).to.equal(false);
+        });
+
+        it("should return false for non-registered address", async function () {
+            expect(await deployerRewards.isGoldTier(other.address)).to.equal(false);
+        });
+    });
+
+    describe("getEffectiveReferrals", function () {
+        beforeEach(async function () {
+            await deployerRewards.connect(deployer).registerDeployer("test.com");
+            await mockToken.transfer(
+                await deployerRewards.getAddress(),
+                ethers.parseEther("100000")
+            );
+        });
+
+        it("should return total users count", async function () {
+            const stakeAmount = ethers.parseEther("100");
+            for (let i = 0; i < 15; i++) {
+                if (i > 0 && i % 9 === 0) await time.increase(31 * 24 * 60 * 60);
+                await deployerRewards.connect(deployer).onUserRegistered(
+                    ethers.Wallet.createRandom().address,
+                    stakeAmount
+                );
+            }
+
+            const effective = await deployerRewards.getEffectiveReferrals(deployer.address);
+            expect(effective).to.equal(15);
+        });
+
+        it("should return 0 for non-registered address", async function () {
+            const effective = await deployerRewards.getEffectiveReferrals(other.address);
+            expect(effective).to.equal(0);
+        });
+    });
+
+    describe("getRewardRate", function () {
+        beforeEach(async function () {
+            await deployerRewards.connect(deployer).registerDeployer("test.com");
+            await mockToken.transfer(
+                await deployerRewards.getAddress(),
+                ethers.parseEther("100000")
+            );
+        });
+
+        it("should return 1000 (10%) for Bronze tier", async function () {
+            const rate = await deployerRewards.getRewardRate(deployer.address);
+            expect(rate).to.equal(1000);
+        });
+
+        it("should return 0 for non-registered address", async function () {
+            const rate = await deployerRewards.getRewardRate(other.address);
+            expect(rate).to.equal(0);
+        });
+    });
 });
