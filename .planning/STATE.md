@@ -1,15 +1,15 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.3
-milestone_name: 测试与部署
-status: executing
-last_updated: "2026-05-18T11:50:00Z"
+milestone: v1.4
+milestone_name: 自主运营
+status: planning
+last_updated: "2026-05-18"
 progress:
-  total_phases: 19
+  total_phases: 22
   completed_phases: 19
-  total_plans: 19
+  total_plans: 22
   completed_plans: 19
-  percent: 100
+  percent: 86
 ---
 
 # AgentSkills - Current State
@@ -19,18 +19,32 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-18)
 
 **Core value:** Skills with accountability — every action is traceable, every contributor is credited, every violation has consequences.
-**Current focus:** Phase 19 Complete - Four-Self System Integration
+**Current focus:** Phase 20 Planning - TreasuryManager 分红系统
 
 ## Current Position
 
-Milestone: v1.3 (测试与部署) - COMPLETE
-Phase: 19
-Plan: deployer-rewards-selfops-integration - COMPLETE
-Status: All phases complete
+Milestone: v1.4 (自主运营) - PLANNING
+Phase: 20
+Plan: TreasuryManager 分红系统 - Planning
+Status: Ready to plan
 
-Progress: [████████████████████] 100% (v1.3)
+Progress: [████████████████░░] 86% (v1.3 complete, v1.4 planning)
 
-## Phase 19 Results
+## v1.3 Completed Phases
+
+| Phase | Name | Plans | Status |
+|-------|------|-------|--------|
+| 11 | 测试基础设施 | 2/2 | Complete |
+| 12 | ASKToken 单元测试 | 1/1 | Complete |
+| 13 | StakingManager 单元测试 | 2/2 | Complete |
+| 14 | SkillRegistry + Attribution 测试 | 2/2 | Complete |
+| 15 | 集成测试 | 2/2 | Complete |
+| 16 | Polygon Amoy 部署 | 0/2 | Not started |
+| 17 | 前端 UI 设计 | 6/6 | Complete |
+| 18 | 合约连接 | 1/1 | Complete |
+| 19 | 四自系统集成 | 5/5 | Complete |
+
+## Phase 19 Results (Four-Self System)
 
 **Plan:** Deployer Rewards × Four-Self Integration
 
@@ -50,18 +64,13 @@ Progress: [████████████████████] 100% (v
 3. **自进化 (Governance)**: Governance with deployer voting weight and Gold veto power
 4. **自运维 (Health)**: HealthReporter with bug/status/stress test incentives
 
-## Completed Work (All Phases)
+## v1.4 Planned Phases
 
-### v1.1 - Standard Documentation
-- SKILLS_STANDARD.md v1.2 with 32+ requirements
-
-### v1.2 - Core Contracts
-- ASKToken, SkillRegistry, Attribution, StakingManager
-- Reputation recovery and lock mechanisms
-
-### v1.3 - Testing & Deployment
-- Phase 11-16: Full test coverage + Polygon Amoy deployment
-- Phase 17-19: Deployer rewards and four-self system
+| Phase | Name | Status |
+|-------|------|--------|
+| 20 | TreasuryManager 分红系统 | Planning |
+| 21 | ReferralManager 推广追踪 | Pending |
+| 22 | Governance 治理集成 | Pending |
 
 ---
-*Last updated: 2026-05-18 after Phase 19 completion*
+*Last updated: 2026-05-18*
