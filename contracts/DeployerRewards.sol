@@ -305,6 +305,93 @@ contract DeployerRewards is Ownable {
     }
 
     // =========================================================================
+    // Dividend & Governance Interfaces (四自系统集成)
+    // =========================================================================
+
+    /**
+     * @notice Get pending dividend for deployer
+     * @param deployer Deployer address
+     * @return Pending ASK dividend amount
+     */
+    function getDividend(address deployer) external view returns (uint256) {
+        if (!isDeployer[deployer]) return 0;
+        DeployerInfo storage info = deployers[deployer];
+        return info.pendingRewards;
+    }
+
+    /**
+     * @notice Claim dividend (called by RevenueDistributor)
+     * @param deployer Deployer address
+     * @param amount Dividend amount
+     */
+    function claimDividend(address deployer, uint256 amount) external {
+        require(msg.sender == owner() || msg.sender == address(this), "Not authorized");
+        DeployerInfo storage info = deployers[deployer];
+        require(info.pendingRewards >= amount, "Insufficient dividend");
+
+        info.pendingRewards -= amount;
+        askToken.transfer(deployer, amount);
+    }
+
+    /**
+     * @notice Get governance weight for Governance contract integration
+     * @param deployer Deployer address
+     * @return Governance weight score
+     * @dev Bronze: 1 vote/50 users, Silver: 1 vote/20 users, Gold: 1 vote/10 users + bonus
+     */
+    function getGovernanceWeight(address deployer) external view returns (uint256) {
+        if (!isDeployer[deployer]) return 0;
+
+        DeployerInfo storage info = deployers[deployer];
+
+        // Base weight: per user
+        uint256 baseWeight = info.totalUsers * 1e18;
+
+        // Tier bonus
+        uint256 tierBonus = 0;
+        if (info.tier == 1) {
+            tierBonus = 100e18;  // Silver: +100
+        } else if (info.tier == 2) {
+            tierBonus = 500e18; // Gold: +500
+        }
+
+        return baseWeight + tierBonus;
+    }
+
+    /**
+     * @notice Check if deployer is Gold tier (special privileges)
+     * @param deployer Deployer address
+     * @return True if Gold tier
+     */
+    function isGoldTier(address deployer) external view returns (bool) {
+        if (!isDeployer[deployer]) return false;
+        return deployers[deployer].tier == 2;
+    }
+
+    /**
+     * @notice Get effective referral count (for reward calculation)
+     * @param deployer Deployer address
+     * @return Effective referral users
+     */
+    function getEffectiveReferrals(address deployer) external view returns (uint256) {
+        if (!isDeployer[deployer]) return 0;
+        DeployerInfo storage info = deployers[deployer];
+        return info.totalUsers;
+    }
+
+    /**
+     * @notice Get reward rate in basis points
+     * @param deployer Deployer address
+     * @return Reward rate (10000 = 100%)
+     */
+    function getRewardRate(address deployer) external view returns (uint256) {
+        if (!isDeployer[deployer]) return 0;
+        DeployerInfo storage info = deployers[deployer];
+        TierConfig memory config = tierConfigs[info.tier];
+        return config.activeRewardRate;
+    }
+
+    // =========================================================================
     // Internal Functions
     // =========================================================================
 
