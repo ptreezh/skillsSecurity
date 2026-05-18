@@ -64,13 +64,13 @@ Progress: [████████████████░░] 86% (v1.3 com
 3. **自进化 (Governance)**: Governance with deployer voting weight and Gold veto power
 4. **自运维 (Health)**: HealthReporter with bug/status/stress test incentives
 
-## v1.4 Planned Phases
+## v1.4 Planned Phases (扩展现有组件)
 
 | Phase | Name | Status |
 |-------|------|--------|
-| 20 | TreasuryManager 分红系统 | Planning |
-| 21 | ReferralManager 推广追踪 | Pending |
-| 22 | Governance 治理集成 | Pending |
+| 20 | DeployerRewards 完善 | Planning |
+| 21 | 四自系统 UI 完善 | Pending |
+| 22 | HealthReporter + 集成测试 | Pending |
 
 ---
 *Last updated: 2026-05-18*
