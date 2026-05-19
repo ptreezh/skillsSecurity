@@ -54,7 +54,7 @@
 - [x] **Phase 17: 前端 UI 设计** - 设计系统、组件库 (completed 2026-05-18)
 - [x] **Phase 18: 合约连接** - 接入真实合约 (completed 2026-05-18)
 - [x] **Phase 19: 四自系统集成** - DeployerRewards × 自运营/自推广/自进化/自运维 (completed 2026-05-18)
-- [ ] **Phase 20: DeployerRewards 完善** - 前端面板 + 测试覆盖
+- [x] **Phase 20: DeployerRewards 完善** - 前端面板 + 测试覆盖 (completed 2026-05-18)
 - [ ] **Phase 21: 四自系统 UI 完善** - 数据可视化 + 交互优化
 - [ ] **Phase 22: HealthReporter + 集成测试** - 完整测试 + 部署脚本
 
@@ -246,7 +246,11 @@ Plan list:
   2. DeployerRewards 完整测试（覆盖率 > 80%）
   3. 分红计算器（预估月收入）
 
-**Plans**: 2 plans in 1 wave
+**Plans**: 2 plans in 2 waves
+
+**Plan list:**
+- [x] 20-01-PLAN.md - DeployerRewards governance tests + ContractService extension
+- [x] 20-02-PLAN.md - SelfOpsPanel integration + dividend calculator
 
 ---
 
@@ -264,7 +268,11 @@ Plan list:
   3. 自进化面板（提案列表、投票历史）
   4. 自运维面板（报告记录、奖励统计）
 
-**Plans**: 2 plans in 1 wave
+**Plans**: 2 plans in 2 waves
+
+**Plan list:**
+- [ ] 21-01-PLAN.md - Create foundation (ABIs, hooks, common components)
+- [ ] 21-02-PLAN.md - Implement chart components for all four tabs
 
 ---
 
@@ -298,9 +306,11 @@ Plan list:
 | 15 | v1.3 | 2/2 | Complete | 2026-05-17 |
 | 16 | v1.3 | 0/2 | Not started | - |
 | 17-19 | v1.3 | 6/6 | Complete | 2026-05-18 |
-| 20-22 | v1.4 | 0/3 | Planning | - |
+| 20 | v1.4 | 2/2 | Complete | 2026-05-18 |
+| 21 | v1.4 | 0/2 | Planning | - |
+| 22 | v1.4 | 0/2 | Not started | - |
 
 ---
 
 *Roadmap created: 2026-05-16*
-*Last updated: 2026-05-18 after Phase 19 completion*
+*Last updated: 2026-05-19 after Phase 21 planning*
