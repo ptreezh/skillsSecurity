@@ -1,254 +1,43 @@
-/**
- * SelfOpsPanel - Four-Self System Integration Panel
- * Phase 19: Deployer Rewards Integration
- *
- * Integrates: 自运营 (Revenue) | 自推广 (Promotion) | 自进化 (Governance) | 自运维 (Health)
- */
+import React, { useState, useEffect } from "react";
+import "./SelfOpsPanel.css";
+import DividendCalculator from "../components/DividendCalculator";
+import DistributionHistory from "../components/DistributionHistory";
+import { usePolling } from "../hooks/usePolling";
+import RevenueChart from "../components/charts/RevenueChart";
+import PromotionBarChart from "../components/charts/PromotionBarChart";
+import GovernancePieChart from "../components/charts/GovernancePieChart";
+import HealthReportChart from "../components/charts/HealthReportChart";
+import Leaderboard from "../components/leaderboard/Leaderboard";
+import { getCumulativeDividends, getPendingDividends, getLeaderboard, getActiveProposalCount, getProposal, getReporterStats } from "../services/ContractService";
 
-import React, { useState, useEffect } from 'react';
-import './SelfOpsPanel.css';
-import DividendCalculator from '../components/DividendCalculator';
-import DistributionHistory from '../components/DistributionHistory';
-import {
-  getCumulativeDividends,
-  getPendingDividends,
-  getDeployerStats,
-  getTierInfo
-} from '../services/ContractService';
-
-const SELF_OPS_CONFIG = {
-  features: [
-    {
-      id: 'revenue',
-      name: '自运营收益',
-      icon: '💰',
-      description: '自动获得协议收入分红',
-      color: '#10b981'
-    },
-    {
-      id: 'promotion',
-      name: '自推广追踪',
-      icon: '📣',
-      description: '追踪你的推广效果',
-      color: '#f59e0b'
-    },
-    {
-      id: 'governance',
-      name: '自进化治理',
-      icon: '🏛️',
-      description: '参与协议治理决策',
-      color: '#8b5cf6'
-    },
-    {
-      id: 'health',
-      name: '自运维激励',
-      icon: '🔧',
-      description: '报告问题获得奖励',
-      color: '#3b82f6'
-    }
-  ]
-};
+const SELF_OPS_CONFIG = { features: [
+  { id: "revenue", name: "REVENUE", icon: "💰", color: "#10b981" },
+  { id: "promotion", name: "PROMO", icon: "📣", color: "#f59e0b" },
+  { id: "governance", name: "GOV", icon: "🏛️", color: "#8b5cf6" },
+  { id: "health", name: "HEALTH", icon: "🔧", color: "#3b82f6" }
+]};
 
 export default function SelfOpsPanel({ user, deployerStats }) {
-  const [activeTab, setActiveTab] = useState('revenue');
+  const [activeTab, setActiveTab] = useState("revenue");
   const [revenueData, setRevenueData] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [promotionData, setPromotionData] = useState({ leaderboard: [] });
+  const [governanceData, setGovernanceData] = useState({ proposals: [], activeProposal: null });
+  const [healthData, setHealthData] = useState({ stats: null });
+  const { data: revenueResult, loading: revenueLoading } = usePolling(async () => { if (!user?.address) return {}; return { cumulative: await getCumulativeDividends(user.address), pending: await getPendingDividends() }; }, 30000);
+  const { data: promotionResult, loading: promotionLoading } = usePolling(async () => ({ leaderboard: await getLeaderboard(10) }), 30000);
+  const { data: governanceResult, loading: governanceLoading } = usePolling(async () => { const count = await getActiveProposalCount(); const proposals = []; for (let i = 1; i <= Math.min(count, 5); i++) { const p = await getProposal(i); if (p && !p.canceled) proposals.push({ id: i, ...p }); } return { proposals }; }, 30000);
+  const { data: healthResult, loading: healthLoading } = usePolling(async () => user?.address ? await getReporterStats(user.address) : {}, 30000);
 
-  // Fetch revenue data when tab is active
-  useEffect(() => {
-    if (activeTab === 'revenue' && user?.address) {
-      fetchRevenueData();
-    }
-  }, [activeTab, user?.address]);
-
-  async function fetchRevenueData() {
-    setLoading(true);
-    try {
-      // Fetch real data from RevenueDistributor contract
-      const [cumulative, pending] = await Promise.all([
-        getCumulativeDividends(user.address),
-        getPendingDividends()
-      ]);
-
-      setRevenueData({
-        totalDividends: parseFloat(cumulative || 0).toFixed(2),
-        pendingDividends: parseFloat(pending || 0).toFixed(2),
-        lastDistribution: new Date().toISOString().split('T')[0],
-        distributionCount: parseFloat(cumulative || 0) > 0 ? 'Multiple' : '0'
-      });
-    } catch (error) {
-      console.error('Failed to fetch revenue data:', error);
-      // Fallback to zeros on error
-      setRevenueData({
-        totalDividends: 0,
-        pendingDividends: 0,
-        lastDistribution: null,
-        distributionCount: 0
-      });
-    }
-    setLoading(false);
-  }
-
-  const currentFeature = SELF_OPS_CONFIG.features.find(f => f.id === activeTab);
+  useEffect(() => { if (revenueResult) setRevenueData({ totalDividends: parseFloat(revenueResult.cumulative || 0).toFixed(2), pendingDividends: parseFloat(revenueResult.pending || 0).toFixed(2) }); }, [revenueResult]);
+  useEffect(() => { if (promotionResult) setPromotionData(p => ({ ...p, leaderboard: promotionResult.leaderboard || [] })); }, [promotionResult]);
+  useEffect(() => { if (governanceResult) setGovernanceData(p => ({ ...p, proposals: governanceResult.proposals || [] })); }, [governanceResult]);
+  useEffect(() => { if (healthResult) setHealthData(p => ({ ...p, stats: healthResult })); }, [healthResult]);
 
   return (
     <div className="self-ops-panel">
       <div className="panel-header">
-        <h2>四自运营系统</h2>
-        <span className="deployer-badge">
-          {deployerStats?.tier === 2 ? '🥇 黄金部署者' :
-           deployerStats?.tier === 1 ? '🥈 白银部署者' : '🥉 青铜部署者'}
-        </span>
+        <h2>Four-Self Ops</h2>
+        <span className="deployer-badge">{deployerStats?.tier === 2 ? "Gold" : deployerStats?.tier === 1 ? "Silver" : "Bronze"}</span>
       </div>
-
-      <div className="tabs">
-        {SELF_OPS_CONFIG.features.map(feature => (
-          <button
-            key={feature.id}
-            className={`tab ${activeTab === feature.id ? 'active' : ''}`}
-            onClick={() => setActiveTab(feature.id)}
-            style={{
-              '--tab-color': feature.color,
-              borderColor: activeTab === feature.id ? feature.color : 'transparent'
-            }}
-          >
-            <span className="tab-icon">{feature.icon}</span>
-            <span className="tab-name">{feature.name}</span>
-          </button>
-        ))}
-      </div>
-
-      <div className="tab-content" style={{ borderColor: currentFeature?.color }}>
-        {activeTab === 'revenue' && (
-          <div className="revenue-tab">
-            <div className="stats-row">
-              <div className="stat-card">
-                <div className="stat-label">累计分红</div>
-                <div className="stat-value">{revenueData?.totalDividends || 0} ASK</div>
-              </div>
-              <div className="stat-card highlight">
-                <div className="stat-label">待分红</div>
-                <div className="stat-value">{revenueData?.pendingDividends || 0} ASK</div>
-              </div>
-            </div>
-
-            <div className="distribution-info">
-              <p>上次分红: {revenueData?.lastDistribution || '暂无'}</p>
-              <p>累计分红次数: {revenueData?.distributionCount || 0}</p>
-            </div>
-
-            <div className="tier-benefits">
-              <h3>等级特权</h3>
-              <ul>
-                <li className={deployerStats?.tier >= 0 ? 'active' : ''}>
-                  🥉 青铜: 获得 40% 分红份额
-                </li>
-                <li className={deployerStats?.tier >= 1 ? 'active' : ''}>
-                  🥈 白银: 获得 60% 分红份额 + 优先分配
-                </li>
-                <li className={deployerStats?.tier >= 2 ? 'active' : ''}>
-                  🥇 黄金: 获得 80% 分红份额 + VIP 专项分红
-                </li>
-              </ul>
-            </div>
-
-            {user?.address && (
-              <>
-                <DividendCalculator address={user.address} tier={deployerStats?.tier || 0} />
-                <DistributionHistory address={user.address} />
-              </>
-            )}
-          </div>
-        )}
-
-        {activeTab === 'promotion' && (
-          <div className="promotion-tab">
-            <h3>推广追踪</h3>
-            <div className="stats-row">
-              <div className="stat-card">
-                <div className="stat-label">有效推广</div>
-                <div className="stat-value">{deployerStats?.totalUsers || 0}</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-label">本月新增</div>
-                <div className="stat-value">{deployerStats?.monthlyCount || 0}</div>
-              </div>
-            </div>
-
-            <div className="promotion-tools">
-              <h4>推广工具</h4>
-              <div className="tool-card">
-                <span className="tool-icon">🔗</span>
-                <div className="tool-info">
-                  <span className="tool-name">推荐链接</span>
-                  <code className="tool-value">
-                    {deployerStats?.referralLink || 'https://app.agentskills.io?ref=...'}
-                  </code>
-                </div>
-                <button className="btn btn-sm" onClick={() => {
-                  if (deployerStats?.referralLink) {
-                    navigator.clipboard.writeText(deployerStats.referralLink);
-                  }
-                }}>
-                  复制
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'governance' && (
-          <div className="governance-tab">
-            <h3>治理参与</h3>
-            <div className="governance-info">
-              <div className="voting-power">
-                <span className="label">你的投票权重</span>
-                <span className="value">{(deployerStats?.totalUsers || 0) * 1e18} 票</span>
-              </div>
-
-              {deployerStats?.tier === 2 && (
-                <div className="gold-perk">
-                  <span className="perk-icon">👑</span>
-                  <span>黄金特权：可使用否决权（30% 反对票可暂停提案）</span>
-                </div>
-              )}
-
-              <div className="proposals-preview">
-                <h4>活跃提案</h4>
-                <p className="no-proposals">暂无活跃提案</p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'health' && (
-          <div className="health-tab">
-            <h3>运维贡献</h3>
-            <div className="health-actions">
-              <button className="action-card">
-                <span className="action-icon">🐛</span>
-                <span className="action-name">报告 Bug</span>
-                <span className="action-reward">+50 ASK</span>
-              </button>
-              <button className="action-card">
-                <span className="action-icon">📊</span>
-                <span className="action-name">状态报告</span>
-                <span className="action-reward">+10 ASK</span>
-              </button>
-              <button className="action-card">
-                <span className="action-icon">⚡</span>
-                <span className="action-name">压力测试</span>
-                <span className="action-reward">+100 ASK</span>
-              </button>
-            </div>
-
-            <div className="health-stats">
-              <p>本月剩余报告次数: 10</p>
-              <p>累计贡献: 0 次</p>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+      <div className="tabs">{SELF_OPS_CONFIG.features.map(f => (<button key={f.id}>{f.icon}{f.name}</button>))}</div><div className="tab-content">{activeTab === "revenue" && <RevenueChart history={[]} loading={revenueLoading} error={null} />}{activeTab === "promotion" && <Leaderboard entries={promotionData.leaderboard} loading={promotionLoading} error={null} />}{activeTab === "governance" && <GovernancePieChart proposal={governanceData.activeProposal || {forVotes:0,againstVotes:0}} loading={governanceLoading} error={null} />}{activeTab === "health" && <HealthReportChart stats={{bugCount:0,statusCount:0,stressCount:0,monthlyTotal:healthData.stats?.monthlyCount||0,maxMonthly:healthData.stats?.maxMonthly||10}} loading={healthLoading} error={null} />}</div></div>  );
 }
