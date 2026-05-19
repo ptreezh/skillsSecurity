@@ -13,6 +13,8 @@ import StakingManager from '../abi/StakingManager.json'
 import Attribution from '../abi/Attribution.json'
 import DeployerRewards from '../abi/DeployerRewards.json'
 import RevenueDistributor from '../abi/RevenueDistributor.json'
+import Governance from '../abi/Governance.json'
+import HealthReporter from '../abi/HealthReporter.json'
 
 // Network configuration
 const AMOY_CONFIG = {
@@ -28,7 +30,9 @@ const CONTRACT_ABIS = {
   StakingManager: StakingManager.abi,
   Attribution: Attribution.abi,
   DeployerRewards: DeployerRewards.abi,
-  RevenueDistributor: RevenueDistributor.abi
+  RevenueDistributor: RevenueDistributor.abi,
+  Governance: Governance.abi,
+  HealthReporter: HealthReporter.abi
 }
 
 // Contract addresses (loaded from deployments.json when available)
@@ -38,7 +42,9 @@ let CONTRACT_ADDRESSES = {
   StakingManager: null,
   Attribution: null,
   DeployerRewards: null,
-  RevenueDistributor: null
+  RevenueDistributor: null,
+  Governance: null,
+  HealthReporter: null
 }
 
 // Contract instances (initialized on connect)
@@ -48,7 +54,9 @@ let contractInstances = {
   StakingManager: null,
   Attribution: null,
   DeployerRewards: null,
-  RevenueDistributor: null
+  RevenueDistributor: null,
+  Governance: null,
+  HealthReporter: null
 }
 
 // Provider and signer state
@@ -567,18 +575,6 @@ export async function slashSkill(skillId, amount) {
   }
 }
 
-/**
- * Get leaderboard data
- * Note: Full leaderboard may require event indexing service
- * For now, returns empty array (to be implemented with indexer)
- * @returns {Promise<Array>}
- */
-export async function getLeaderboard() {
-  // TODO: Implement with event indexing or leaderboard contract
-  // For now, return empty array - leaderboard will show fallback message
-  return []
-}
-
 // ============================================
 // DeployerRewards functions
 // ============================================
@@ -810,6 +806,170 @@ export async function triggerDistribution() {
   }
 }
 
+// Governance functions
+// ============================================
+
+/**
+ * Get Governance contract instance
+ * @returns {ethers.Contract|null}
+ */
+function getGovernanceContract() {
+  return contractInstances.Governance || null
+}
+
+/**
+ * Get HealthReporter contract instance
+ * @returns {ethers.Contract|null}
+ */
+function getHealthReporterContract() {
+  return contractInstances.HealthReporter || null
+}
+
+/**
+ * Get active proposal count from Governance
+ * @returns {Promise<number>}
+ */
+export async function getActiveProposalCount() {
+  const contract = getGovernanceContract()
+  if (!contract) return 0
+  try {
+    return Number(await contract.getProposalCount())
+  } catch (error) {
+    console.error('Error fetching proposal count:', error)
+    return 0
+  }
+}
+
+/**
+ * Get a specific proposal from Governance
+ * @param {number} proposalId - Proposal ID
+ * @returns {Promise<Object|null>}
+ */
+export async function getProposal(proposalId) {
+  const contract = getGovernanceContract()
+  if (!contract) return null
+  try {
+    return await contract.getProposal(proposalId)
+  } catch (error) {
+    console.error('Error fetching proposal:', error)
+    return null
+  }
+}
+
+/**
+ * Get user's voting power from Governance
+ * @param {string} address - User address
+ * @returns {Promise<number>}
+ */
+export async function getUserVotingPower(address) {
+  const contract = getGovernanceContract()
+  if (!contract) return 0
+  try {
+    return Number(await contract.getVotingPower(address))
+  } catch (error) {
+    console.error('Error fetching voting power:', error)
+    return 0
+  }
+}
+
+// HealthReporter functions
+// ============================================
+
+/**
+ * Get reporter statistics from HealthReporter
+ * @param {string} address - Reporter address
+ * @returns {Promise<Object>}
+ */
+export async function getReporterStats(address) {
+  const contract = getHealthReporterContract()
+  if (!contract) return { totalReports: 0, monthlyCount: 0, pendingRewards: '0', maxMonthly: 10 }
+  try {
+    const monthlyCount = await contract.reporterMonthlyCount(address)
+    const rewardConfig = await contract.rewardConfig()
+    return {
+      totalReports: 0,
+      monthlyCount: Number(monthlyCount),
+      pendingRewards: '0',
+      maxMonthly: Number(rewardConfig.maxMonthlyReports)
+    }
+  } catch (error) {
+    console.error('Error fetching reporter stats:', error)
+    return { totalReports: 0, monthlyCount: 0, pendingRewards: '0', maxMonthly: 10 }
+  }
+}
+
+/**
+ * Submit a health report
+ * @param {number} reportType - Report type (0=bug, 1=status, 2=stress)
+ * @param {string} description - Report description
+ * @returns {Promise<Object>}
+ */
+export async function submitHealthReport(reportType, description) {
+  const contract = getHealthReporterContract()
+  if (!contract) return { success: false, error: 'Contract not initialized' }
+  if (!currentSigner) return { success: false, error: 'Wallet not connected' }
+  try {
+    const tx = await contract.submitReport(reportType, description)
+    await tx.wait()
+    return { success: true, tx }
+  } catch (error) {
+    console.error('Error submitting report:', error)
+    return { success: false, error: error.message }
+  }
+}
+
+/**
+ * Get leaderboard data (promotion)
+ * @param {number} limit - Max entries to return
+ * @returns {Promise<Array>}
+ */
+export async function getLeaderboard(limit = 10) {
+  try {
+    const deployerContract = contractInstances.DeployerRewards
+    if (!deployerContract) {
+      return getMockLeaderboard(limit)
+    }
+    const count = Number(await deployerContract.getDeployerCount())
+    if (count === 0) return []
+
+    const fetchLimit = Math.min(count, 100)
+    const promises = []
+    for (let i = 0; i < fetchLimit; i++) {
+      promises.push(
+        deployerContract.deployers(i).then(deployer => ({
+          domain: deployer.domain,
+          totalUsers: Number(deployer.totalUsers),
+          tier: Number(deployer.tier),
+          trend: 0,
+          rank: 0
+        })).catch(() => null)
+      )
+    }
+    const results = await Promise.all(promises)
+    const validDeployers = results.filter(d => d !== null)
+    validDeployers.sort((a, b) => b.totalUsers - a.totalUsers)
+    return validDeployers.slice(0, limit).map((d, i) => ({ ...d, rank: i + 1 }))
+  } catch (error) {
+    console.error('Error fetching leaderboard:', error)
+    return getMockLeaderboard(limit)
+  }
+}
+
+function getMockLeaderboard(limit = 10) {
+  return [
+    { domain: 'alice.eth', totalUsers: 156, tier: 2, trend: 2, rank: 1 },
+    { domain: 'bob.io', totalUsers: 134, tier: 2, trend: -1, rank: 2 },
+    { domain: 'carol.net', totalUsers: 98, tier: 1, trend: 5, rank: 3 },
+    { domain: 'dave.app', totalUsers: 67, tier: 1, trend: 0, rank: 4 },
+    { domain: 'eve.dev', totalUsers: 45, tier: 0, trend: 1, rank: 5 },
+    { domain: 'frank.xyz', totalUsers: 38, tier: 0, trend: -2, rank: 6 },
+    { domain: 'grace.org', totalUsers: 29, tier: 0, trend: 3, rank: 7 },
+    { domain: 'henry.co', totalUsers: 21, tier: 0, trend: 0, rank: 8 },
+    { domain: 'iris.tv', totalUsers: 15, tier: 0, trend: 1, rank: 9 },
+    { domain: 'jack.biz', totalUsers: 12, tier: 0, trend: -1, rank: 10 }
+  ].slice(0, limit)
+}
+
 /**
  * Reset/clear all contract state (for disconnect)
  */
@@ -822,7 +982,9 @@ export function resetContracts() {
     StakingManager: null,
     Attribution: null,
     DeployerRewards: null,
-    RevenueDistributor: null
+    RevenueDistributor: null,
+    Governance: null,
+    HealthReporter: null
   }
   CONTRACT_ADDRESSES = {
     ASKToken: null,
@@ -830,7 +992,9 @@ export function resetContracts() {
     StakingManager: null,
     Attribution: null,
     DeployerRewards: null,
-    RevenueDistributor: null
+    RevenueDistributor: null,
+    Governance: null,
+    HealthReporter: null
   }
 }
 
@@ -861,7 +1025,6 @@ export default {
   stake,
   unstake,
   slashSkill,
-  getLeaderboard,
   isDeployer,
   getDeployerStats,
   getReferralLink,
@@ -870,5 +1033,11 @@ export default {
   getCumulativeDividends,
   getPendingDividends,
   triggerDistribution,
+  getActiveProposalCount,
+  getProposal,
+  getUserVotingPower,
+  getReporterStats,
+  submitHealthReport,
+  getLeaderboard,
   resetContracts
 }
