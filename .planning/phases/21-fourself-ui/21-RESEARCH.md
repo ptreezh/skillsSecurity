@@ -1,6 +1,6 @@
 # Phase 21: 四自系统 UI 完善 - Research
-
 **Researched:** 2026-05-19
+**Updated:** 2026-05-19 (Open questions resolved)
 **Domain:** React Frontend / Data Visualization
 **Confidence:** MEDIUM (codebase analysis, npm verification)
 
@@ -217,7 +217,7 @@ function LeaderboardRow({ rank, deployer }) {
 ## Don't Hand-Roll
 
 | Problem | Don't Build | Use Instead | Why |
-|---------|-------------|------------|-----|
+|---------|-------------|-------------|-----|
 | Chart library | Custom SVG/Canvas | recharts 3.8.1 | Battle-tested, composable, tree-shakeable |
 | Auto-refresh | setInterval in component | usePolling hook | Clean lifecycle management, visibility API support |
 | Empty states | Inline conditionals everywhere | EmptyState component | Consistent UX, reusable |
@@ -350,28 +350,25 @@ const proposalVotes = {
 | A1 | Governance ABI can be generated from contracts/DAO/Governance.sol | ABIs | ABI must exist or be generated |
 | A2 | HealthReporter ABI can be generated from contracts/HealthReporter.sol | ABIs | ABI must exist or be generated |
 | A3 | recharts works with React 18.2.0 | Dependencies | Verified: recharts 3.x supports React 18 |
-| A4 | getLeaderboard can be implemented with deployerList iteration | Leaderboard | May need contract modification |
+| A4 | getLeaderboard can be implemented with deployerList iteration | Leaderboard | Implemented with Promise.all parallel fetching |
 
 **If this table is non-empty:** Planners should verify assumptions before finalizing plan.
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **How to implement leaderboard efficiently?**
-   - What we know: DeployerRewards has `deployerList(index)` and `getDeployerCount()`
-   - What's unclear: Is there a way to batch queries, or must we iterate one by one?
-   - Recommendation: Implement with Promise.all for parallel fetching, cache results
+1. **How to implement leaderboard efficiently?** (RESOLVED)
+   - Solution: Use `getDeployerCount()` + `deployers(i)` with Promise.all for parallel fetching
+   - Cap at 100 deployers for performance, sort by totalUsers, return Top N
 
-2. **Should we use The Graph instead of direct contract queries?**
-   - What we know: Direct queries work but scale poorly
-   - What's unclear: Is The Graph infrastructure available?
-   - Recommendation: Use direct queries for MVP, plan migration to The Graph later
+2. **Should we use The Graph instead of direct contract queries?** (RESOLVED)
+   - Decision: Use direct queries for MVP, plan migration to The Graph later if needed
+   - Direct queries are simpler and sufficient for MVP scale
 
-3. **What mock data should show when contracts aren't deployed?**
-   - What we know: ContractService has demo mode fallback
-   - What's unclear: Exact mock data structure for charts
-   - Recommendation: Use seeded random data with realistic distributions
+3. **What mock data should show when contracts aren't deployed?** (RESOLVED)
+   - Solution: Provide `getMockLeaderboard()` in ContractService with seeded realistic data
+   - Use realistic domain names (alice.eth, bob.io, etc.) and varied user counts
 
 ---
 
