@@ -8,7 +8,7 @@ import PromotionBarChart from "../components/charts/PromotionBarChart";
 import GovernancePieChart from "../components/charts/GovernancePieChart";
 import HealthReportChart from "../components/charts/HealthReportChart";
 import Leaderboard from "../components/leaderboard/Leaderboard";
-import { getCumulativeDividends, getPendingDividends, getLeaderboard, getActiveProposalCount, getProposal, getReporterStats } from "../services/ContractService";
+import { getCumulativeDividends, getPendingDividends, getLeaderboard, getActiveProposalCount, getProposal, getReporterStats, getUserVotingPower, submitHealthReport } from "../services/ContractService";
 
 const SELF_OPS_CONFIG = { features: [
   { id: "revenue", name: "REVENUE", icon: "💰", color: "#10b981" },
@@ -19,6 +19,8 @@ const SELF_OPS_CONFIG = { features: [
 
 export default function SelfOpsPanel({ user, deployerStats }) {
   const [activeTab, setActiveTab] = useState("revenue");
+  const [selectedProposal, setSelectedProposal] = useState(null);
+  const [votingPower, setVotingPower] = useState(0);
   const [revenueData, setRevenueData] = useState(null);
   const [promotionData, setPromotionData] = useState({ leaderboard: [] });
   const [governanceData, setGovernanceData] = useState({ proposals: [], activeProposal: null });
@@ -30,7 +32,8 @@ export default function SelfOpsPanel({ user, deployerStats }) {
 
   useEffect(() => { if (revenueResult) setRevenueData({ totalDividends: parseFloat(revenueResult.cumulative || 0).toFixed(2), pendingDividends: parseFloat(revenueResult.pending || 0).toFixed(2) }); }, [revenueResult]);
   useEffect(() => { if (promotionResult) setPromotionData(p => ({ ...p, leaderboard: promotionResult.leaderboard || [] })); }, [promotionResult]);
-  useEffect(() => { if (governanceResult) setGovernanceData(p => ({ ...p, proposals: governanceResult.proposals || [] })); }, [governanceResult]);
+  useEffect(() => { if (governanceResult?.proposals) setGovernanceData(p => ({ ...p, proposals: governanceResult.proposals || [] })); }, [governanceResult]);
+  useEffect(() => { if (user?.address) getUserVotingPower(user.address).then(setVotingPower); }, [user]);
   useEffect(() => { if (healthResult) setHealthData(p => ({ ...p, stats: healthResult })); }, [healthResult]);
 
   return (
@@ -39,5 +42,106 @@ export default function SelfOpsPanel({ user, deployerStats }) {
         <h2>Four-Self Ops</h2>
         <span className="deployer-badge">{deployerStats?.tier === 2 ? "Gold" : deployerStats?.tier === 1 ? "Silver" : "Bronze"}</span>
       </div>
-      <div className="tabs">{SELF_OPS_CONFIG.features.map(f => (<button key={f.id}>{f.icon}{f.name}</button>))}</div><div className="tab-content">{activeTab === "revenue" && <RevenueChart history={[]} loading={revenueLoading} error={null} />}{activeTab === "promotion" && <Leaderboard entries={promotionData.leaderboard} loading={promotionLoading} error={null} />}{activeTab === "governance" && <GovernancePieChart proposal={governanceData.activeProposal || {forVotes:0,againstVotes:0}} loading={governanceLoading} error={null} />}{activeTab === "health" && <HealthReportChart stats={{bugCount:0,statusCount:0,stressCount:0,monthlyTotal:healthData.stats?.monthlyCount||0,maxMonthly:healthData.stats?.maxMonthly||10}} loading={healthLoading} error={null} />}</div></div>  );
+      <div className="tabs">
+        {SELF_OPS_CONFIG.features.map(f => (
+          <button
+            key={f.id}
+            onClick={() => setActiveTab(f.id)}
+            className={activeTab === f.id ? 'active' : ''}
+          >
+            {f.icon}{f.name}
+          </button>
+        ))}
+      </div>
+      <div className="tab-content">
+        {activeTab === "revenue" && (
+          <RevenueChart history={[]} loading={revenueLoading} error={null} />
+        )}
+        {activeTab === "promotion" && (
+          <>
+            <PromotionBarChart data={promotionData.leaderboard} loading={promotionLoading} error={null} />
+            <Leaderboard entries={promotionData.leaderboard} loading={promotionLoading} error={null} />
+          </>
+        )}
+        {activeTab === "governance" && (
+          <>
+            <div className="governance-header">
+              <span className="voting-power">Your Voting Power: {votingPower}</span>
+            </div>
+            <GovernancePieChart
+              proposal={selectedProposal || governanceData.proposals[0] || {forVotes:0, againstVotes:0}}
+              loading={governanceLoading}
+              error={null}
+            />
+            <ul className="proposal-items">
+              {governanceData.proposals.length === 0 ? (
+                <li className="empty-proposal">No active proposals</li>
+              ) : (
+                governanceData.proposals.map(proposal => (
+                  <li
+                    key={proposal.id}
+                    className={`proposal-item ${selectedProposal?.id === proposal.id ? 'selected' : ''}`}
+                    onClick={() => setSelectedProposal(proposal)}
+                  >
+                    <span className="proposal-id">#{proposal.id}</span>
+                    <span className="proposal-votes">
+                      For: {Number(proposal.forVotes || 0)} / Against: {Number(proposal.againstVotes || 0)}
+                    </span>
+                    <div className="vote-buttons">
+                      <button className="vote-for-btn" disabled={!user}>For</button>
+                      <button className="vote-against-btn" disabled={!user}>Against</button>
+                    </div>
+                  </li>
+                ))
+              )}
+            </ul>
+          </>
+        )}
+        {activeTab === "health" && (
+          <>
+            <div className="health-actions">
+              <button
+                className="health-action-btn bug-btn"
+                onClick={() => submitHealthReport(0, "Bug report description")}
+                disabled={!user}
+              >
+                Bug Report +50 ASK
+              </button>
+              <button
+                className="health-action-btn status-btn"
+                onClick={() => submitHealthReport(1, "Status report description")}
+                disabled={!user}
+              >
+                Status Report +10 ASK
+              </button>
+              <button
+                className="health-action-btn stress-btn"
+                onClick={() => submitHealthReport(2, "Stress test description")}
+                disabled={!user}
+              >
+                Stress Test +100 ASK
+              </button>
+            </div>
+            <div className="health-stats">
+              <span className="stat-label">Remaining this month: </span>
+              <span className="stat-value">
+                {Math.max(0, (healthData.stats?.maxMonthly || 10) - (healthData.stats?.monthlyCount || 0))} / {healthData.stats?.maxMonthly || 10}
+              </span>
+            </div>
+            <HealthReportChart
+              stats={{
+                bugCount: 0,
+                statusCount: 0,
+                stressCount: 0,
+                monthlyTotal: healthData.stats?.monthlyCount || 0,
+                maxMonthly: healthData.stats?.maxMonthly || 10
+              }}
+              loading={healthLoading}
+              error={null}
+            />
+          </>
+        )}
+      </div>
+    </div>
+  );
 }
