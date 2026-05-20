@@ -56,7 +56,7 @@
 - [x] **Phase 19: 四自系统集成** - DeployerRewards × 自运营/自推广/自进化/自运维 (completed 2026-05-18)
 - [x] **Phase 20: DeployerRewards 完善** - 前端面板 + 测试覆盖 (completed 2026-05-18)
 - [x] **Phase 21: 四自系统 UI 完善** - 数据可视化 + 交互优化 (completed 2026-05-20)
-- [ ] **Phase 22: HealthReporter + 集成测试** - 完整测试 + 部署脚本
+- [x] **Phase 22: HealthReporter + 集成测试** - 完整测试 + 部署脚本 (completed 2026-05-20)
 
 ---
 
@@ -290,8 +290,8 @@ Plan list:
 **Plans**: 2 plans in 2 waves
 
 **Plan list:**
-- [ ] 22-01-PLAN.md - Core contracts (RevenueSplit, ReputationBadges, SelfSustainingEcosystem)
-- [ ] 22-02-PLAN.md - Deprecate token contracts and update existing contracts
+- [x] 22-01-PLAN.md - Core contracts (RevenueSplit, ReputationBadges, SelfSustainingEcosystem)
+- [x] 22-02-PLAN.md - Deprecate token contracts and update existing contracts
 
 
 ---
@@ -311,7 +311,7 @@ Plan list:
 | 17-19 | v1.3 | 6/6 | Complete | 2026-05-18 |
 | 20 | v1.4 | 2/2 | Complete | 2026-05-18 |
 | 21 | v1.4 | 3/3 | Complete   | 2026-05-20 |
-| 22 | v1.4 | 0/2 | Not started | - |
+| 22 | v1.4 | 2/2 | Complete    | 2026-05-20 |
 
 ---
 
