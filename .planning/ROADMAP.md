@@ -55,7 +55,7 @@
 - [x] **Phase 18: 合约连接** - 接入真实合约 (completed 2026-05-18)
 - [x] **Phase 19: 四自系统集成** - DeployerRewards × 自运营/自推广/自进化/自运维 (completed 2026-05-18)
 - [x] **Phase 20: DeployerRewards 完善** - 前端面板 + 测试覆盖 (completed 2026-05-18)
-- [ ] **Phase 21: 四自系统 UI 完善** - 数据可视化 + 交互优化
+- [x] **Phase 21: 四自系统 UI 完善** - 数据可视化 + 交互优化 (completed 2026-05-20)
 - [ ] **Phase 22: HealthReporter + 集成测试** - 完整测试 + 部署脚本
 
 ---
@@ -76,7 +76,7 @@
   3. Mocha 测试运行器配置覆盖报告功能
   4. 覆盖率报告可以为所有合约生成
 
-**Plans**: 2 plans in 2 waves
+**Plans**: 3 plans in 1 wave
 
 Plan list:
 - [x] 11-01-PLAN.md - Install plugins and update network config
@@ -120,7 +120,7 @@ Plan list:
   4. Reputation lock excludes locked amount from voting power
   5. Time-based unlock (90-day period) works with evm_increaseTime + evm_mine
 
-**Plans**: 2 plans in 2 waves
+**Plans**: 3 plans in 1 wave
 
 Plan list:
 - [x] 13-01-PLAN.md - StakingManager stake/unstake tests (STAK-01, STAK-05)
@@ -145,7 +145,7 @@ Plan list:
   6. Cross-contract notification triggers StakingManager correctly
   7. setPositiveContribution() marks contribution and triggers recovery
 
-**Plans**: 2 plans in 2 waves
+**Plans**: 3 plans in 1 wave
 
 Plan list:
 - [x] 14-01-PLAN.md - SkillRegistry unit tests (SKIL-01 to SKIL-04)
@@ -167,7 +167,7 @@ Plan list:
   3. Anti-slash flow: like -> slash -> lock -> recover completes successfully
   4. Cross-contract state synchronization maintains consistency
 
-**Plans**: 2 plans in 2 waves
+**Plans**: 3 plans in 1 wave
 
 Plan list:
 - [x] 15-01-PLAN.md - Integration test fixtures
@@ -189,7 +189,7 @@ Plan list:
   3. Contracts deployed and accessible on Polygon Amoy testnet
   4. Contracts verified on Polygonscan using hardhat-verify
 
-**Plans**: 2 plans in 2 waves
+**Plans**: 3 plans in 1 wave
 
 Plan list:
 - [ ] 16-01-PLAN.md - Configure Polygon Amoy network
@@ -246,7 +246,7 @@ Plan list:
   2. DeployerRewards 完整测试（覆盖率 > 80%）
   3. 分红计算器（预估月收入）
 
-**Plans**: 2 plans in 2 waves
+**Plans**: 3 plans in 1 wave
 
 **Plan list:**
 - [x] 20-01-PLAN.md - DeployerRewards governance tests + ContractService extension
@@ -268,11 +268,12 @@ Plan list:
   3. 自进化面板（提案列表、投票历史）
   4. 自运维面板（报告记录、奖励统计）
 
-**Plans**: 2 plans in 2 waves
+**Plans**: 3 plans in 1 wave
 
 **Plan list:**
-- [ ] 21-01-PLAN.md - Create foundation (ABIs, hooks, common components)
-- [ ] 21-02-PLAN.md - Implement chart components for all four tabs
+- [x] 21-01-PLAN.md - Create foundation (ABIs, hooks, common components)
+- [x] 21-02-PLAN.md - Implement chart components for all four tabs
+- [ ] 21-03-PLAN.md - Gap closure (governance list, health buttons, tab switching)
 
 ---
 
@@ -307,7 +308,7 @@ Plan list:
 | 16 | v1.3 | 0/2 | Not started | - |
 | 17-19 | v1.3 | 6/6 | Complete | 2026-05-18 |
 | 20 | v1.4 | 2/2 | Complete | 2026-05-18 |
-| 21 | v1.4 | 0/2 | Planning | - |
+| 21 | v1.4 | 2/2 | Complete    | 2026-05-20 |
 | 22 | v1.4 | 0/2 | Not started | - |
 
 ---
