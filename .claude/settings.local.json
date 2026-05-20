@@ -112,7 +112,10 @@
       "WebFetch(domain:hardhat.org)",
       "Bash(git -C \"F:\\\\skillsSecurity\" log --oneline --all --grep=\"14-01\" --since=\"1 hour ago\")",
       "Bash(git -C \"F:\\\\skillsSecurity\" log --oneline --all --grep=\"14-02\" --since=\"1 hour ago\")",
-      "Skill(using-superpowers)"
+      "Skill(using-superpowers)",
+      "Skill(brainstorming)",
+      "Skill(writing-plans)",
+      "Skill(subagent-driven-development)"
     ]
   }
 }

@@ -1,0 +1,196 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+/**
+ * @title DeployerRewards
+ * @notice 部署者激励合约 - 奖励推广AgentSkills的用户/社区
+ * @dev 部署者通过注册获得推荐奖励分成
+ */
+contract DeployerRewards {
+    // 代币接口
+    IERC20 public askToken;
+
+    // 部署者信息
+    struct DeployerInfo {
+        string domain;           // 部署域名
+        uint256 totalUsers;      // 总带来的用户数
+        uint256 totalRewards;    // 总获得奖励
+        bool isActive;           // 是否活跃
+        uint256 registeredAt;    // 注册时间
+    }
+
+    // 用户信息
+    struct UserInfo {
+        address referrer;        // 推荐人(部署者)
+        uint256 joinedAt;        // 加入时间
+        address deployer;        // 所属部署者
+    }
+
+    // 映射
+    mapping(address => DeployerInfo) public deployers;
+    mapping(address => UserInfo) public users;
+
+    // 部署者地址列表
+    address[] public deployerList;
+
+    // 奖励比例 (基点 100 = 1%)
+    uint256 public deployerRewardRate = 1000; // 10%
+    uint256 public userRewardRate = 500;     // 5%
+    uint256 public constant BASIS_POINTS = 10000;
+
+    // 事件
+    event DeployerRegistered(address indexed deployer, string domain);
+    event UserRegistered(address indexed user, address indexed referrer, address indexed deployer);
+    event RewardClaimed(address indexed deployer, uint256 amount);
+    event RewardDistributed(address indexed user, uint256 deployerReward, uint256 userReward);
+
+    // 错误
+    error AlreadyRegistered();
+    error NotRegistered();
+    error ZeroAddress();
+    error InvalidRewardRate();
+
+    constructor(address _askToken) {
+        if (_askToken == address(0)) revert ZeroAddress();
+        askToken = IERC20(_askToken);
+    }
+
+    /**
+     * @notice 注册为部署者
+     * @param domain 部署的域名或名称
+     */
+    function registerDeployer(string calldata domain) external {
+        if (bytes(domain).length == 0) revert ZeroAddress();
+
+        DeployerInfo storage info = deployers[msg.sender];
+        if (info.registeredAt != 0) revert AlreadyRegistered();
+
+        info.domain = domain;
+        info.isActive = true;
+        info.registeredAt = block.timestamp;
+
+        deployerList.push(msg.sender);
+
+        emit DeployerRegistered(msg.sender, domain);
+    }
+
+    /**
+     * @notice 注册用户（通过部署者推荐）
+     * @param user 用户地址
+     * @param deployer 部署者地址
+     */
+    function registerUser(address user, address deployer) external {
+        if (user == address(0) || deployer == address(0)) revert ZeroAddress();
+        if (deployers[deployer].registeredAt == 0) revert NotRegistered();
+
+        UserInfo storage info = users[user];
+        if (info.registeredAt != 0) revert AlreadyRegistered();
+
+        info.referrer = deployer;
+        info.joinedAt = block.timestamp;
+        info.deployer = deployer;
+
+        // 更新部署者统计
+        deployers[deployer].totalUsers++;
+
+        // 计算奖励
+        uint256 deployerReward = calculateDeployerReward(user);
+        uint256 userReward = calculateUserReward(user);
+
+        // 分发奖励
+        if (deployerReward > 0) {
+            askToken.transferFrom(address(this), deployer, deployerReward);
+            deployers[deployer].totalRewards += deployerReward;
+            emit RewardDistributed(user, deployerReward, userReward);
+        }
+
+        emit UserRegistered(user, deployer, deployer);
+    }
+
+    /**
+     * @notice 部署者认领累积奖励
+     */
+    function claimRewards() external {
+        DeployerInfo storage info = deployers[msg.sender];
+        if (info.totalRewards == 0) revert NotRegistered();
+
+        uint256 amount = info.totalRewards;
+        info.totalRewards = 0;
+
+        askToken.transfer(msg.sender, amount);
+
+        emit RewardClaimed(msg.sender, amount);
+    }
+
+    /**
+     * @notice 设置奖励比例（仅管理员）
+     */
+    function setRewardRates(uint256 _deployerRate, uint256 _userRate) external {
+        if (_deployerRate > BASIS_POINTS || _userRate > BASIS_POINTS) revert InvalidRewardRate();
+        deployerRewardRate = _deployerRate;
+        userRewardRate = _userRate;
+    }
+
+    // === 计算函数 ===
+
+    function calculateDeployerReward(address user) public view returns (uint256) {
+        // 基础奖励：用户首笔质押的10%
+        // 这里简化计算，实际需要从StakingManager获取质押金额
+        return 1000 * 1e18; // 1000 ASK 基础奖励
+    }
+
+    function calculateUserReward(address user) public view returns (uint256) {
+        // 用户获得首笔质押的5%作为奖励
+        return 500 * 1e18; // 500 ASK 基础奖励
+    }
+
+    // === 查询函数 ===
+
+    function getDeployerCount() external view returns (uint256) {
+        return deployerList.length;
+    }
+
+    function isDeployer(address account) external view returns (bool) {
+        return deployers[account].registeredAt != 0;
+    }
+
+    function getDeployerStats(address deployer) external view returns (
+        uint256 totalUsers,
+        uint256 totalRewards,
+        bool isActive
+    ) {
+        DeployerInfo storage info = deployers[deployer];
+        return (info.totalUsers, info.totalRewards, info.isActive);
+    }
+
+    // === 白标功能 ===
+
+    /**
+     * @notice 获取部署者的推荐链接
+     */
+    function getReferralLink(address deployer) external view returns (string memory) {
+        DeployerInfo storage info = deployers[deployer];
+        return string(abi.encodePacked("https://app.agentskills.io?ref=", toString(deployer)));
+    }
+
+    // === 工具函数 ===
+
+    function toString(address x) internal pure returns (string memory) {
+        bytes memory b = new bytes(42);
+        b[0] = '0';
+        b[1] = 'x';
+        for (uint i = 0; i < 20; i++) {
+            b[42 - 1 - i] = bytes1(uint8(uint256(uint160(x)) / (2 ** (8 * i))) % 16);
+            if (b[42 - 1 - i] < 10) b[42 - 1 - i] = bytes1(uint8(b[42 - 1 - i]) + 48);
+            else b[42 - 1 - i] = bytes1(uint8(b[42 - 1 - i]) + 87);
+        }
+        return string(b);
+    }
+}
+
+// ERC20接口
+interface IERC20 {
+    function transfer(address to, uint256 amount) external returns (bool);
+    function transferFrom(address from, address to, uint256 amount) external returns (bool);
+    function balanceOf(address account) external view returns (uint256);
+}
