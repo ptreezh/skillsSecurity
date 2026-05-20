@@ -247,8 +247,6 @@ Plan list:
   3. 分红计算器（预估月收入）
 
 **Plans**: 3 plans in 1 wave
-
-**Plan list:**
 - [x] 20-01-PLAN.md - DeployerRewards governance tests + ContractService extension
 - [x] 20-02-PLAN.md - SelfOpsPanel integration + dividend calculator
 
@@ -269,28 +267,32 @@ Plan list:
   4. 自运维面板（报告记录、奖励统计）
 
 **Plans**: 3 plans in 1 wave
-
-**Plan list:**
 - [x] 21-01-PLAN.md - Create foundation (ABIs, hooks, common components)
 - [x] 21-02-PLAN.md - Implement chart components for all four tabs
-- [ ] 21-03-PLAN.md - Gap closure (governance list, health buttons, tab switching)
+- [x] 21-03-PLAN.md - Gap closure (governance list, health buttons, tab switching)
 
 ---
 
-### Phase 22: HealthReporter + 集成测试
+### Phase 22: 无代币核心基础设施
 
-**Goal**: 完成 HealthReporter 合约并测试四自系统集成
+**Goal**: 重构为无代币架构 - 区块链 + 声誉系统 + 服务分账
 
 **Depends on**: Phase 21
 
 **Requirements**: OPS-07, OPS-08, OPS-09
 
 **Success Criteria** (what must be TRUE):
-  1. HealthReporter 完整单元测试
-  2. 四自系统端到端测试
-  3. 部署脚本更新（包含所有新合约）
+  1. RevenueSplit 合约完成（服务费分账，无代币）
+  2. ReputationBadges 合约完成（链上声誉徽章，不可转让）
+  3. 移除/禁用代币相关合约（ASKToken, DeployerRewards, RevenueDistributor）
+  4. 合规性确认（无代币 = 全球可服务）
 
-**Plans**: 2 plans in 1 wave
+**Plans**: 2 plans in 2 waves
+
+**Plan list:**
+- [ ] 22-01-PLAN.md - Core contracts (RevenueSplit, ReputationBadges, SelfSustainingEcosystem)
+- [ ] 22-02-PLAN.md - Deprecate token contracts and update existing contracts
+
 
 ---
 
@@ -308,7 +310,7 @@ Plan list:
 | 16 | v1.3 | 0/2 | Not started | - |
 | 17-19 | v1.3 | 6/6 | Complete | 2026-05-18 |
 | 20 | v1.4 | 2/2 | Complete | 2026-05-18 |
-| 21 | v1.4 | 2/2 | Complete    | 2026-05-20 |
+| 21 | v1.4 | 3/3 | Complete   | 2026-05-20 |
 | 22 | v1.4 | 0/2 | Not started | - |
 
 ---
