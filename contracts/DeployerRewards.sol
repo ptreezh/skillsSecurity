@@ -4,212 +4,41 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-/**
- * @title DeployerRewards
- * @notice Tiered incentive system for deployers who promote AgentSkills platform
- * @dev Deployers earn rewards based on their tier level when they refer new users
- */
+/// @title DeployerRewards
+/// @notice Tiered incentive system for deployers who promote AgentSkills platform
+/// @dev Deployers earn rewards based on their tier level when they refer new users
+///      DEPRECATED: AgentSkills has moved to no-token architecture.
+///      Use SelfSustainingEcosystem for role-based incentives.
+///      This contract is preserved for historical state reference only.
 contract DeployerRewards is Ownable {
-    error AlreadyRegistered();
-    error NotRegistered();
-    error InvalidTier();
-    error MonthlyLimitReached();
-    error ZeroAddress();
-    error InvalidStakeAmount();
+    bool public deprecated = true;
 
-    // =========================================================================
-    // Constants
-    // =========================================================================
-    uint256 public constant BASIS_POINTS = 10000;
-
-    // =========================================================================
-    // Tier Configuration
-    // =========================================================================
-    struct TierConfig {
-        uint256 minUsers;           // Minimum total users required
-        uint256 minActiveUsers;     // Minimum active users required
-        uint256 firstReward;        // First-time registration reward
-        uint256 activeRewardRate;   // Reward rate in basis points (e.g., 1000 = 10%)
-        uint256 monthlyLimit;       // Monthly referral limit (0 = unlimited)
+    /// @notice Deprecated
+    constructor(address _askToken) Ownable() {
+        // Preserve historical state - no initialization needed for deprecated contract
+        _askToken; // silence unused warning
     }
 
-    // =========================================================================
-    // State Variables
-    // =========================================================================
-    IERC20 public askToken;
-
-    // Tier configurations (index 0 = Bronze, 1 = Silver, 2 = Gold)
-    TierConfig[3] public tierConfigs;
-
-    // Deployer information
-    struct DeployerInfo {
-        string domain;
-        uint256 tier;
-        uint256 totalUsers;
-        uint256 activeUsers;
-        uint256 totalRewards;
-        uint256 pendingRewards;
-        uint256 monthlyCount;
-        uint256 monthStart;
-        uint256 registeredAt;
-        bool isActive;
-        bool hasClaimedFirstReward;
+    /// @notice Deprecated - registerDeployer no longer functional
+    function registerDeployer(string calldata domain) external pure {
+        domain; // silence unused warning
+        revert("Deprecated: Use SelfSustainingEcosystem for role-based incentives");
     }
 
-    mapping(address => DeployerInfo) public deployers;
-    mapping(address => bool) public isDeployer;
-
-    // User binding information
-    struct UserBinding {
-        address deployer;
-        uint256 firstStakeTime;
-        bool hasClaimed;
+    /// @notice Deprecated - onUserRegistered no longer functional
+    function onUserRegistered(address user, uint256 stakeAmount) external pure {
+        user; stakeAmount; // silence unused warning
+        revert("Deprecated: Use SelfSustainingEcosystem for role-based incentives");
     }
 
-    mapping(address => UserBinding) public userBindings;
-    mapping(address => address) public userToDeployer;
-
-    address[] public deployerList;
-
-    // =========================================================================
-    // Events
-    // =========================================================================
-    event DeployerRegistered(address indexed deployer, string domain, uint256 tier);
-    event DeployerUpgraded(address indexed deployer, uint256 oldTier, uint256 newTier);
-    event UserRegistered(address indexed user, address indexed deployer);
-    event RewardDistributed(address indexed deployer, uint256 amount, uint256 userReward);
-    event TierConfigUpdated(uint256 indexed tier, TierConfig config);
-
-    // =========================================================================
-    // Constructor
-    // =========================================================================
-    constructor(address _askToken) {
-        if (_askToken == address(0)) revert ZeroAddress();
-        askToken = IERC20(_askToken);
-
-        // Initialize tier configurations
-        // Tier 0: Bronze
-        tierConfigs[0] = TierConfig({
-            minUsers: 0,
-            minActiveUsers: 0,
-            firstReward: 1000 * 10**18,  // 1000 ASK
-            activeRewardRate: 1000,       // 10%
-            monthlyLimit: 10
-        });
-
-        // Tier 1: Silver
-        tierConfigs[1] = TierConfig({
-            minUsers: 20,
-            minActiveUsers: 10,
-            firstReward: 3000 * 10**18,  // 3000 ASK
-            activeRewardRate: 1500,       // 15%
-            monthlyLimit: 50
-        });
-
-        // Tier 2: Gold
-        tierConfigs[2] = TierConfig({
-            minUsers: 100,
-            minActiveUsers: 50,
-            firstReward: 5000 * 10**18,  // 5000 ASK
-            activeRewardRate: 2000,       // 20%
-            monthlyLimit: 0               // Unlimited
-        });
+    /// @notice Deprecated
+    function calculateTier(address deployer) external pure {
+        deployer; // silence unused warning
+        revert("Deprecated: Use SelfSustainingEcosystem for role-based incentives");
     }
 
-    // =========================================================================
-    // External Functions
-    // =========================================================================
-
-    /**
-     * @notice Register a new deployer with default Bronze tier
-     * @param domain Deployer's domain or name
-     */
-    function registerDeployer(string calldata domain) external {
-        if (bytes(domain).length == 0) revert ZeroAddress();
-
-        if (isDeployer[msg.sender]) revert AlreadyRegistered();
-
-        DeployerInfo storage info = deployers[msg.sender];
-        info.domain = domain;
-        info.tier = 0; // Bronze by default
-        info.isActive = true;
-        info.registeredAt = block.timestamp;
-        info.monthStart = block.timestamp;
-
-        isDeployer[msg.sender] = true;
-        deployerList.push(msg.sender);
-
-        emit DeployerRegistered(msg.sender, domain, 0);
-    }
-
-    /**
-     * @notice Process user registration and distribute rewards
-     * @param user User address
-     * @param stakeAmount User's first stake amount
-     */
-    function onUserRegistered(address user, uint256 stakeAmount) external {
-        if (user == address(0)) revert ZeroAddress();
-        if (stakeAmount == 0) revert InvalidStakeAmount();
-
-        DeployerInfo storage deployerInfo = deployers[msg.sender];
-        if (!isDeployer[msg.sender]) revert NotRegistered();
-
-        // Check monthly limit (0 = unlimited)
-        TierConfig memory tierConfig = tierConfigs[deployerInfo.tier];
-        if (tierConfig.monthlyLimit > 0) {
-            _resetMonthlyCountIfNeeded(msg.sender);
-            if (deployerInfo.monthlyCount >= tierConfig.monthlyLimit) {
-                revert MonthlyLimitReached();
-            }
-            deployerInfo.monthlyCount++;
-        }
-
-        // Record user binding
-        userBindings[user] = UserBinding({
-            deployer: msg.sender,
-            firstStakeTime: block.timestamp,
-            hasClaimed: false
-        });
-        userToDeployer[user] = msg.sender;
-
-        // Update deployer stats
-        deployerInfo.totalUsers++;
-
-        // Calculate and distribute rewards
-        uint256 deployerReward = (stakeAmount * tierConfig.activeRewardRate) / BASIS_POINTS;
-        uint256 userReward = (stakeAmount * 500) / BASIS_POINTS; // 5% to user
-
-        if (deployerReward > 0) {
-            deployerInfo.pendingRewards += deployerReward;
-            deployerInfo.totalRewards += deployerReward;
-
-            // Transfer rewards from contract to deployer
-            if (askToken.balanceOf(address(this)) >= deployerReward) {
-                askToken.transfer(msg.sender, deployerReward);
-            }
-        }
-
-        emit UserRegistered(user, msg.sender);
-        emit RewardDistributed(msg.sender, deployerReward, userReward);
-
-        // Check for tier upgrade
-        _checkAndUpgradeTier(msg.sender);
-    }
-
-    /**
-     * @notice Calculate and update tier based on current stats
-     * @param deployer Deployer address
-     */
-    function calculateTier(address deployer) external {
-        if (!isDeployer[deployer]) revert NotRegistered();
-        _checkAndUpgradeTier(deployer);
-    }
-
-    /**
-     * @notice Get deployer statistics
-     * @param deployer Deployer address
-     */
-    function getDeployerStats(address deployer) external view returns (
+    /// @notice Deprecated - returns empty stats
+    function getDeployerStats(address deployer) external pure returns (
         string memory domain,
         uint256 tier,
         uint256 totalUsers,
@@ -220,233 +49,100 @@ contract DeployerRewards is Ownable {
         uint256 registeredAt,
         bool isActive
     ) {
-        DeployerInfo storage info = deployers[deployer];
-        return (
-            info.domain,
-            info.tier,
-            info.totalUsers,
-            info.activeUsers,
-            info.totalRewards,
-            info.pendingRewards,
-            info.monthlyCount,
-            info.registeredAt,
-            info.isActive
-        );
+        deployer; // silence unused warning
+        return ("", 0, 0, 0, 0, 0, 0, 0, false);
     }
 
-    /**
-     * @notice Get referral link for deployer
-     * @param deployer Deployer address
-     */
-    function getReferralLink(address deployer) external view returns (string memory) {
-        if (!isDeployer[deployer]) revert NotRegistered();
-        return string(abi.encodePacked("https://app.agentskills.io/ref/", _toString(deployer)));
+    /// @notice Deprecated
+    function getReferralLink(address deployer) external pure returns (string memory) {
+        deployer; // silence unused warning
+        revert("Deprecated: Use SelfSustainingEcosystem for referral tracking");
     }
 
-    /**
-     * @notice Check if address is registered deployer
-     * @param account Address to check
-     */
-    function checkIsDeployer(address account) external view returns (bool) {
-        return isDeployer[account];
+    /// @notice Deprecated
+    function checkIsDeployer(address account) external pure returns (bool) {
+        account; // silence unused warning
+        revert("Deprecated: Use SelfSustainingEcosystem for role management");
     }
 
-    /**
-     * @notice Get tier configuration
-     * @param tierIndex Tier index (0-2)
-     */
-    function getTierInfo(uint256 tierIndex) external view returns (TierConfig memory) {
-        if (tierIndex >= 3) revert InvalidTier();
-        return tierConfigs[tierIndex];
+    /// @notice Deprecated
+    function getTierInfo(uint256 tierIndex) external pure returns (TierConfig memory) {
+        tierIndex; // silence unused warning
+        revert("Deprecated: Use SelfSustainingEcosystem for tier management");
     }
 
-    /**
-     * @notice Set tier configuration (owner only)
-     * @param tierIndex Tier index (0-2)
-     * @param config New tier configuration
-     */
-    function setTierConfig(uint256 tierIndex, TierConfig calldata config) external onlyOwner {
-        if (tierIndex >= 3) revert InvalidTier();
-        tierConfigs[tierIndex] = config;
-        emit TierConfigUpdated(tierIndex, config);
+    /// @notice Deprecated
+    function setTierConfig(uint256 tierIndex, TierConfig calldata config) external pure {
+        tierIndex; config; // silence unused warning
+        revert("Deprecated: Use SelfSustainingEcosystem for tier management");
     }
 
-    /**
-     * @notice Get deployer count
-     */
-    function getDeployerCount() external view returns (uint256) {
-        return deployerList.length;
+    /// @notice Deprecated
+    function getDeployerCount() external pure returns (uint256) {
+        revert("Deprecated: Use SelfSustainingEcosystem for deployer count");
     }
 
-    /**
-     * @notice Claim pending deployer rewards
-     */
-    function claimRewards() external {
-        if (!isDeployer[msg.sender]) revert NotRegistered();
-
-        DeployerInfo storage info = deployers[msg.sender];
-        uint256 amount = info.pendingRewards;
-
-        if (amount == 0) revert NotRegistered();
-
-        info.pendingRewards = 0;
-        askToken.transfer(msg.sender, amount);
+    /// @notice Deprecated
+    function claimRewards() external pure {
+        revert("Deprecated: Use SelfSustainingEcosystem for reward claims");
     }
 
-    /**
-     * @notice Update user as active (called by external system)
-     * @param user User address
-     */
-    function setUserActive(address user, address deployer) external {
-        if (!isDeployer[deployer]) revert NotRegistered();
-
-        DeployerInfo storage info = deployers[deployer];
-        info.activeUsers++;
+    /// @notice Deprecated
+    function setUserActive(address user, address deployer) external pure {
+        user; deployer; // silence unused warning
+        revert("Deprecated: Use SelfSustainingEcosystem for user activity");
     }
 
-    // =========================================================================
-    // Dividend & Governance Interfaces (四自系统集成)
-    // =========================================================================
-
-    /**
-     * @notice Get pending dividend for deployer
-     * @param deployer Deployer address
-     * @return Pending ASK dividend amount
-     */
-    function getDividend(address deployer) external view returns (uint256) {
-        if (!isDeployer[deployer]) return 0;
-        DeployerInfo storage info = deployers[deployer];
-        return info.pendingRewards;
+    /// @notice Deprecated
+    function getDividend(address deployer) external pure returns (uint256) {
+        deployer; // silence unused warning
+        revert("Deprecated: Use SelfSustainingEcosystem for dividends");
     }
 
-    /**
-     * @notice Claim dividend (called by RevenueDistributor)
-     * @param deployer Deployer address
-     * @param amount Dividend amount
-     */
-    function claimDividend(address deployer, uint256 amount) external {
-        require(msg.sender == owner() || msg.sender == address(this), "Not authorized");
-        DeployerInfo storage info = deployers[deployer];
-        require(info.pendingRewards >= amount, "Insufficient dividend");
-
-        info.pendingRewards -= amount;
-        askToken.transfer(deployer, amount);
+    /// @notice Deprecated
+    function claimDividend(address deployer, uint256 amount) external pure {
+        deployer; amount; // silence unused warning
+        revert("Deprecated: Use SelfSustainingEcosystem for dividends");
     }
 
-    /**
-     * @notice Get governance weight for Governance contract integration
-     * @param deployer Deployer address
-     * @return Governance weight score
-     * @dev Bronze: 1 vote/50 users, Silver: 1 vote/20 users, Gold: 1 vote/10 users + bonus
-     */
-    function getGovernanceWeight(address deployer) external view returns (uint256) {
-        if (!isDeployer[deployer]) return 0;
-
-        DeployerInfo storage info = deployers[deployer];
-
-        // Base weight: per user
-        uint256 baseWeight = info.totalUsers * 1e18;
-
-        // Tier bonus
-        uint256 tierBonus = 0;
-        if (info.tier == 1) {
-            tierBonus = 100e18;  // Silver: +100
-        } else if (info.tier == 2) {
-            tierBonus = 500e18; // Gold: +500
-        }
-
-        return baseWeight + tierBonus;
+    /// @notice Deprecated
+    function getGovernanceWeight(address deployer) external pure returns (uint256) {
+        deployer; // silence unused warning
+        revert("Deprecated: Use SelfSustainingEcosystem for governance weight");
     }
 
-    /**
-     * @notice Check if deployer is Gold tier (special privileges)
-     * @param deployer Deployer address
-     * @return True if Gold tier
-     */
-    function isGoldTier(address deployer) external view returns (bool) {
-        if (!isDeployer[deployer]) return false;
-        return deployers[deployer].tier == 2;
+    /// @notice Deprecated
+    function isGoldTier(address deployer) external pure returns (bool) {
+        deployer; // silence unused warning
+        revert("Deprecated: Use SelfSustainingEcosystem for tier info");
     }
 
-    /**
-     * @notice Get effective referral count (for reward calculation)
-     * @param deployer Deployer address
-     * @return Effective referral users
-     */
-    function getEffectiveReferrals(address deployer) external view returns (uint256) {
-        if (!isDeployer[deployer]) return 0;
-        DeployerInfo storage info = deployers[deployer];
-        return info.totalUsers;
+    /// @notice Deprecated
+    function getEffectiveReferrals(address deployer) external pure returns (uint256) {
+        deployer; // silence unused warning
+        revert("Deprecated: Use SelfSustainingEcosystem for referrals");
     }
 
-    /**
-     * @notice Get reward rate in basis points
-     * @param deployer Deployer address
-     * @return Reward rate (10000 = 100%)
-     */
-    function getRewardRate(address deployer) external view returns (uint256) {
-        if (!isDeployer[deployer]) return 0;
-        DeployerInfo storage info = deployers[deployer];
-        TierConfig memory config = tierConfigs[info.tier];
-        return config.activeRewardRate;
+    /// @notice Deprecated
+    function getRewardRate(address deployer) external pure returns (uint256) {
+        deployer; // silence unused warning
+        revert("Deprecated: Use SelfSustainingEcosystem for reward rates");
     }
 
-    // =========================================================================
-    // Internal Functions
-    // =========================================================================
-
-    /**
-     * @notice Check and upgrade tier if thresholds are met
-     */
-    function _checkAndUpgradeTier(address deployer) internal {
-        DeployerInfo storage info = deployers[deployer];
-        uint256 oldTier = info.tier;
-        uint256 newTier = oldTier;
-
-        // Check each tier from highest to lowest
-        for (uint256 i = 2; i >= 1; i--) {
-            TierConfig memory config = tierConfigs[i];
-            if (info.totalUsers >= config.minUsers && info.activeUsers >= config.minActiveUsers) {
-                newTier = i;
-                break;
-            }
-        }
-
-        if (newTier > oldTier) {
-            info.tier = newTier;
-            emit DeployerUpgraded(deployer, oldTier, newTier);
-        }
+    /// @notice Check if contract is deprecated
+    function isDeprecated() external pure returns (bool) {
+        return true;
     }
 
-    /**
-     * @notice Reset monthly count if new month started
-     */
-    function _resetMonthlyCountIfNeeded(address deployer) internal {
-        DeployerInfo storage info = deployers[deployer];
-        uint256 currentMonth = block.timestamp / 30 days;
-        uint256 storedMonth = info.monthStart / 30 days;
+    // Reserved storage slots for upgrade compatibility
+    uint256[50] private __gap;
 
-        if (currentMonth > storedMonth) {
-            info.monthlyCount = 0;
-            info.monthStart = block.timestamp;
-        }
-    }
-
-    /**
-     * @notice Convert address to string
-     */
-    function _toString(address x) internal pure returns (string memory) {
-        bytes memory b = new bytes(42);
-        b[0] = "0";
-        b[1] = "x";
-        for (uint256 i = 0; i < 20; i++) {
-            // Extract byte from most significant to least significant
-            uint256 byteVal = uint256(uint160(x)) / (2 ** (8 * (19 - i))) % 256;
-            uint8 hi = uint8(byteVal / 16);
-            uint8 lo = uint8(byteVal % 16);
-            b[2 + i * 2] = hi < 10 ? bytes1(hi + 48) : bytes1(hi + 87);
-            b[2 + i * 2 + 1] = lo < 10 ? bytes1(lo + 48) : bytes1(lo + 87);
-        }
-        return string(b);
+    // Tier configuration struct - preserved for historical reference
+    struct TierConfig {
+        uint256 minUsers;
+        uint256 minActiveUsers;
+        uint256 firstReward;
+        uint256 activeRewardRate;
+        uint256 monthlyLimit;
     }
 }

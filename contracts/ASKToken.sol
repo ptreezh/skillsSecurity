@@ -5,6 +5,11 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+/// @title ASKToken
+/// @notice AgentSkills token contract
+/// @dev DEPRECATED: AgentSkills has moved to no-token architecture.
+/// Use RevenueSplit for service fee distribution. No token needed.
+/// This contract is preserved for historical state reference only.
 contract ASKToken is ERC20, ERC20Burnable, Ownable {
     uint256 public constant MAX_SUPPLY = 1_000_000_000 * 10**18;
     uint256 public constant COMMUNITY = 600_000_000 * 10**18;
@@ -15,21 +20,44 @@ contract ASKToken is ERC20, ERC20Burnable, Ownable {
     mapping(address => address) private _delegates;
     mapping(address => uint256[]) private _pastVotes;
 
+    bool public deprecated = true;
+
     constructor() ERC20("AgentSkills Token", "ASK") Ownable() {
         _mint(msg.sender, MAX_SUPPLY);
     }
 
+    /// @notice Deprecated - token architecture no longer used
     function getVotes(address account) external view returns (uint256) {
-        return _votes[account];
+        account; // silence unused warning
+        revert("Deprecated: No token architecture");
     }
 
+    /// @notice Deprecated - token architecture no longer used
     function delegate(address delegatee) external {
-        _delegates[msg.sender] = delegatee;
-        _votes[delegatee] += balanceOf(msg.sender);
+        delegatee; // silence unused warning
+        revert("Deprecated: No token architecture");
     }
 
+    /// @notice Deprecated - token architecture no longer used
     function mint(address to, uint256 amount) external onlyOwner {
-        require(totalSupply() + amount <= MAX_SUPPLY, "Max supply exceeded");
-        _mint(to, amount);
+        to; amount; // silence unused warning
+        revert("Deprecated: No token architecture");
+    }
+
+    /// @notice Deprecated - token architecture no longer used
+    function transfer(address to, uint256 amount) public pure override returns (bool) {
+        to; amount; // silence unused warning
+        revert("Deprecated: No token architecture");
+    }
+
+    /// @notice Deprecated - token architecture no longer used
+    function transferFrom(address from, address to, uint256 amount) public pure override returns (bool) {
+        from; to; amount; // silence unused warning
+        revert("Deprecated: No token architecture");
+    }
+
+    /// @notice Check if contract is deprecated
+    function isDeprecated() external pure returns (bool) {
+        return true;
     }
 }
