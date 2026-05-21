@@ -57,7 +57,7 @@
 - [x] **Phase 20: DeployerRewards 完善** - 前端面板 + 测试覆盖 (completed 2026-05-18)
 - [x] **Phase 21: 四自系统 UI 完善** - 数据可视化 + 交互优化 (completed 2026-05-20)
 - [x] **Phase 22: 无代币核心基础设施** - RevenueSplit, ReputationBadges, 合约禁用 (completed 2026-05-20)
-- [ ] **Phase 23: 无 Token 核心重构** - 移除核心合约对 ASKToken 的依赖，完成无 token 架构
+- [x] **Phase 23: 无 Token 核心重构** - 移除核心合约对 ASKToken 的依赖，完成无 token 架构 (completed 2026-05-21)
 
 ---
 
@@ -313,9 +313,9 @@ Plan list:
 **Plans**: 3 plans in 2 waves
 
 **Plan list:**
-- [ ] 23-01-PLAN.md - Refactor StakingManager to remove ASKToken dependency
-- [ ] 23-02-PLAN.md - Refactor SkillRegistry to remove ASKToken dependency
-- [ ] 23-03-PLAN.md - Update tests and verify contracts work without token
+- [x] 23-01-PLAN.md - Refactor StakingManager to remove ASKToken dependency
+- [x] 23-02-PLAN.md - Refactor SkillRegistry to remove ASKToken dependency
+- [x] 23-03-PLAN.md - Update tests and verify contracts work without token
 
 ---
 
@@ -335,7 +335,7 @@ Plan list:
 | 20 | v1.4 | 2/2 | Complete | 2026-05-18 |
 | 21 | v1.4 | 3/3 | Complete | 2026-05-20 |
 | 22 | v1.4 | 2/2 | Complete | 2026-05-20 |
-| 23 | v1.4 | 0/3 | Planning | - |
+| 23 | v1.4 | 3/3 | Complete    | 2026-05-21 |
 
 ---
 
