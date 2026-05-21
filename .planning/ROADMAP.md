@@ -346,7 +346,7 @@ Plan list:
 | 21 | v1.4 | 3/3 | Complete | 2026-05-20 |
 | 22 | v1.4 | 2/2 | Complete | 2026-05-20 |
 | 23 | v1.4 | 3/3 | Complete    | 2026-05-21 |
-| 24 | v1.5 | TBD | Not started | - |
+| 24 | v1.5 | 4/4 | Planning | - |
 | 25 | v1.6 | 0/4 | Planning | - |
 
 ---
