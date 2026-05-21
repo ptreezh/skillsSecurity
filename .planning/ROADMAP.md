@@ -5,7 +5,7 @@
 - [x] **v1.1 标准文档完善** - Phases 1-7 (shipped 2026-05-15)
 - [x] **v1.2 技术债补齐** - Phases 8-10 (shipped 2026-05-16)
 - [x] **v1.3 测试与部署** - Phases 11-19 (shipped 2026-05-18)
-- [ ] **v1.4 自主运营** - Phases 20-23 (planning)
+- [x] **v1.4 自主运营** - Phases 20-23 (completed 2026-05-21)
 - [ ] **v1.5 安全加固** - Phases 24 (planning)
 - [ ] **v1.6 产品完善** - Phases 25 (planning)
 
@@ -40,8 +40,14 @@
 
 ### v1.4 自主运营 (Phases 20-23)
 
-**In progress**
+**Shipped:** 2026-05-21
 **Goal:** 完善已部署的四自系统组件，移除代币依赖，完成无 token 架构
+
+**Resolved:**
+- DeployerRewards + RevenueDistributor frontend panels
+- SelfOpsPanel with 4 tabs (revenue, promotion, governance, health)
+- No-token architecture: RevenueSplit, ReputationBadges, SelfSustainingEcosystem
+- Core contracts refactored (StakingManager, SkillRegistry) to remove ASKToken dependency
 
 ---
 
@@ -341,7 +347,7 @@ Plan list:
 | 22 | v1.4 | 2/2 | Complete | 2026-05-20 |
 | 23 | v1.4 | 3/3 | Complete    | 2026-05-21 |
 | 24 | v1.5 | TBD | Not started | - |
-| 25 | v1.6 | TBD | Not started | - |
+| 25 | v1.6 | 0/4 | Planning | - |
 
 ---
 
@@ -381,10 +387,10 @@ Plan list:
   4. API 文档完成
   5. 用户指南完成
 
-**Plans**: TBD
+**Plans**: 4 plans in 3 waves
 
 **Plan list:**
-- [ ] 25-01-PLAN.md - Complete frontend core features
+- [x] 25-01-PLAN.md - Complete frontend core features
 - [ ] 25-02-PLAN.md - Build monitoring and alerting system
 - [ ] 25-03-PLAN.md - Implement Timelock governance
 - [ ] 25-04-PLAN.md - Create API documentation and user guide
@@ -392,4 +398,4 @@ Plan list:
 ---
 
 *Roadmap created: 2026-05-16*
-*Last updated: 2026-05-21 after Phase 23 planning*
+*Last updated: 2026-05-21 after Phase 25 planning*
