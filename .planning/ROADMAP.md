@@ -6,6 +6,8 @@
 - [x] **v1.2 技术债补齐** - Phases 8-10 (shipped 2026-05-16)
 - [x] **v1.3 测试与部署** - Phases 11-19 (shipped 2026-05-18)
 - [ ] **v1.4 自主运营** - Phases 20-23 (planning)
+- [ ] **v1.5 安全加固** - Phases 24 (planning)
+- [ ] **v1.6 产品完善** - Phases 25 (planning)
 
 ---
 
@@ -58,6 +60,8 @@
 - [x] **Phase 21: 四自系统 UI 完善** - 数据可视化 + 交互优化 (completed 2026-05-20)
 - [x] **Phase 22: 无代币核心基础设施** - RevenueSplit, ReputationBadges, 合约禁用 (completed 2026-05-20)
 - [x] **Phase 23: 无 Token 核心重构** - 移除核心合约对 ASKToken 的依赖，完成无 token 架构 (completed 2026-05-21)
+- [ ] **Phase 24: 安全加固** - 修复高风险漏洞，添加多签机制，委托第三方审计
+- [ ] **Phase 25: 产品完善** - 完善前端功能，搭建监控系统，实现 Timelock 治理
 
 ---
 
@@ -336,6 +340,54 @@ Plan list:
 | 21 | v1.4 | 3/3 | Complete | 2026-05-20 |
 | 22 | v1.4 | 2/2 | Complete | 2026-05-20 |
 | 23 | v1.4 | 3/3 | Complete    | 2026-05-21 |
+| 24 | v1.5 | TBD | Not started | - |
+| 25 | v1.6 | TBD | Not started | - |
+
+---
+
+### Phase 24: 安全加固
+
+**Goal**: 修复高风险漏洞，添加多签机制，委托第三方审计
+
+**Depends on**: Phase 23
+
+**Success Criteria** (what must be TRUE):
+  1. `setEffectiveReputation()` 漏洞已修复
+  2. 多签机制已实现（至少 3-of-5）
+  3. 紧急暂停机制已添加
+  4. 所有合约编译通过，测试通过
+  5. 第三方安全审计报告完成
+
+**Plans**: TBD
+
+**Plan list:**
+- [ ] 24-01-PLAN.md - Fix critical vulnerabilities (setEffectiveReputation, reentrancy)
+- [ ] 24-02-PLAN.md - Implement multi-signature governance
+- [ ] 24-03-PLAN.md - Add emergency pause mechanism
+- [ ] 24-04-PLAN.md - Complete security audit preparation
+
+---
+
+### Phase 25: 产品完善
+
+**Goal**: 完善前端功能，搭建监控系统，实现 Timelock 治理
+
+**Depends on**: Phase 24
+
+**Success Criteria** (what must be TRUE):
+  1. 前端 SelfOpsPanel 功能完整
+  2. 监控系统部署（Gas 监控、异常告警）
+  3. Timelock 治理合约实现
+  4. API 文档完成
+  5. 用户指南完成
+
+**Plans**: TBD
+
+**Plan list:**
+- [ ] 25-01-PLAN.md - Complete frontend core features
+- [ ] 25-02-PLAN.md - Build monitoring and alerting system
+- [ ] 25-03-PLAN.md - Implement Timelock governance
+- [ ] 25-04-PLAN.md - Create API documentation and user guide
 
 ---
 
