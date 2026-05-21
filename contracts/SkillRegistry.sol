@@ -3,7 +3,6 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
-import "./ASKToken.sol";
 import "./StakingManager.sol";
 
 struct Skill {
@@ -44,11 +43,9 @@ contract SkillRegistry is Ownable {
     uint256 public constant MIN_STAKE_HIGH = 100 ether;
     uint256 public constant MIN_STAKE_CRITICAL = 200 ether;
     
-    ASKToken public immutable token;
     StakingManager public stakingManager;
 
-    constructor(address _token, address _stakingManager) Ownable() {
-        token = ASKToken(_token);
+    constructor(address _stakingManager) Ownable() {
         stakingManager = StakingManager(_stakingManager);
     }
     
@@ -70,9 +67,8 @@ contract SkillRegistry is Ownable {
         string memory _version
     ) external returns (uint256) {
         require(!nameTaken[_name], "Name taken");
-        
+
         uint256 stakeAmount = _getStakeAmount(_riskLevel);
-        require(token.transferFrom(msg.sender, address(this), stakeAmount), "Stake failed");
 
         // Check effective reputation (exclude locked) based on risk level
         int256 effectiveRep = stakingManager.getUserReputation(msg.sender);
