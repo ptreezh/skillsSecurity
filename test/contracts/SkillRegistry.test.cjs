@@ -7,15 +7,7 @@ describe("SkillRegistry", function() {
 
   async function deploy() {
     const result = await loadFixture(fixture);
-    // Fund registry with tokens for stakes to be withdrawable
-    await result.token.transfer(result.registry.target, ethers.parseEther("1000000"));
     return result;
-  }
-
-  // Helper to fund a user with tokens and approve the registry
-  async function fundUser(token, user, registry, amount) {
-    await token.transfer(user.address, amount);
-    await token.connect(user).approve(registry.target, amount);
   }
 
   // Helper to give effective reputation via setEffectiveReputation (test-only helper)
@@ -28,8 +20,7 @@ describe("SkillRegistry", function() {
   describe("registerSkill - Reputation Thresholds", function() {
 
     it("LOW risk should register without reputation check", async function() {
-      const { registry, token, user1 } = await deploy();
-      await fundUser(token, user1, registry, ethers.parseEther("100"));
+      const { registry, user1 } = await deploy();
 
       await expect(registry.connect(user1).registerSkill(
         "LOWSkill",
@@ -43,8 +34,7 @@ describe("SkillRegistry", function() {
     });
 
     it("MEDIUM risk should revert when effective reputation < 500", async function() {
-      const { registry, token, user1 } = await deploy();
-      await fundUser(token, user1, registry, ethers.parseEther("100"));
+      const { registry, user1 } = await deploy();
 
       await expect(
         registry.connect(user1).registerSkill(
@@ -59,10 +49,9 @@ describe("SkillRegistry", function() {
     });
 
     it("MEDIUM risk should register when effective reputation >= 500", async function() {
-      const { registry, staking, owner, token, user1 } = await deploy();
-      // Give user1 500 effective reputation via likeSkill (250 calls * +2)
+      const { registry, staking, owner, user1 } = await deploy();
+      // Give user1 500 effective reputation via setEffectiveReputation
       await giveEffectiveReputation(staking, owner, user1, 500);
-      await fundUser(token, user1, registry, ethers.parseEther("100"));
 
       await expect(registry.connect(user1).registerSkill(
         "MEDIUMSkill",
@@ -76,9 +65,8 @@ describe("SkillRegistry", function() {
     });
 
     it("HIGH risk should register when effective reputation >= 2000", async function() {
-      const { registry, staking, owner, token, user1 } = await deploy();
+      const { registry, staking, owner, user1 } = await deploy();
       await giveEffectiveReputation(staking, owner, user1, 2000);
-      await fundUser(token, user1, registry, ethers.parseEther("300"));
 
       await expect(registry.connect(user1).registerSkill(
         "HIGHSkill",
@@ -92,10 +80,9 @@ describe("SkillRegistry", function() {
     });
 
     it("HIGH risk should revert when effective reputation < 2000", async function() {
-      const { registry, staking, owner, token, user1 } = await deploy();
+      const { registry, staking, owner, user1 } = await deploy();
       // Give only 1000 effective reputation
       await giveEffectiveReputation(staking, owner, user1, 1000);
-      await fundUser(token, user1, registry, ethers.parseEther("200"));
 
       await expect(
         registry.connect(user1).registerSkill(
@@ -110,9 +97,8 @@ describe("SkillRegistry", function() {
     });
 
     it("CRITICAL risk should register when effective reputation >= 5000", async function() {
-      const { registry, staking, owner, token, user1 } = await deploy();
+      const { registry, staking, owner, user1 } = await deploy();
       await giveEffectiveReputation(staking, owner, user1, 5000);
-      await fundUser(token, user1, registry, ethers.parseEther("300"));
 
       await expect(registry.connect(user1).registerSkill(
         "CRITICALSkill",
@@ -126,10 +112,9 @@ describe("SkillRegistry", function() {
     });
 
     it("CRITICAL risk should revert when effective reputation < 5000", async function() {
-      const { registry, staking, owner, token, user1 } = await deploy();
+      const { registry, staking, owner, user1 } = await deploy();
       // Give only 4000 effective reputation
       await giveEffectiveReputation(staking, owner, user1, 4000);
-      await fundUser(token, user1, registry, ethers.parseEther("300"));
 
       await expect(
         registry.connect(user1).registerSkill(
@@ -144,8 +129,7 @@ describe("SkillRegistry", function() {
     });
 
     it("should emit FingerprintGenerated event on registration", async function() {
-      const { registry, token, user1 } = await deploy();
-      await fundUser(token, user1, registry, ethers.parseEther("100"));
+      const { registry, user1 } = await deploy();
 
       await expect(registry.connect(user1).registerSkill(
         "FingerprintSkill",
@@ -205,8 +189,7 @@ describe("SkillRegistry", function() {
     });
 
     it("stored fingerprint should match computed fingerprint from registration", async function() {
-      const { registry, token, user1 } = await deploy();
-      await fundUser(token, user1, registry, ethers.parseEther("100"));
+      const { registry, user1 } = await deploy();
 
       const ipfsHash = "QmStoredFingerprint";
       const tx = await registry.connect(user1).registerSkill(
@@ -239,9 +222,8 @@ describe("SkillRegistry", function() {
   describe("verifySkill", function() {
 
     it("should verify LOW risk skill when verifier has 100+ effective reputation", async function() {
-      const { registry, staking, owner, token, user1, user2 } = await deploy();
-      // user1 registers LOW skill
-      await fundUser(token, user1, registry, ethers.parseEther("100"));
+      const { registry, staking, owner, user1, user2 } = await deploy();
+      // user1 registers LOW skill (no reputation needed)
       await registry.connect(user1).registerSkill("LowSkill", "", "trigger", "QmLow", 0, "v1");
 
       // user2 gets 100 effective reputation
@@ -253,10 +235,9 @@ describe("SkillRegistry", function() {
     });
 
     it("should verify MEDIUM risk skill when verifier has 500+ effective reputation", async function() {
-      const { registry, staking, owner, token, user1, user2 } = await deploy();
+      const { registry, staking, owner, user1, user2 } = await deploy();
       // user1 registers MEDIUM skill (needs 500 reputation)
       await giveEffectiveReputation(staking, owner, user1, 500);
-      await fundUser(token, user1, registry, ethers.parseEther("100"));
       await registry.connect(user1).registerSkill("MedSkill", "", "trigger", "QmMed", 1, "v1");
 
       // user2 gets 500 effective reputation to verify
@@ -268,10 +249,9 @@ describe("SkillRegistry", function() {
     });
 
     it("should verify HIGH risk skill when verifier has 1000+ effective reputation", async function() {
-      const { registry, staking, owner, token, user1, user2 } = await deploy();
+      const { registry, staking, owner, user1, user2 } = await deploy();
       // user1 registers HIGH skill (needs 2000 reputation)
       await giveEffectiveReputation(staking, owner, user1, 2000);
-      await fundUser(token, user1, registry, ethers.parseEther("200"));
       await registry.connect(user1).registerSkill("HighSkill", "", "trigger", "QmHigh", 2, "v1");
 
       // user2 gets 1000 effective reputation to verify
@@ -283,10 +263,9 @@ describe("SkillRegistry", function() {
     });
 
     it("should verify CRITICAL risk skill when verifier has 2000+ effective reputation", async function() {
-      const { registry, staking, owner, token, user1, user2 } = await deploy();
+      const { registry, staking, owner, user1, user2 } = await deploy();
       // user1 registers CRITICAL skill (needs 5000 reputation)
       await giveEffectiveReputation(staking, owner, user1, 5000);
-      await fundUser(token, user1, registry, ethers.parseEther("300"));
       await registry.connect(user1).registerSkill("CritSkill", "", "trigger", "QmCrit", 3, "v1");
 
       // user2 gets 2000 effective reputation to verify
@@ -298,9 +277,8 @@ describe("SkillRegistry", function() {
     });
 
     it("should revert verifySkill when verifier has insufficient reputation", async function() {
-      const { registry, staking, owner, token, user1, user2 } = await deploy();
-      // user1 registers LOW skill
-      await fundUser(token, user1, registry, ethers.parseEther("100"));
+      const { registry, staking, owner, user1, user2 } = await deploy();
+      // user1 registers LOW skill (no reputation needed)
       await registry.connect(user1).registerSkill("LowSkill2", "", "trigger", "QmLow2", 0, "v1");
 
       // user2 has only 50 effective reputation (below 100 threshold)
@@ -312,9 +290,8 @@ describe("SkillRegistry", function() {
     });
 
     it("verifySkill with pass=true should trigger setPositiveContribution (SKIL-04)", async function() {
-      const { registry, staking, owner, token, user1, user2 } = await deploy();
-      // user1 registers LOW skill
-      await fundUser(token, user1, registry, ethers.parseEther("100"));
+      const { registry, staking, owner, user1, user2 } = await deploy();
+      // user1 registers LOW skill (no reputation needed)
       await registry.connect(user1).registerSkill("LowSkill3", "", "trigger", "QmLow3", 0, "v1");
 
       // user2 has 100 effective reputation
@@ -330,9 +307,8 @@ describe("SkillRegistry", function() {
     });
 
     it("verifySkill with pass=false should NOT trigger setPositiveContribution", async function() {
-      const { registry, staking, owner, token, user1, user2 } = await deploy();
-      // user1 registers LOW skill
-      await fundUser(token, user1, registry, ethers.parseEther("100"));
+      const { registry, staking, owner, user1, user2 } = await deploy();
+      // user1 registers LOW skill (no reputation needed)
       await registry.connect(user1).registerSkill("LowSkill4", "", "trigger", "QmLow4", 0, "v1");
 
       // user2 has 100 effective reputation
@@ -356,8 +332,7 @@ describe("SkillRegistry", function() {
     });
 
     it("verifiedSkills mapping should be set correctly after verification", async function() {
-      const { registry, staking, owner, token, user1, user2 } = await deploy();
-      await fundUser(token, user1, registry, ethers.parseEther("100"));
+      const { registry, staking, owner, user1, user2 } = await deploy();
       await registry.connect(user1).registerSkill("VerifyMapTest", "", "trigger", "QmMap", 0, "v1");
 
       await giveEffectiveReputation(staking, owner, user2, 100);
@@ -367,7 +342,7 @@ describe("SkillRegistry", function() {
     });
   });
 
-  // --- Additional: getFingerprint and getUserReputation integration ---
+  // --- Additional: getFingerprint ---
 
   describe("getFingerprint", function() {
 
@@ -377,9 +352,7 @@ describe("SkillRegistry", function() {
     });
 
     it("should return non-zero fingerprint for registered skill", async function() {
-      const { registry, token, user1 } = await deploy();
-      await token.transfer(user1.address, ethers.parseEther("100"));
-      await token.connect(user1).approve(registry.target, ethers.parseEther("100"));
+      const { registry, user1 } = await deploy();
       await registry.connect(user1).registerSkill("SomeSkill", "", "trigger", "QmSome", 0, "v1");
       // skillId 0 is registered - should have a valid non-zero fingerprint
       const fp = await registry.getFingerprint(0);
