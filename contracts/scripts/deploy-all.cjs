@@ -1,11 +1,10 @@
 /**
  * AgentSkills Deployment Script - Polygon Amoy
  *
- * Deploys all contracts in correct dependency order:
- * 1. ASKToken (no dependencies)
- * 2. StakingManager (requires ASKToken address)
- * 3. SkillRegistry (requires ASKToken + StakingManager addresses)
- * 4. Attribution (no constructor args, then wire setStakingManager)
+ * Deploys all contracts in correct dependency order (no-token architecture):
+ * 1. StakingManager (no constructor args)
+ * 2. SkillRegistry (requires StakingManager address)
+ * 3. Attribution (no constructor args, then wire setStakingManager)
  *
  * Usage: npx hardhat run contracts/scripts/deploy-all.cjs --network polygonAmoy
  */
@@ -27,6 +26,7 @@ const POLYGONSCAN_API_KEY = process.env.POLYGONSCAN_API_KEY;
 async function main() {
   console.log("=".repeat(60));
   console.log("AgentSkills Deployment - Polygon Amoy Testnet");
+  console.log("(No-Token Architecture)");
   console.log("=".repeat(60));
   console.log("Network:", hre.network.name);
   console.log("Chain ID:", hre.network.config.chainId);
@@ -40,35 +40,26 @@ async function main() {
 
   const deployed = {};
 
-  // 1. Deploy ASKToken (D-03: deployment order)
-  console.log("\n[1/4] Deploying ASKToken...");
-  const ASKToken = await hre.ethers.getContractFactory("ASKToken", wallet);
-  const askToken = await ASKToken.deploy();
-  await askToken.waitForDeployment();
-  const askTokenAddress = await askToken.getAddress();
-  deployed.ASKToken = askTokenAddress;
-  console.log("  ASKToken deployed to:", askTokenAddress);
-
-  // 2. Deploy StakingManager
-  console.log("\n[2/4] Deploying StakingManager...");
+  // 1. Deploy StakingManager (no constructor args in no-token architecture)
+  console.log("\n[1/3] Deploying StakingManager...");
   const StakingManager = await hre.ethers.getContractFactory("StakingManager", wallet);
-  const stakingManager = await StakingManager.deploy(askTokenAddress);
+  const stakingManager = await StakingManager.deploy();
   await stakingManager.waitForDeployment();
   const stakingManagerAddress = await stakingManager.getAddress();
   deployed.StakingManager = stakingManagerAddress;
   console.log("  StakingManager deployed to:", stakingManagerAddress);
 
-  // 3. Deploy SkillRegistry
-  console.log("\n[3/4] Deploying SkillRegistry...");
+  // 2. Deploy SkillRegistry (only stakingManager address)
+  console.log("\n[2/3] Deploying SkillRegistry...");
   const SkillRegistry = await hre.ethers.getContractFactory("SkillRegistry", wallet);
-  const skillRegistry = await SkillRegistry.deploy(askTokenAddress, stakingManagerAddress);
+  const skillRegistry = await SkillRegistry.deploy(stakingManagerAddress);
   await skillRegistry.waitForDeployment();
   const skillRegistryAddress = await skillRegistry.getAddress();
   deployed.SkillRegistry = skillRegistryAddress;
   console.log("  SkillRegistry deployed to:", skillRegistryAddress);
 
-  // 4. Deploy Attribution (no constructor args)
-  console.log("\n[4/4] Deploying Attribution...");
+  // 3. Deploy Attribution (no constructor args)
+  console.log("\n[3/3] Deploying Attribution...");
   const Attribution = await hre.ethers.getContractFactory("Attribution", wallet);
   const attribution = await Attribution.deploy();
   await attribution.waitForDeployment();
@@ -76,7 +67,7 @@ async function main() {
   deployed.Attribution = attributionAddress;
   console.log("  Attribution deployed to:", attributionAddress);
 
-  // CRITICAL: Wire Attribution to StakingManager (D-04)
+  // CRITICAL: Wire Attribution to StakingManager
   console.log("\n[Wiring] Calling Attribution.setStakingManager()...");
   await attribution.setStakingManager(stakingManagerAddress);
   console.log("  Attribution wired to StakingManager at:", stakingManagerAddress);
@@ -85,7 +76,6 @@ async function main() {
   console.log("\n" + "=".repeat(60));
   console.log("DEPLOYMENT SUMMARY");
   console.log("=".repeat(60));
-  console.log("ASKToken:       ", askTokenAddress);
   console.log("StakingManager:", stakingManagerAddress);
   console.log("SkillRegistry: ", skillRegistryAddress);
   console.log("Attribution:   ", attributionAddress);
@@ -104,30 +94,18 @@ async function main() {
   fs.writeFileSync(deploymentsPath, JSON.stringify(deployments, null, 2));
   console.log("\nDeployment info saved to:", deploymentsPath);
 
-  // Verify contracts if API key is present (D-11, D-12)
+  // Verify contracts if API key is present
   if (POLYGONSCAN_API_KEY) {
     console.log("\n" + "=".repeat(60));
     console.log("VERIFYING CONTRACTS ON POLYGONSCAN");
     console.log("=".repeat(60));
 
     try {
-      // Verify ASKToken (no constructor args)
-      console.log("\n[Verify 1/4] Verifying ASKToken...");
-      await hre.run("verify:verify", {
-        address: askTokenAddress,
-        constructorArguments: []
-      });
-      console.log("  ASKToken verified successfully");
-    } catch (err) {
-      console.warn("  ASKToken verification failed:", err.message);
-    }
-
-    try {
-      // Verify StakingManager
-      console.log("\n[Verify 2/4] Verifying StakingManager...");
+      // Verify StakingManager (no constructor args)
+      console.log("\n[Verify 1/3] Verifying StakingManager...");
       await hre.run("verify:verify", {
         address: stakingManagerAddress,
-        constructorArguments: [askTokenAddress]
+        constructorArguments: []
       });
       console.log("  StakingManager verified successfully");
     } catch (err) {
@@ -135,11 +113,11 @@ async function main() {
     }
 
     try {
-      // Verify SkillRegistry
-      console.log("\n[Verify 3/4] Verifying SkillRegistry...");
+      // Verify SkillRegistry (constructor arg: stakingManager address)
+      console.log("\n[Verify 2/3] Verifying SkillRegistry...");
       await hre.run("verify:verify", {
         address: skillRegistryAddress,
-        constructorArguments: [askTokenAddress, stakingManagerAddress]
+        constructorArguments: [stakingManagerAddress]
       });
       console.log("  SkillRegistry verified successfully");
     } catch (err) {
@@ -148,7 +126,7 @@ async function main() {
 
     try {
       // Verify Attribution (no constructor args)
-      console.log("\n[Verify 4/4] Verifying Attribution...");
+      console.log("\n[Verify 3/3] Verifying Attribution...");
       await hre.run("verify:verify", {
         address: attributionAddress,
         constructorArguments: []

@@ -8,8 +8,6 @@ describe("Integration Tests", function() {
 
   async function deploy() {
     const result = await loadFixture(fixture);
-    // Fund registry with tokens for stakes
-    await result.token.transfer(result.registry.target, ethers.parseEther("1000000"));
     return result;
   }
 
@@ -25,9 +23,8 @@ describe("Integration Tests", function() {
   describe("INTG-01: Full Deployment", function() {
 
     it("should deploy all contracts in correct order", async function() {
-      const { token, staking, registry, attribution, owner } = await loadFixture(fixture);
+      const { staking, registry, attribution, owner } = await loadFixture(fixture);
       // Verify all addresses are non-zero
-      expect(token.target).to.not.equal(ethers.ZeroAddress);
       expect(staking.target).to.not.equal(ethers.ZeroAddress);
       expect(registry.target).to.not.equal(ethers.ZeroAddress);
       expect(attribution.target).to.not.equal(ethers.ZeroAddress);
@@ -47,10 +44,10 @@ describe("Integration Tests", function() {
       expect(wiredStaking).to.equal(staking.target);
     });
 
-    it("should have correct token references in all contracts", async function() {
-      const { token, staking, registry } = await loadFixture(fixture);
-      expect(await staking.token()).to.equal(token.target);
-      expect(await registry.token()).to.equal(token.target);
+    it("no-token architecture: token references removed from contracts", async function() {
+      const { registry, staking } = await loadFixture(fixture);
+      // Verify contracts exist and have expected interfaces
+      expect(await registry.stakingManager()).to.equal(staking.target);
     });
   });
 
@@ -61,11 +58,9 @@ describe("Integration Tests", function() {
   describe("INTG-02: Reputation Flow", function() {
 
     it("should complete full reputation flow: register -> verify -> positive contribution", async function() {
-      const { registry, staking, token, owner, user1, user2 } = await deploy();
+      const { registry, staking, owner, user1, user2 } = await deploy();
 
       // Step 1: user1 registers LOW skill (no reputation threshold)
-      await token.transfer(user1.address, ethers.parseEther("100"));
-      await token.connect(user1).approve(registry.target, ethers.parseEther("100"));
       const tx = await registry.connect(user1).registerSkill(
         "RepFlowSkill", "Test", "trigger", "QmRepFlow", 0, "v1"
       );
@@ -91,10 +86,8 @@ describe("Integration Tests", function() {
     });
 
     it("should not trigger positive contribution when verify with pass=false", async function() {
-      const { registry, staking, token, owner, user1, user2 } = await deploy();
+      const { registry, staking, owner, user1, user2 } = await deploy();
 
-      await token.transfer(user1.address, ethers.parseEther("100"));
-      await token.connect(user1).approve(registry.target, ethers.parseEther("100"));
       const tx = await registry.connect(user1).registerSkill(
         "FailVerify", "Test", "trigger", "QmFail", 0, "v1"
       );
@@ -135,12 +128,10 @@ describe("Integration Tests", function() {
     });
 
     it("should verify reputation flow with MEDIUM skill requiring 500 reputation", async function() {
-      const { registry, staking, token, owner, user1, user2 } = await deploy();
+      const { registry, staking, owner, user1, user2 } = await deploy();
 
       // Give user1 500 effective reputation to register MEDIUM skill
       await giveEffectiveReputation(staking, owner, user1, 500);
-      await token.transfer(user1.address, ethers.parseEther("500"));
-      await token.connect(user1).approve(registry.target, ethers.parseEther("500"));
 
       await registry.connect(user1).registerSkill(
         "MediumSkill", "Test", "trigger", "QmMedium", 1, "v1" // RiskLevel.MEDIUM
@@ -154,9 +145,7 @@ describe("Integration Tests", function() {
     });
 
     it("should emit SkillRegistered and SkillVerified events in reputation flow", async function() {
-      const { registry, staking, token, owner, user1, user2 } = await deploy();
-      await token.transfer(user1.address, ethers.parseEther("100"));
-      await token.connect(user1).approve(registry.target, ethers.parseEther("100"));
+      const { registry, staking, owner, user1, user2 } = await deploy();
 
       await expect(registry.connect(user1).registerSkill(
         "EventTest", "Test", "trigger", "QmEvent", 0, "v1"
@@ -174,20 +163,14 @@ describe("Integration Tests", function() {
 
   describe("INTG-03: Anti-Slash Flow", function() {
 
-    // Helper to fund StakingManager for rewards
-    async function fundStakingManager(token, staking, amount) {
-      await token.transfer(staking.target, amount);
-    }
-
     it("should complete full anti-slash flow: stake -> like -> slash -> lock -> recover", async function() {
-      const { token, staking, owner, user1, user2 } = await loadFixture(fixture);
-      await fundStakingManager(token, staking, ethers.parseEther("1000000"));
+      const { staking, owner, user1 } = await loadFixture(fixture);
 
       const skillId = 1;
       const stakeAmount = ethers.parseEther("100");
       const slashPenalty = -50;
 
-      // Step 1: user1 stakes tokens (90-day lock)
+      // Step 1: user1 stakes (no token transfer - stake info only)
       await staking.connect(user1).stake(skillId, stakeAmount);
       expect((await staking.stakes(user1.address, skillId)).amount).to.equal(stakeAmount);
 
@@ -224,10 +207,8 @@ describe("Integration Tests", function() {
       await time.increase(90 * 24 * 60 * 60);
       await mine();
 
-      const balanceBefore = await token.balanceOf(user1.address);
       await expect(staking.connect(user1).unstake(skillId))
         .to.emit(staking, "Unstaked");
-      expect(await token.balanceOf(user1.address)).to.equal(balanceBefore + stakeAmount);
     });
 
     it("should handle slash without prior stake (pure reputation slash)", async function() {
@@ -291,7 +272,7 @@ describe("Integration Tests", function() {
   describe("INTG-04: Cross-Contract State Synchronization", function() {
 
     it("should synchronize user reputation across contracts", async function() {
-      const { registry, staking, token, owner, user1, user2 } = await deploy();
+      const { registry, staking, owner, user1, user2 } = await deploy();
 
       // Give user1 200 effective reputation via StakingManager
       await giveEffectiveReputation(staking, owner, user1, 200);
@@ -317,11 +298,9 @@ describe("Integration Tests", function() {
     });
 
     it("should trigger cross-contract notification on verifySkill (pass=true)", async function() {
-      const { registry, staking, token, owner, user1, user2 } = await deploy();
+      const { registry, staking, owner, user1, user2 } = await deploy();
 
       // user1 registers LOW skill
-      await token.transfer(user1.address, ethers.parseEther("100"));
-      await token.connect(user1).approve(registry.target, ethers.parseEther("100"));
       const tx = await registry.connect(user1).registerSkill(
         "SyncTest", "Test", "trigger", "QmSync", 0, "v1"
       );
@@ -367,7 +346,7 @@ describe("Integration Tests", function() {
     });
 
     it("should maintain state consistency after reputation operations", async function() {
-      const { registry, staking, token, owner, user1, user2 } = await deploy();
+      const { registry, staking, owner, user1, user2 } = await deploy();
 
       // Step 1: Initial state - user has 100 reputation
       await giveEffectiveReputation(staking, owner, user1, 100);
@@ -395,10 +374,7 @@ describe("Integration Tests", function() {
     });
 
     it("should verify all events emitted in cross-contract flow", async function() {
-      const { registry, staking, token, owner, user1, user2 } = await deploy();
-
-      await token.transfer(user1.address, ethers.parseEther("100"));
-      await token.connect(user1).approve(registry.target, ethers.parseEther("100"));
+      const { registry, staking, owner, user1, user2 } = await deploy();
 
       // user1 registers a skill
       const tx = await registry.connect(user1).registerSkill(

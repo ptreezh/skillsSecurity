@@ -7,7 +7,15 @@ describe("SkillRegistry", function() {
 
   async function deploy() {
     const result = await loadFixture(fixture);
-    return result;
+    return {
+      staking: result.staking,
+      registry: result.registry,
+      attribution: result.attribution,
+      owner: result.owner,
+      user1: result.user1,
+      user2: result.user2,
+      accounts: result.accounts
+    };
   }
 
   // Helper to give effective reputation via setEffectiveReputation (test-only helper)

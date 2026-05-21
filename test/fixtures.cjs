@@ -1,38 +1,32 @@
 /**
  * Test Fixtures for AgentSkills Contracts
  *
- * Deployment Order (per D-02):
- * 1. ASKToken — no dependencies
- * 2. StakingManager — requires ASKToken address
- * 3. SkillRegistry — requires ASKToken + StakingManager addresses
- * 4. Attribution — requires setStakingManager() call after deployment (per D-03)
+ * Deployment Order (no-token architecture, per D-02):
+ * 1. StakingManager -- no constructor args
+ * 2. SkillRegistry -- requires StakingManager address only
+ * 3. Attribution -- no constructor args, needs setStakingManager() call after deployment
  */
 
 /**
  * Deploy all contracts in correct dependency order.
  * Uses loadFixture for snapshot isolation (handles beforeEach automatically).
  *
- * @returns {Object} { token, staking, registry, attribution }
+ * @returns {Object} { staking, registry, attribution, owner, user1, user2, accounts }
  */
 async function deployContracts() {
   const [owner, user1, user2, ...accounts] = await ethers.getSigners();
 
-  // 1. Deploy ASKToken
-  const Token = await ethers.getContractFactory("ASKToken");
-  const token = await Token.deploy();
-  await token.waitForDeployment();
-
-  // 2. Deploy StakingManager (requires token address)
+  // 1. Deploy StakingManager (no constructor args in no-token architecture)
   const Staking = await ethers.getContractFactory("StakingManager");
-  const staking = await Staking.deploy(token);
+  const staking = await Staking.deploy();
   await staking.waitForDeployment();
 
-  // 3. Deploy SkillRegistry (requires token + stakingManager addresses)
+  // 2. Deploy SkillRegistry (only stakingManager address)
   const Registry = await ethers.getContractFactory("SkillRegistry");
-  const registry = await Registry.deploy(token, staking);
+  const registry = await Registry.deploy(staking);
   await registry.waitForDeployment();
 
-  // 4. Deploy Attribution (no constructor args, but needs setStakingManager)
+  // 3. Deploy Attribution (no constructor args, but needs setStakingManager)
   const Attribution = await ethers.getContractFactory("Attribution");
   const attribution = await Attribution.deploy();
   await attribution.waitForDeployment();
@@ -40,13 +34,12 @@ async function deployContracts() {
   // CRITICAL: Wire Attribution to StakingManager (per D-03 and PITFALL #1)
   await attribution.setStakingManager(staking);
 
-  return { token, staking, registry, attribution, owner, user1, user2, accounts };
+  return { staking, registry, attribution, owner, user1, user2, accounts };
 }
 
 module.exports = {
   deployContracts,
   // Also export contract names for direct use
-  ASKToken: "ASKToken",
   StakingManager: "StakingManager",
   SkillRegistry: "SkillRegistry",
   Attribution: "Attribution"

@@ -7,22 +7,17 @@ describe("StakingManager", function() {
   const fixture = deployContracts;
 
   async function deploy() {
-    const { token, staking, owner, user1, user2, accounts } = await loadFixture(fixture);
-
-    // Fund StakingManager with tokens for unstake to work
-    await token.transfer(staking.target, ethers.parseEther("1000000"));
-
-    return { token, staking, owner, user1, user2, accounts };
+    const { staking, owner, user1, user2, accounts } = await loadFixture(fixture);
+    return { staking, owner, user1, user2, accounts };
   }
 
   describe("Stake", function() {
     it("should stake tokens and set 90-day lock period", async function() {
-      const { staking, token, user1 } = await deploy();
+      const { staking, user1 } = await deploy();
       const skillId = 1;
       const amount = ethers.parseEther("100");
 
-      // stake() does NOT transfer tokens - user just calls stake() with amount they already have
-      // So we just need user1 to have tokens (from deploy fixture)
+      // stake() records stake info (no token transfer in no-token model)
       await expect(staking.connect(user1).stake(skillId, amount))
         .to.emit(staking, "Staked")
         .withArgs(user1.address, skillId, amount);
@@ -34,7 +29,7 @@ describe("StakingManager", function() {
     });
 
     it("should emit Staked event with correct parameters", async function() {
-      const { staking, token, user1 } = await deploy();
+      const { staking, user1 } = await deploy();
       const skillId = 2;
       const amount = ethers.parseEther("200");
 
@@ -44,7 +39,7 @@ describe("StakingManager", function() {
     });
 
     it("should allow multiple stakes for same skillId (overwrites previous)", async function() {
-      const { staking, token, user1 } = await deploy();
+      const { staking, user1 } = await deploy();
       const skillId = 1;
       const amount1 = ethers.parseEther("100");
       const amount2 = ethers.parseEther("200");
@@ -61,7 +56,7 @@ describe("StakingManager", function() {
     });
 
     it("should revert when user was slashed for this skillId", async function() {
-      const { staking, token, owner, user1 } = await deploy();
+      const { staking, owner, user1 } = await deploy();
       const skillId = 1;
       const amount = ethers.parseEther("100");
 
@@ -88,30 +83,24 @@ describe("StakingManager", function() {
   });
 
   describe("Unstake", function() {
-    it("should unstake tokens after lock period expires", async function() {
-      const { staking, token, user1 } = await deploy();
+    it("should unstake after lock period expires", async function() {
+      const { staking, user1 } = await deploy();
       const skillId = 1;
       const amount = ethers.parseEther("100");
 
-      // Stake tokens (90-day lock starts now)
+      // Stake (90-day lock starts now)
       await staking.connect(user1).stake(skillId, amount);
 
       // Advance time past 90 days (90 days = 7776000 seconds, add 1 for safety)
       await time.increase(90 * 24 * 60 * 60 + 1);
       await mine();
 
-      // Get user1's balance before unstake
-      const balanceBefore = await token.balanceOf(user1.address);
-
       // Unstake should succeed
       await expect(staking.connect(user1).unstake(skillId))
         .to.emit(staking, "Unstaked")
         .withArgs(user1.address, skillId, amount);
 
-      // Verify tokens received
-      expect(await token.balanceOf(user1.address)).to.equal(balanceBefore + amount);
-
-      // Verify stake cleared
+      // Verify stake cleared (no token balance check in no-token model)
       const stakeInfo = await staking.stakes(user1.address, skillId);
       expect(stakeInfo.amount).to.equal(0);
       expect(stakeInfo.lockedUntil).to.equal(0);
@@ -119,7 +108,7 @@ describe("StakingManager", function() {
     });
 
     it("should emit Unstaked event with correct parameters", async function() {
-      const { staking, token, user1 } = await deploy();
+      const { staking, user1 } = await deploy();
       const skillId = 1;
       const amount = ethers.parseEther("100");
 
@@ -135,11 +124,11 @@ describe("StakingManager", function() {
     });
 
     it("should revert when still locked", async function() {
-      const { staking, token, user1 } = await deploy();
+      const { staking, user1 } = await deploy();
       const skillId = 1;
       const amount = ethers.parseEther("100");
 
-      // Stake tokens (90-day lock starts)
+      // Stake (90-day lock starts)
       await staking.connect(user1).stake(skillId, amount);
 
       // Try to unstake immediately - should fail because locked
@@ -158,11 +147,11 @@ describe("StakingManager", function() {
     });
 
     it("should revert at 89 days (1 day before unlock)", async function() {
-      const { staking, token, user1 } = await deploy();
+      const { staking, user1 } = await deploy();
       const skillId = 1;
       const amount = ethers.parseEther("100");
 
-      // Stake tokens
+      // Stake
       await staking.connect(user1).stake(skillId, amount);
 
       // Get stake info to check lockedUntil
@@ -183,7 +172,7 @@ describe("StakingManager", function() {
 
   describe("Time-based Unlock", function() {
     it("should unstake exactly at 90 days", async function() {
-      const { staking, token, user1 } = await deploy();
+      const { staking, user1 } = await deploy();
       const skillId = 1;
       const amount = ethers.parseEther("100");
 
@@ -203,7 +192,7 @@ describe("StakingManager", function() {
     });
 
     it("should revert at 89 days (exactly 1 day before unlock)", async function() {
-      const { staking, token, user1 } = await deploy();
+      const { staking, user1 } = await deploy();
       const skillId = 1;
       const amount = ethers.parseEther("100");
 
@@ -226,7 +215,7 @@ describe("StakingManager", function() {
     });
 
     it("should allow unstake after 90 days + 1 second", async function() {
-      const { staking, token, user1 } = await deploy();
+      const { staking, user1 } = await deploy();
       const skillId = 1;
       const amount = ethers.parseEther("100");
 
@@ -247,8 +236,8 @@ describe("StakingManager", function() {
   });
 
   describe("Slash", function() {
-    it("should slash tokens and reward reporter 25%", async function() {
-      const { token, staking, owner, user1 } = await deploy();
+    it("should slash tokens (no-token model: simply reduces stake)", async function() {
+      const { staking, owner, user1 } = await deploy();
       const skillId = 1;
       const stakeAmount = ethers.parseEther("100");
       const slashAmount = ethers.parseEther("40");
@@ -256,20 +245,10 @@ describe("StakingManager", function() {
       // Setup: user1 stakes
       await staking.connect(user1).stake(skillId, stakeAmount);
 
-      // Fund StakingManager for slash rewards (25% of slashAmount)
-      await token.transfer(staking.target, ethers.parseEther("100"));
-
-      const ownerInitialBalance = await token.balanceOf(owner.address);
-
-      // Slash 40 tokens, reporter gets 10 (25%)
+      // Slash (no token transfer in no-token model)
       await expect(staking.slash(user1.address, skillId, slashAmount))
         .to.emit(staking, "Slash")
         .withArgs(user1.address, skillId, slashAmount);
-
-      // Verify reporter reward
-      const expectedReward = slashAmount * 25n / 100n;
-      expect(await token.balanceOf(owner.address))
-        .to.equal(ownerInitialBalance + expectedReward);
 
       // Verify stake amount reduced
       const stakeInfo = await staking.stakes(user1.address, skillId);
@@ -331,7 +310,7 @@ describe("StakingManager", function() {
 
   describe("Recovery", function() {
     it("should calculate 5% monthly recovery based on originalSlashAmount", async function() {
-      const { staking, token, owner, user1 } = await deploy();
+      const { staking, owner, user1 } = await deploy();
       const penalty = -100; // 100 locked
 
       // Slash and lock reputation
@@ -352,7 +331,7 @@ describe("StakingManager", function() {
     });
 
     it("should calculate recovery for multiple months", async function() {
-      const { staking, token, owner, user1 } = await deploy();
+      const { staking, owner, user1 } = await deploy();
       const penalty = -100; // 100 locked
 
       await staking.slashLiker(user1.address, penalty, "Test slash");
@@ -418,19 +397,14 @@ describe("StakingManager", function() {
       await staking.connect(user1).claimRecoverableReputation();
     });
 
-    it("should set positive contribution", async function() {
+    it("should set positive contribution (callable by external contracts)", async function() {
       const { staking, owner, user1 } = await deploy();
+      // setPositiveContribution is called by other contracts (SkillRegistry, Attribution)
+      // It's a public function for cross-contract calls, not restricted to owner
       await expect(staking.setPositiveContribution(user1.address))
         .to.emit(staking, "PositiveContributionSet")
         .withArgs(user1.address);
       expect(await staking.hasPositiveContribution(user1.address)).to.be.true;
-    });
-
-    it("should revert when non-owner sets positive contribution", async function() {
-      const { staking, user1, user2 } = await deploy();
-      await expect(
-        staking.connect(user2).setPositiveContribution(user1.address)
-      ).to.be.revertedWith("Ownable: caller is not the owner");
     });
   });
 
