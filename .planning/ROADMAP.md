@@ -5,7 +5,7 @@
 - [x] **v1.1 标准文档完善** - Phases 1-7 (shipped 2026-05-15)
 - [x] **v1.2 技术债补齐** - Phases 8-10 (shipped 2026-05-16)
 - [x] **v1.3 测试与部署** - Phases 11-19 (shipped 2026-05-18)
-- [ ] **v1.4 自主运营** - Phases 20-22 (planning)
+- [ ] **v1.4 自主运营** - Phases 20-23 (planning)
 
 ---
 
@@ -36,10 +36,10 @@
 
 ---
 
-### v1.4 自主运营 (Phases 20-22)
+### v1.4 自主运营 (Phases 20-23)
 
 **In progress**
-**Goal:** 完善已部署的四自系统组件，添加前端面板、测试覆盖和集成验证
+**Goal:** 完善已部署的四自系统组件，移除代币依赖，完成无 token 架构
 
 ---
 
@@ -53,10 +53,11 @@
 - [ ] **Phase 16: Polygon Amoy 部署** - 配置、部署、验证
 - [x] **Phase 17: 前端 UI 设计** - 设计系统、组件库 (completed 2026-05-18)
 - [x] **Phase 18: 合约连接** - 接入真实合约 (completed 2026-05-18)
-- [x] **Phase 19: 四自系统集成** - DeployerRewards × 自运营/自推广/自进化/自运维 (completed 2026-05-18)
+- [x] **Phase 19: 四自系统集成** - DeployerRewards x 自运营/自推广/自进化/自运维 (completed 2026-05-18)
 - [x] **Phase 20: DeployerRewards 完善** - 前端面板 + 测试覆盖 (completed 2026-05-18)
 - [x] **Phase 21: 四自系统 UI 完善** - 数据可视化 + 交互优化 (completed 2026-05-20)
-- [x] **Phase 22: HealthReporter + 集成测试** - 完整测试 + 部署脚本 (completed 2026-05-20)
+- [x] **Phase 22: 无代币核心基础设施** - RevenueSplit, ReputationBadges, 合约禁用 (completed 2026-05-20)
+- [ ] **Phase 23: 无 Token 核心重构** - 移除核心合约对 ASKToken 的依赖，完成无 token 架构
 
 ---
 
@@ -72,7 +73,7 @@
 
 **Success Criteria** (what must be TRUE):
   1. Hardhat chai-matchers, network-helpers, verify 插件安装并正常工作
-  2. Test fixtures 按正确顺序部署: ASKToken -> StakingManager -> SkillRegistry -> Attribution
+  2. Test fixtures 按正确顺序部署: StakingManager -> SkillRegistry -> Attribution
   3. Mocha 测试运行器配置覆盖报告功能
   4. 覆盖率报告可以为所有合约生成
 
@@ -223,7 +224,7 @@ Plan list:
 
 ### Phase 19: 四自系统集成
 
-**Goal**: DeployerRewards × 自运营/自推广/自进化/自运维
+**Goal**: DeployerRewards x 自运营/自推广/自进化/自运维
 
 **Depends on**: Phase 18
 
@@ -293,6 +294,28 @@ Plan list:
 - [x] 22-01-PLAN.md - Core contracts (RevenueSplit, ReputationBadges, SelfSustainingEcosystem)
 - [x] 22-02-PLAN.md - Deprecate token contracts and update existing contracts
 
+---
+
+### Phase 23: 无 Token 核心重构
+
+**Goal**: 移除核心合约对 ASKToken 的依赖，完成无 token 架构
+
+**Depends on**: Phase 22
+
+**Requirements**: NO-TOKEN-01, NO-TOKEN-02, NO-TOKEN-03, NO-TOKEN-04, NO-TOKEN-05, NO-TOKEN-06, NO-TOKEN-07
+
+**Success Criteria** (what must be TRUE):
+  1. StakingManager 不再依赖 ASKToken（移除 token 字段和所有 token 调用）
+  2. SkillRegistry 不再依赖 ASKToken（移除 token 字段）
+  3. 核心合约使用纯声誉系统替代代币质押
+  4. 所有测试通过
+
+**Plans**: 3 plans in 2 waves
+
+**Plan list:**
+- [ ] 23-01-PLAN.md - Refactor StakingManager to remove ASKToken dependency
+- [ ] 23-02-PLAN.md - Refactor SkillRegistry to remove ASKToken dependency
+- [ ] 23-03-PLAN.md - Update tests and verify contracts work without token
 
 ---
 
@@ -310,10 +333,11 @@ Plan list:
 | 16 | v1.3 | 0/2 | Not started | - |
 | 17-19 | v1.3 | 6/6 | Complete | 2026-05-18 |
 | 20 | v1.4 | 2/2 | Complete | 2026-05-18 |
-| 21 | v1.4 | 3/3 | Complete   | 2026-05-20 |
-| 22 | v1.4 | 2/2 | Complete    | 2026-05-20 |
+| 21 | v1.4 | 3/3 | Complete | 2026-05-20 |
+| 22 | v1.4 | 2/2 | Complete | 2026-05-20 |
+| 23 | v1.4 | 0/3 | Planning | - |
 
 ---
 
 *Roadmap created: 2026-05-16*
-*Last updated: 2026-05-19 after Phase 21 planning*
+*Last updated: 2026-05-21 after Phase 23 planning*

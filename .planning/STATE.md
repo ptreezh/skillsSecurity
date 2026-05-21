@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: 标准文档完善
 status: executing
-last_updated: "2026-05-20T14:13:08.277Z"
+last_updated: "2026-05-21T11:32:12.592Z"
 progress:
-  total_phases: 13
-  completed_phases: 11
-  total_plans: 25
-  completed_plans: 25
+  total_phases: 15
+  completed_phases: 12
+  total_plans: 28
+  completed_plans: 28
   percent: 100
 ---
 
