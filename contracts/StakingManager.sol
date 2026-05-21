@@ -2,7 +2,6 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./ASKToken.sol";
 
 contract StakingManager is Ownable {
     struct StakeInfo {
@@ -11,8 +10,7 @@ contract StakingManager is Ownable {
         bool slashed;
     }
     
-    ASKToken public immutable token;
-    
+        
     mapping(address => mapping(uint256 => StakeInfo)) public stakes;
     mapping(address => uint256[]) public userStakeIds;
     
@@ -49,9 +47,7 @@ contract StakingManager is Ownable {
     event Slash(address indexed user, uint256 skillId, uint256 amount);
     event AntiSlash(address indexed user, int256 penalty, string reason);  // 新增
     
-    constructor(address _token) Ownable() {
-        token = ASKToken(_token);
-    }
+    constructor() Ownable() {}
     
     // 质押
     function stake(uint256 _skillId, uint256 _amount) external {
@@ -80,7 +76,6 @@ contract StakingManager is Ownable {
         info.lockedUntil = 0;
         info.slashed = false;
 
-        token.transfer(msg.sender, amount);
         emit Unstaked(msg.sender, _skillId, amount);
     }
     
@@ -90,11 +85,8 @@ contract StakingManager is Ownable {
         require(info.amount >= _amount, "Insufficient stake");
         
         info.amount -= _amount;
-        
-        // 发送给举报者25%（宪法第三条）
-        uint256 reporterReward = (_amount * 25) / 100;
-        token.transfer(msg.sender, reporterReward);  // 简化：msg.sender 作为举报者
-        
+
+        // No token transfer in no-token model - slash simply reduces stake
         emit Slash(_user, _skillId, _amount);
     }
     
