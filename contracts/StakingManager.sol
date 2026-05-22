@@ -43,6 +43,22 @@ contract StakingManager is Ownable, ReentrancyGuard {
     event Slash(address indexed user, uint256 skillId, uint256 amount);
     event AntiSlash(address indexed user, int256 penalty, string reason);
 
+    /// @notice Governance contract address for secure actions
+    address public governance;
+
+    /// @notice Modifier to restrict to governance contract
+    modifier onlyGovernance() {
+        require(msg.sender == governance, "Not governance");
+        _;
+    }
+
+    /// @notice Set governance contract address (owner only)
+    /// @param _gov Governance contract address
+    function setGovernance(address _gov) external onlyOwner {
+        require(_gov != address(0), "Invalid address");
+        governance = _gov;
+    }
+
     constructor() Ownable() {}
 
     /// @notice Stake reputation on a skill
@@ -82,7 +98,7 @@ contract StakingManager is Ownable, ReentrancyGuard {
     /// @param _user User address
     /// @param _skillId Skill ID
     /// @param _amount Amount to slash
-    function slash(address _user, uint256 _skillId, uint256 _amount) external nonReentrant onlyOwner {
+    function slash(address _user, uint256 _skillId, uint256 _amount) external nonReentrant onlyGovernance {
         StakeInfo storage info = stakes[_user][_skillId];
         require(info.amount >= _amount, "Insufficient stake");
 
@@ -95,7 +111,7 @@ contract StakingManager is Ownable, ReentrancyGuard {
     /// @param _liker User address to penalize
     /// @param _penalty Penalty amount (negative value)
     /// @param _reason Reason for penalty
-    function slashLiker(address _liker, int256 _penalty, string memory _reason) external nonReentrant onlyOwner {
+    function slashLiker(address _liker, int256 _penalty, string memory _reason) external nonReentrant onlyGovernance {
         // CHECKS
         require(_liker != address(0), "Invalid address");
         require(_penalty < 0, "Penalty must be negative");

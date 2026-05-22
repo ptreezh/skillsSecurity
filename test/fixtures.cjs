@@ -21,6 +21,9 @@ async function deployContracts() {
   const staking = await Staking.deploy();
   await staking.waitForDeployment();
 
+  // Set governance to owner for testing (in production, use GovernanceTimelock)
+  await staking.setGovernance(owner.address);
+
   // 2. Deploy SkillRegistry (only stakingManager address)
   const Registry = await ethers.getContractFactory("SkillRegistry");
   const registry = await Registry.deploy(staking);
