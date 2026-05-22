@@ -3,11 +3,12 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "./AgentPausable.sol";
 
 /// @title StakingManager
 /// @notice Reputation-based staking system for AgentSkills
-/// @dev Security: ReentrancyGuard, CEI pattern, overflow protection
-contract StakingManager is Ownable, ReentrancyGuard {
+/// @dev Security: ReentrancyGuard, CEI pattern, overflow protection, Pausable
+contract StakingManager is Ownable, ReentrancyGuard, AgentPausable {
     struct StakeInfo {
         uint256 amount;
         uint256 lockedUntil;
@@ -64,7 +65,7 @@ contract StakingManager is Ownable, ReentrancyGuard {
     /// @notice Stake reputation on a skill
     /// @param _skillId Skill ID to stake on
     /// @param _amount Amount of reputation to stake
-    function stake(uint256 _skillId, uint256 _amount) external nonReentrant {
+    function stake(uint256 _skillId, uint256 _amount) external nonReentrant whenNotPaused {
         require(!stakes[msg.sender][_skillId].slashed, "Already slashed");
 
         stakes[msg.sender][_skillId] = StakeInfo({
@@ -80,7 +81,7 @@ contract StakingManager is Ownable, ReentrancyGuard {
 
     /// @notice Unstake after lock period (90 days)
     /// @param _skillId Skill ID to unstake from
-    function unstake(uint256 _skillId) external nonReentrant {
+    function unstake(uint256 _skillId) external nonReentrant whenNotPaused {
         StakeInfo storage info = stakes[msg.sender][_skillId];
         require(info.amount > 0, "No stake");
         require(block.timestamp > info.lockedUntil, "Still locked");
@@ -98,7 +99,7 @@ contract StakingManager is Ownable, ReentrancyGuard {
     /// @param _user User address
     /// @param _skillId Skill ID
     /// @param _amount Amount to slash
-    function slash(address _user, uint256 _skillId, uint256 _amount) external nonReentrant onlyGovernance {
+    function slash(address _user, uint256 _skillId, uint256 _amount) external nonReentrant onlyGovernance whenNotPaused {
         StakeInfo storage info = stakes[_user][_skillId];
         require(info.amount >= _amount, "Insufficient stake");
 
@@ -111,7 +112,7 @@ contract StakingManager is Ownable, ReentrancyGuard {
     /// @param _liker User address to penalize
     /// @param _penalty Penalty amount (negative value)
     /// @param _reason Reason for penalty
-    function slashLiker(address _liker, int256 _penalty, string memory _reason) external nonReentrant onlyGovernance {
+    function slashLiker(address _liker, int256 _penalty, string memory _reason) external nonReentrant onlyGovernance whenNotPaused {
         // CHECKS
         require(_liker != address(0), "Invalid address");
         require(_penalty < 0, "Penalty must be negative");
@@ -137,7 +138,7 @@ contract StakingManager is Ownable, ReentrancyGuard {
 
     /// @notice Like a skill
     /// @param _skillId Skill ID to like
-    function likeSkill(uint256 _skillId) external nonReentrant {
+    function likeSkill(uint256 _skillId) external nonReentrant whenNotPaused {
         require(!hasLiked[msg.sender], "Already liked");
         require(userReputation[msg.sender] >= 0, "Need reputation");
 
