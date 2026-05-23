@@ -269,7 +269,7 @@ describe("StakingManager", function() {
       // user2 is not owner
       await expect(
         staking.connect(user2).slash(user1.address, 1, ethers.parseEther("50"))
-      ).to.be.revertedWith("Ownable: caller is not the owner");
+      ).to.be.revertedWith("Not governance");
     });
   });
 
@@ -304,7 +304,7 @@ describe("StakingManager", function() {
       const { staking, user1, user2 } = await deploy();
       await expect(
         staking.connect(user2).slashLiker(user1.address, -10, "Test")
-      ).to.be.revertedWith("Ownable: caller is not the owner");
+      ).to.be.revertedWith("Not governance");
     });
   });
 
