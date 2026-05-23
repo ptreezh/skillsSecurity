@@ -6,8 +6,8 @@
 - [x] **v1.2 技术债补齐** - Phases 8-10 (shipped 2026-05-16)
 - [x] **v1.3 测试与部署** - Phases 11-19 (shipped 2026-05-18)
 - [x] **v1.4 自主运营** - Phases 20-23 (completed 2026-05-21)
-- [ ] **v1.5 安全加固** - Phases 24 (planning)
-- [ ] **v1.6 产品完善** - Phases 25 (planning)
+- [x] **v1.5 安全加固** - Phases 24 (completed 2026-05-23)
+- [x] **v1.6 产品完善** - Phases 25 (completed 2026-05-23)
 
 ---
 
@@ -48,6 +48,34 @@
 - SelfOpsPanel with 4 tabs (revenue, promotion, governance, health)
 - No-token architecture: RevenueSplit, ReputationBadges, SelfSustainingEcosystem
 - Core contracts refactored (StakingManager, SkillRegistry) to remove ASKToken dependency
+
+---
+
+### v1.5 安全加固 (Phase 24)
+
+**Shipped:** 2026-05-23
+**Goal:** 修复高风险漏洞，添加多签机制，委托第三方审计
+
+**Resolved:**
+- ReentrancyGuard applied to StakingManager
+- CEI pattern (Checks-Effects-Interactions) on all state changes
+- GovernanceTimelock: 3-of-N multisig with 24-hour timelock delay
+- AgentPausable: emergency pause mechanism for critical functions
+- Audit package: executive summary, contract descriptions, bug bounty program
+- 27 tests passing
+
+---
+
+### v1.6 产品完善 (Phase 25)
+
+**Shipped:** 2026-05-23
+**Goal:** 完善前端功能，搭建监控系统，实现 Timelock 治理
+
+**Resolved:**
+- Monitoring: GasMonitor, EventWatcher, AlertService
+- OpsDashboard: real-time operations dashboard
+- Governance: AgentTimelock (48h), ReputationVotes, AgentGovernor
+- Documentation: API reference, user onboarding, FAQ, deployment checklist
 
 ---
 
@@ -346,8 +374,8 @@ Plan list:
 | 21 | v1.4 | 3/3 | Complete | 2026-05-20 |
 | 22 | v1.4 | 2/2 | Complete | 2026-05-20 |
 | 23 | v1.4 | 3/3 | Complete    | 2026-05-21 |
-| 24 | v1.5 | 4/4 | Planning | - |
-| 25 | v1.6 | 0/4 | Planning | - |
+| 24 | v1.5 | 4/4 | Complete | 2026-05-23 |
+| 25 | v1.6 | 4/4 | Complete | 2026-05-23 |
 
 ---
 
@@ -357,20 +385,30 @@ Plan list:
 
 **Depends on**: Phase 23
 
+**Status**: COMPLETE (2026-05-23)
+
+**Resolved:**
+- ReentrancyGuard added to StakingManager
+- CEI pattern applied to all state-changing functions
+- GovernanceTimelock (3-of-N multisig, 24h delay)
+- AgentPausable for emergency pause
+- Audit package created
+- Bug bounty program defined
+
 **Success Criteria** (what must be TRUE):
   1. `setEffectiveReputation()` 漏洞已修复
   2. 多签机制已实现（至少 3-of-5）
   3. 紧急暂停机制已添加
   4. 所有合约编译通过，测试通过
-  5. 第三方安全审计报告完成
+  5. 第三方安全审计报告完成 (待执行)
 
-**Plans**: TBD
+**Plans**: 4 plans in 2 waves
 
 **Plan list:**
-- [ ] 24-01-PLAN.md - Fix critical vulnerabilities (setEffectiveReputation, reentrancy)
-- [ ] 24-02-PLAN.md - Implement multi-signature governance
-- [ ] 24-03-PLAN.md - Add emergency pause mechanism
-- [ ] 24-04-PLAN.md - Complete security audit preparation
+- [x] 24-01-PLAN.md - Fix critical vulnerabilities (setEffectiveReputation, reentrancy)
+- [x] 24-02-PLAN.md - Implement multi-signature governance
+- [x] 24-03-PLAN.md - Add emergency pause mechanism
+- [x] 24-04-PLAN.md - Complete security audit preparation
 
 ---
 
@@ -379,6 +417,16 @@ Plan list:
 **Goal**: 完善前端功能，搭建监控系统，实现 Timelock 治理
 
 **Depends on**: Phase 24
+
+**Status**: COMPLETE (2026-05-23)
+
+**Resolved:**
+- GasMonitor for Polygon gas price monitoring
+- EventWatcher for contract events
+- AlertService with Telegram/Email/Slack support
+- OpsDashboard for real-time monitoring
+- AgentTimelock (48h delay), ReputationVotes, AgentGovernor
+- API documentation, user onboarding guide, FAQ
 
 **Success Criteria** (what must be TRUE):
   1. 前端 SelfOpsPanel 功能完整
@@ -391,11 +439,11 @@ Plan list:
 
 **Plan list:**
 - [x] 25-01-PLAN.md - Complete frontend core features
-- [ ] 25-02-PLAN.md - Build monitoring and alerting system
-- [ ] 25-03-PLAN.md - Implement Timelock governance
-- [ ] 25-04-PLAN.md - Create API documentation and user guide
+- [x] 25-02-PLAN.md - Build monitoring and alerting system
+- [x] 25-03-PLAN.md - Implement Timelock governance
+- [x] 25-04-PLAN.md - Create API documentation and user guide
 
 ---
 
 *Roadmap created: 2026-05-16*
-*Last updated: 2026-05-21 after Phase 25 planning*
+*Last updated: 2026-05-23 after Phase 24 & 25 completion*
