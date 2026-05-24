@@ -2,6 +2,7 @@ import "@nomicfoundation/hardhat-chai-matchers";
 import "@nomicfoundation/hardhat-network-helpers";
 import "@nomicfoundation/hardhat-verify";
 import "solidity-coverage";
+import "dotenv/config";
 
 export default {
   solidity: {
@@ -24,7 +25,7 @@ export default {
       chainId: 80002
     },
     polygon: {
-      url: process.env.POLYGON_RPC || "",
+      url: process.env.POLYGON_RPC || "https://rpc.ankr.com/polygon",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       chainId: 137
     }
