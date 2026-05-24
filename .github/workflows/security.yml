@@ -29,27 +29,45 @@ jobs:
 
       - name: Install Slither
         run: |
-          pip install slither-analyzer
+          pip install slither-analyzer setuptools
+
+      - name: Install solc
+        run: |
+          pip install solc-select
+          solc-select install 0.8.20
+          solc-select use 0.8.20
 
       - name: Run Slither
         id: slither
         run: |
-          slither . --json results.json --exclude-dependencies
-        continue-on-error: true
+          echo "=== Running Slither ==="
+          slither . --json results.json --exclude-dependencies --solc-remaps "@openzeppelin=node_modules/@openzeppelin" || true
+          echo "Slither analysis completed"
+          ls -la results.json 2>/dev/null || echo "No results file generated"
 
       - name: Upload Slither results
-        if: always()
-        uses: github/codeql-action/upload-sarif@v3
+        if: always() && fileExists('results.json')
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: results.json
           category: slither
 
-      - name: Display findings
+      - name: Display findings summary
         if: always()
         run: |
-          if [ -f results.json ]; then
-            echo "=== Slither Findings ==="
-            cat results.json | jq -r '.results[] | select(.severity | contains("HIGH") or contains("CRITICAL")) | "\(.kind) - \(.description)"' || echo "No HIGH/CRITICAL issues found"
+          echo "=== Slither Findings Summary ==="
+          if [ -f results.json ] && command -v jq &> /dev/null; then
+            HIGH=$(cat results.json | jq '[.results[]? | select(.severity == "HIGH") | length]' 2>/dev/null || echo "0")
+            CRITICAL=$(cat results.json | jq '[.results[]? | select(.severity == "CRITICAL") | length]' 2>/dev/null || echo "0")
+            MEDIUM=$(cat results.json | jq '[.results[]? | select(.severity == "MEDIUM") | length]' 2>/dev/null || echo "0")
+            LOW=$(cat results.json | jq '[.results[]? | select(.severity == "LOW") | length]' 2>/dev/null || echo "0")
+            echo "HIGH: $HIGH"
+            echo "CRITICAL: $CRITICAL"
+            echo "MEDIUM: $MEDIUM"
+            echo "LOW: $LOW"
+          else
+            echo "No results.json or jq not available"
+            echo "Slither may have encountered issues - check logs"
           fi
 
   mythril:
