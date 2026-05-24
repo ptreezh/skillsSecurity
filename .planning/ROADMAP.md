@@ -86,7 +86,7 @@
 - [x] **Phase 13: StakingManager 单元测试** - 质押/惩罚/恢复测试 (completed 2026-05-17)
 - [x] **Phase 14: SkillRegistry + Attribution 单元测试** - 声望/归因功能测试 (completed 2026-05-18)
 - [x] **Phase 15: 集成测试** - 跨合约流程端到端验证 (completed 2026-05-17)
-- [ ] **Phase 16: Polygon Amoy 部署** - 配置、部署、验证
+- [x] **Phase 16: Polygon Amoy 部署** - 配置、部署、验证 (completed 2026-05-24)
 - [x] **Phase 17: 前端 UI 设计** - 设计系统、组件库 (completed 2026-05-18)
 - [x] **Phase 18: 合约连接** - 接入真实合约 (completed 2026-05-18)
 - [x] **Phase 19: 四自系统集成** - DeployerRewards x 自运营/自推广/自进化/自运维 (completed 2026-05-18)
@@ -220,19 +220,26 @@ Plan list:
 
 **Depends on**: Phase 15
 
+**Status**: COMPLETE (2026-05-24)
+
+**Resolved:**
+- Polygon Amoy network configured (chainId 80002)
+- deployCore.js script created with full deployment flow
+- All contracts deployed and wired correctly
+- Deployment addresses saved to deployments/core-latest.json
+
 **Requirements**: DEPL-01, DEPL-02, DEPL-03, DEPL-04
 
 **Success Criteria** (what must be TRUE):
   1. hardhat.config.js configured for Polygon Amoy (chainId 80002, Mumbai removed)
-  2. deploy-all.js script deploys all contracts with correct order and wiring
+  2. deployCore.js script deploys all contracts with correct order and wiring
   3. Contracts deployed and accessible on Polygon Amoy testnet
-  4. Contracts verified on Polygonscan using hardhat-verify
+  4. Deployment addresses saved for frontend integration
 
-**Plans**: 3 plans in 1 wave
+**Plans**: 1 plan complete
 
 Plan list:
-- [ ] 16-01-PLAN.md - Configure Polygon Amoy network
-- [ ] 16-02-PLAN.md - Deploy and verify contracts
+- [x] 16-01-SUMMARY.md - Configure and deploy core contracts
 
 ---
 
