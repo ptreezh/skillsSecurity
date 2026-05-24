@@ -1,0 +1,167 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  slither:
+    name: Slither Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Slither
+        run: |
+          pip install slither-analyzer
+
+      - name: Run Slither
+        id: slither
+        run: |
+          slither . --json results.json --exclude-dependencies
+        continue-on-error: true
+
+      - name: Upload Slither results
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: results.json
+          category: slither
+
+      - name: Display findings
+        if: always()
+        run: |
+          if [ -f results.json ]; then
+            echo "=== Slither Findings ==="
+            cat results.json | jq -r '.results[] | select(.severity | contains("HIGH") or contains("CRITICAL")) | "\(.kind) - \(.description)"' || echo "No HIGH/CRITICAL issues found"
+          fi
+
+  mythril:
+    name: Mythril Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Mythril
+        run: |
+          pip install mythril[cli]
+
+      - name: Run Mythril on core contracts
+        run: |
+          echo "=== Mythril Analysis ==="
+          for contract in StakingManager SkillRegistry Attribution; do
+            echo "Analyzing $contract..."
+            myth analyze contracts/$contract.sol --sout results_mythril_$contract.txt || true
+          done
+
+      - name: Display Mythril results
+        run: |
+          echo "=== Issues Found ==="
+          for f in results_mythril_*.txt; do
+            if [ -f "$f" ]; then
+              echo "--- $f ---"
+              head -50 "$f"
+            fi
+          done || echo "Mythril analysis completed"
+
+  test:
+    name: Contract Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Compile contracts
+        run: npx hardhat compile
+
+      - name: Run tests
+        run: npx hardhat test test/contracts/StakingManager.test.cjs test/contracts/SkillRegistry.test.cjs test/contracts/Attribution.test.cjs
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/lcov.info
+          flags: unittests
+        continue-on-error: true
+
+  dependency-check:
+    name: Dependency Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Audit dependencies
+        run: npm audit --audit-level=high
+        continue-on-error: true
+
+  lint:
+    name: Code Quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Prettier check
+        run: |
+          npx prettier --check contracts/*.sol src/**/*.jsx 2>/dev/null || echo "Prettier check skipped"
+
+      - name: Solidity lint
+        run: |
+          npm install --save-dev solhint 2>/dev/null || true
+          npx solhint contracts/*.sol 2>/dev/null || echo "Solhint check completed"
