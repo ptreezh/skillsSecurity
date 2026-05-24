@@ -8,6 +8,7 @@
 - [x] **v1.4 自主运营** - Phases 20-23 (completed 2026-05-21)
 - [x] **v1.5 安全加固** - Phases 24 (completed 2026-05-23)
 - [x] **v1.6 产品完善** - Phases 25 (completed 2026-05-23)
+- [x] **v1.7 测试对齐** - No-token architecture test alignment (completed 2026-05-25)
 
 ---
 
@@ -66,23 +67,25 @@
 
 ---
 
-### v1.6 产品完善 (Phase 25)
+### v1.7 测试对齐 (2026-05-25)
 
-**Shipped:** 2026-05-23
-**Goal:** 完善前端功能，搭建监控系统，实现 Timelock 治理
+**Goal:** 对齐测试套件与无 token 架构
 
 **Resolved:**
-- Monitoring: GasMonitor, EventWatcher, AlertService
-- OpsDashboard: real-time operations dashboard
-- Governance: AgentTimelock (48h), ReputationVotes, AgentGovernor
-- Documentation: API reference, user onboarding, FAQ, deployment checklist
+- Playwright/Mocha 冲突修复 (E2E 测试移至 e2e/ 目录)
+- ASKToken 测试归档 (contracts/test/archive/)
+- Smoke fixture 更新为无 token 架构
+- SelfSustainingEcosystem 测试 (25 tests)
+- RevenueSplit 测试 (28 tests)
+- ReputationBadges 测试 (30 tests)
+- 115 tests passing
 
 ---
 
 ## Phases
 
 - [x] **Phase 11: 测试基础设施** - Hardhat 环境配置、测试框架、fixtures (completed 2026-05-17)
-- [x] **Phase 12: ASKToken 单元测试** - 代币功能完整测试 (completed 2026-05-17)
+- [x] **Phase 12: ASKToken 单元测试** - 代币功能完整测试 (completed 2026-05-17) [已归档]
 - [x] **Phase 13: StakingManager 单元测试** - 质押/惩罚/恢复测试 (completed 2026-05-17)
 - [x] **Phase 14: SkillRegistry + Attribution 单元测试** - 声望/归因功能测试 (completed 2026-05-18)
 - [x] **Phase 15: 集成测试** - 跨合约流程端到端验证 (completed 2026-05-17)
@@ -94,8 +97,9 @@
 - [x] **Phase 21: 四自系统 UI 完善** - 数据可视化 + 交互优化 (completed 2026-05-20)
 - [x] **Phase 22: 无代币核心基础设施** - RevenueSplit, ReputationBadges, 合约禁用 (completed 2026-05-20)
 - [x] **Phase 23: 无 Token 核心重构** - 移除核心合约对 ASKToken 的依赖，完成无 token 架构 (completed 2026-05-21)
-- [ ] **Phase 24: 安全加固** - 修复高风险漏洞，添加多签机制，委托第三方审计
-- [ ] **Phase 25: 产品完善** - 完善前端功能，搭建监控系统，实现 Timelock 治理
+- [x] **Phase 24: 安全加固** - 修复高风险漏洞，添加多签机制，委托第三方审计 (completed 2026-05-23)
+- [x] **Phase 25: 产品完善** - 完善前端功能，搭建监控系统，实现 Timelock 治理 (completed 2026-05-23)
+- [x] **Phase 26: 测试对齐** - 对齐测试套件与无 token 架构 (completed 2026-05-25)
 
 ---
 

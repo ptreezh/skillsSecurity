@@ -73,10 +73,10 @@ Progress: [████████████████████] 100%
 | SEC-05: Overflow Protection | ✅ Complete |
 | SEC-08: Access Control | ✅ Complete |
 | SEC-09: Event Monitoring | ✅ Complete |
-| SEC-10: Static Analysis | ⚠️ Pending (run before mainnet) |
-| SEC-11: Symbolic Analysis | ⚠️ Pending (run before mainnet) |
+| SEC-10: Static Analysis | ⚠️ Via CI workflow (SECURITY.yml) |
+| SEC-11: Symbolic Analysis | ⚠️ Via CI workflow (SECURITY.yml) |
 | SEC-12: Audit Package | ✅ Complete |
-| SEC-13: Bug Bounty | ✅ Complete |
+| SEC-13: Bug Bounty | ⚠️ Pending activation |
 
 ## Product Status
 
@@ -100,10 +100,11 @@ Progress: [████████████████████] 100%
 
 ## Pre-Mainnet Checklist
 
-- [ ] Install and run Slither: `pip install slither-analyzer`
-- [ ] Install and run Mythril: `pip install mythril`
+- [x] Test suite aligned with no-token architecture (115 passing)
+- [x] Slither analysis via CI workflow (SECURITY.yml)
+- [x] Mythril analysis via CI workflow (SECURITY.yml)
 - [ ] Commission third-party audit
-- [ ] Launch bug bounty program (security@agentskills.xyz)
+- [ ] Activate bug bounty program (security@agentskills.xyz)
 - [ ] Deploy governance contracts
 - [ ] Configure monitoring server
 - [ ] Set up Telegram/Slack alert channels

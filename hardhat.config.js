@@ -29,5 +29,7 @@ export default {
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       chainId: 137
     }
-  }
+  },
+  // Only run Solidity tests, exclude E2E Playwright tests
+  testFiles: []
 };
