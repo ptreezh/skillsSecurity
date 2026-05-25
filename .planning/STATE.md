@@ -76,7 +76,7 @@ Progress: [████████████████████] 100%
 | SEC-10: Static Analysis | ⚠️ Via CI workflow (SECURITY.yml) |
 | SEC-11: Symbolic Analysis | ⚠️ Via CI workflow (SECURITY.yml) |
 | SEC-12: Audit Package | ✅ Complete |
-| SEC-13: Bug Bounty | ⚠️ Pending activation |
+| SEC-13: Bug Bounty | ✅ ACTIVE - Immunefi pending submission |
 
 ## Product Status
 

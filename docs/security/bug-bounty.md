@@ -1,7 +1,8 @@
 # AgentSkills Bug Bounty Program
 
-**Effective Date:** TBD (post-audit)
-**Last Updated:** 2026-05-22
+**Effective Date:** 2026-05-25
+**Status:** ACTIVE
+**Last Updated:** 2026-05-25
 
 ## Overview
 
@@ -130,6 +131,14 @@ We consider activities conducted under this program to be authorized security re
 ## Contact
 
 **Security Email:** security@agentskills.xyz
+**Immunefi:** https://immunefi.com/agentskills (pending submission)
+**Response Time:** 48 hours
+
+## How to Submit
+
+1. **Immunefi (Preferred):** Submit via https://immunefi.com/agentskills
+2. **Email:** security@agentskills.xyz (include PGP key if available)
+3. **Response Time:** Initial response within 48 hours
 
 *For general security inquiries, please use our contact form on the website.*
 
