@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgentSkills - AI Agent Skill Marketplace</title>
+  <meta name="description" content="Discover, verify, and monetize AI agent skills. The trusted marketplace for AI developers.">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary: #10b981;
+      --dark: #0f172a;
+      --gray: #64748b;
+      --light: #f8fafc;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: var(--dark);
+      background: var(--light);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Header */
+    header {
+      padding: 20px 0;
+      background: white;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--gray);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    .btn {
+      padding: 10px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+    }
+
+    /* Hero */
+    .hero {
+      padding: 100px 0;
+      text-align: center;
+      background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+    }
+
+    .hero h1 {
+      font-size: 56px;
+      font-weight: 800;
+      margin-bottom: 24px;
+      line-height: 1.2;
+    }
+
+    .hero h1 span {
+      color: var(--primary);
+    }
+
+    .hero p {
+      font-size: 20px;
+      color: var(--gray);
+      max-width: 600px;
+      margin: 0 auto 40px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+    }
+
+    .hero .btn {
+      padding: 14px 32px;
+      font-size: 18px;
+    }
+
+    /* Stats */
+    .stats {
+      padding: 60px 0;
+      background: white;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 32px;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 42px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .stat-label {
+      color: var(--gray);
+      margin-top: 8px;
+    }
+
+    /* Features */
+    .features {
+      padding: 100px 0;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 60px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 40px;
+    }
+
+    .feature-card {
+      background: white;
+      padding: 32px;
+      border-radius: 16px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      transition: transform 0.2s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .feature-icon {
+      width: 56px;
+      height: 56px;
+      background: #e0e7ff;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+
+    .feature-card h3 {
+      font-size: 20px;
+      margin-bottom: 12px;
+    }
+
+    .feature-card p {
+      color: var(--gray);
+    }
+
+    /* How it works */
+    .how-it-works {
+      padding: 100px 0;
+      background: white;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 40px;
+    }
+
+    .step {
+      text-align: center;
+    }
+
+    .step-number {
+      width: 48px;
+      height: 48px;
+      background: var(--primary);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0 auto 20px;
+    }
+
+    .step h3 {
+      margin-bottom: 12px;
+    }
+
+    .step p {
+      color: var(--gray);
+      font-size: 14px;
+    }
+
+    /* Pricing */
+    .pricing {
+      padding: 100px 0;
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .price-card {
+      background: white;
+      padding: 40px;
+      border-radius: 16px;
+      text-align: center;
+      border: 2px solid #e2e8f0;
+    }
+
+    .price-card.featured {
+      border-color: var(--primary);
+      transform: scale(1.05);
+    }
+
+    .price-card h3 {
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+
+    .price {
+      font-size: 48px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .price span {
+      font-size: 16px;
+      color: var(--gray);
+      font-weight: 400;
+    }
+
+    .price-card ul {
+      list-style: none;
+      margin: 24px 0;
+      text-align: left;
+    }
+
+    .price-card li {
+      padding: 8px 0;
+      color: var(--gray);
+    }
+
+    .price-card li::before {
+      content: "✓ ";
+      color: var(--secondary);
+      font-weight: 700;
+    }
+
+    /* CTA */
+    .cta {
+      padding: 100px 0;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      text-align: center;
+    }
+
+    .cta h2 {
+      font-size: 36px;
+      margin-bottom: 16px;
+    }
+
+    .cta p {
+      font-size: 20px;
+      opacity: 0.9;
+      margin-bottom: 40px;
+    }
+
+    .cta .btn {
+      background: white;
+      color: var(--primary);
+      padding: 16px 40px;
+      font-size: 18px;
+    }
+
+    .cta .btn:hover {
+      background: #f1f5f9;
+    }
+
+    /* Email Form */
+    .email-form {
+      max-width: 500px;
+      margin: 40px auto 0;
+      display: flex;
+      gap: 12px;
+    }
+
+    .email-form input {
+      flex: 1;
+      padding: 14px 20px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+    }
+
+    .email-form .btn {
+      white-space: nowrap;
+    }
+
+    /* Footer */
+    footer {
+      padding: 40px 0;
+      background: var(--dark);
+      color: white;
+    }
+
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+    }
+
+    .footer-links a {
+      color: #94a3b8;
+      text-decoration: none;
+    }
+
+    .footer-links a:hover {
+      color: white;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 36px;
+      }
+
+      .stats-grid,
+      .features-grid,
+      .steps,
+      .pricing-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .hero-buttons {
+        flex-direction: column;
+      }
+
+      .email-form {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="container">
+      <nav>
+        <a href="#" class="logo">AgentSkills</a>
+        <ul class="nav-links">
+          <li><a href="#features">Features</a></li>
+          <li><a href="#how-it-works">How it Works</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+        </ul>
+        <button class="btn btn-primary">Get Early Access</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <h1>Discover <span>Trusted</span> AI Agents</h1>
+      <p>The marketplace where developers share, verify, and monetize AI agent skills. Find the perfect agent for your project in seconds.</p>
+      <div class="hero-buttons">
+        <button class="btn btn-primary">Join Waitlist</button>
+        <button class="btn btn-secondary">Browse Skills</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="stats">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-number">1000+</div>
+          <div class="stat-label">Verified Skills</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">50+</div>
+          <div class="stat-label">Auditors</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">500+</div>
+          <div class="stat-label">Beta Users</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">$0</div>
+          <div class="stat-label">To Get Started</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features" id="features">
+    <div class="container">
+      <h2 class="section-title">Why AgentSkills?</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🔍</div>
+          <h3>Easy Discovery</h3>
+          <p>Search and filter thousands of AI agents by category, language, and verification status. Find what you need in seconds.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">✓</div>
+          <h3>Verified Quality</h3>
+          <p>Every skill is audited by certified professionals. No more guessing if an agent will work for your use case.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⛓️</div>
+          <h3>Trustless Attribution</h3>
+          <p>Blockchain-verified usage tracking. Know exactly who's using your agents and get fair compensation.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">💰</div>
+          <h3>Monetize Your Work</h3>
+          <p>Set your own prices and earn from your AI agents. From $0.5/month to premium tiers - you decide.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🛡️</div>
+          <h3>Dispute Resolution</h3>
+          <p>Fair arbitration for conflicts. Built-in reputation system keeps everyone accountable.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🚀</div>
+          <h3>One-Click Integration</h3>
+          <p>Copy, paste, and run. Standardized interfaces make integration seamless.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it Works -->
+  <section class="how-it-works" id="how-it-works">
+    <div class="container">
+      <h2 class="section-title">How It Works</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <h3>Search</h3>
+          <p>Browse verified AI agents by category, language, or use case</p>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <h3>Verify</h3>
+          <p>Check auditor stamps, usage stats, and user reviews</p>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <h3>Subscribe</h3>
+          <p>Pay per agent, month by month. No commitments.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">4</div>
+          <h3>Integrate</h3>
+          <p>One-click copy and start building</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section class="pricing" id="pricing">
+    <div class="container">
+      <h2 class="section-title">Simple, Transparent Pricing</h2>
+      <div class="pricing-grid">
+        <div class="price-card">
+          <h3>Explorer</h3>
+          <div class="price">$0<span>/month</span></div>
+          <ul>
+            <li>Browse all free skills</li>
+            <li>Basic search & filter</li>
+            <li>Community support</li>
+            <li>Basic analytics</li>
+          </ul>
+          <button class="btn btn-secondary" style="width: 100%">Get Started</button>
+        </div>
+        <div class="price-card featured">
+          <h3>Professional</h3>
+          <div class="price">$29<span>/month</span></div>
+          <ul>
+            <li>Access premium skills</li>
+            <li>Advanced filtering</li>
+            <li>Priority support</li>
+            <li>Detailed analytics</li>
+            <li>Early access to new features</li>
+          </ul>
+          <button class="btn btn-primary" style="width: 100%">Start Free Trial</button>
+        </div>
+        <div class="price-card">
+          <h3>Enterprise</h3>
+          <div class="price">$299<span>/month</span></div>
+          <ul>
+            <li>Everything in Pro</li>
+            <li>Custom integrations</li>
+            <li>Dedicated account manager</li>
+            <li>SLA guarantee</li>
+            <li>Custom reporting</li>
+          </ul>
+          <button class="btn btn-secondary" style="width: 100%">Contact Sales</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="container">
+      <h2>Ready to Transform Your AI Development?</h2>
+      <p>Join thousands of developers building better AI agents</p>
+      <div class="email-form">
+        <input type="email" placeholder="Enter your email">
+        <button class="btn">Join Waitlist</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <a href="#" class="logo" style="color: white;">AgentSkills</a>
+        <ul class="footer-links">
+          <li><a href="#">Documentation</a></li>
+          <li><a href="#">GitHub</a></li>
+          <li><a href="#">Twitter</a></li>
+          <li><a href="#">Discord</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Simple form handling
+    document.querySelectorAll('.btn').forEach(btn => {
+      if (btn.textContent.includes('Waitlist') || btn.textContent.includes('Join')) {
+        btn.addEventListener('click', () => {
+          const email = document.querySelector('.email-form input').value;
+          if (email) {
+            alert('Thanks for joining! We\'ll be in touch soon.');
+            document.querySelector('.email-form input').value = '';
+          } else {
+            alert('Please enter your email first.');
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
