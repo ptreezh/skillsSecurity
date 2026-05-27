@@ -1,6 +1,7 @@
 # PROJECT KNOWLEDGE BASE
 
-**Generated:** 2026-05-04
+**Generated:** 2026-05-27
+**Commit:** 81bad1a
 **Branch:** main
 
 ## OVERVIEW
@@ -10,62 +11,132 @@ Research paper project: "Responsibility Vacuum in Agent Skill Ecosystems" — to
 ```
 skillsSecurity/
 ├── CONSTITUTION.md               # 🏛️ Project constitution (zero-startup, anti-financing)
-├── ROADMAP.md                    # 📅 Phased milestones + whip-system (check every Monday)
+├── ROADMAP.md                    # Phased milestones + whip-system (check every Monday)
 ├── A-tokenomics-design.md      # Tokenomics model (ASK token, staking, slash)
 ├── B-technical-implementation.md # Solidity contracts (ERC20, SkillRegistry, DAO)
 ├── C-dao-governance.md          # DAO governance design (voting, proposals)
 ├── D-community-growth.md        # Community growth strategy (cold start, user tiers)
 ├── paper-draft-en.md           # Main paper draft (RQ1/RQ2, literature, framework)
-├── .planning/
-│   ├── PHASE_0.md          # GSD Phase 0 plan (12 tasks, 4 waves)
-│   ├── CURRENT_PHASE.txt    # Current phase tracker (infinite loop)
-│   └── progress.log         # Progress log (whip-system)
-├── contracts/
-│   ├── ASKToken.sol           # ASK ERC20 token (1B supply, 4 distributions)
-│   ├── SkillRegistry.sol       # Skill registry + fingerprint (Constitution Art.3)
-│   ├── Attribution.sol         # Contribution tracking + test/like + anti-slash
-│   └── StakingManager.sol     # Staking + slash + anti-slash (Constitution Art.3)
-├── src/                           # Frontend MVP (React + Vite)
-│   ├── main.jsx                  # Entry point
-│   ├── components/
-│   │   └── SkillBrowser.jsx      # Skill browser (reputation sort, Art.3)
-│   ├── pages/
-│   │   ├── UserProfile.jsx        # User reputation center (Art.2)
-│   │   └── Leaderboard.jsx        # Global reputation board (Art.3)
-│   └── services/
-│       └── WalletService.js       # Embedded wallet (low-friction, Art.2)
-├── skills/                        # Seed skills (Wave 3)
-│   ├── email-sender.SKILL.md
-│   ├── web-search.SKILL.md
-│   ├── calendar-helper.SKILL.md
-│   ├── code-formatter.SKILL.md
-│   ├── file-organizer.SKILL.md
-│   ├── data-analyzer.SKILL.md
-│   ├── social-media-poster.SKILL.md
-│   ├── password-generator.SKILL.md
-│   ├── text-summarizer.SKILL.md
-│   └── translation-helper.SKILL.md
-├── community/                     # Community docs (Wave 3)
-│   ├── twitter-posts.md          # Twitter posts (constitution, tokenomics)
-│   └── discord-server.md         # Discord setup (roles, commands)
-├── scripts/                       # Automation scripts
-│   ├── airdrop.js                # Airdrop script (120 users, 12,000 ASK)
-│   ├── check-progress.sh          # Whip-system check (Monday 09:00)
-│   └── whip-system.ps1            # Windows scheduled task setup
-└── data/
-    └── test-users.json            # Airdrop user list (120 users)
+├── hardhat.config.js            # Hardhat config (Solidity compiler, networks)
+├── .github/
+│   └── workflows/               # CI workflows
+├── .planning/                    # GSD planning system
+│   ├── PHASE_0.md              # Phase 0 plan (12 tasks, 4 waves)
+│   ├── PHASE_1.md              # Phase 1 plan
+│   ├── ROADMAP.md              # Roadmap
+│   ├── PROJECT.md              # Project definition
+│   ├── REQUIREMENTS.md         # Requirements
+│   ├── STATE.md                # Current state
+│   ├── CURRENT_PHASE.txt       # Phase tracker
+│   ├── progress.log            # Whip-system log
+│   ├── codebase/               # Codebase analysis docs
+│   ├── milestones/             # Milestone plans
+│   └── research/               # Research outputs
+├── archive/                      # Archived files
+├── community/                    # Community docs
+│   ├── twitter-posts.md
+│   └── discord-server.md
+├── contracts/                    # Solidity smart contracts (Hardhat)
+│   ├── ASKToken.sol            # ASK ERC20 token (1B supply, 4 distributions)
+│   ├── SkillRegistry.sol        # Skill registry + fingerprint (Constitution Art.3)
+│   ├── Attribution.sol          # Contribution tracking + test/like + anti-slash
+│   ├── StakingManager.sol      # Staking + slash + anti-slash (Constitution Art.3)
+│   ├── DeployerRewards.sol     # Deployer reward distribution
+│   ├── HealthReporter.sol      # On-chain health reporting
+│   ├── RevenueDistributor.sol  # Revenue sharing
+│   ├── AgentGovernor.sol       # Agent DAO governor
+│   ├── AgentVotes.sol          # Agent voting
+│   ├── AgentTimelock.sol       # Timelock controller
+│   ├── AgentPausable.sol       # Pausable module
+│   ├── GovernanceTimelock.sol  # Governance timelock
+│   ├── ReputationBadges.sol    # Reputation badge system
+│   ├── ReputationVotes.sol     # Reputation-weighted voting
+│   ├── RevenueSplit.sol        # Revenue split logic
+│   ├── SelfSustainingEcosystem.sol # Self-sustaining loop
+│   ├── DAO/
+│   │   ├── Governance.sol
+│   │   └── Treasury.sol
+│   ├── interfaces/             # Solidity interfaces
+│   ├── scripts/                # Deploy/test scripts
+│   ├── test/                   # Contract tests
+│   ├── artifacts/              # Compiled ABIs
+│   └── package.json
+├── data/                         # Data files
+│   └── test-users.json
+├── deployments/                  # Deployment configs
+├── docs/                         # Extended documentation
+│   ├── api/                    # API docs
+│   ├── business/               # Business docs
+│   ├── guides/                 # User guides
+│   ├── plans/                  # Implementation plans
+│   └── security/               # Security docs
+├── downloads/                    # Downloaded resources
+├── e2e/                          # E2E test files
+├── paper-submission/              # Paper submission materials
+│   ├── paper-draft-en.docx/html # Paper in doc formats
+│   ├── cover-letters            # Submission cover letters
+│   └── SUBMISSION-CHECKLIST.md
+├── REPORTS/                      # Daily audit/reports
+├── scripts/                      # Automation scripts
+│   ├── airdrop.js              # Airdrop script
+│   ├── deploy-with-rewards.js  # Deploy with reward system
+│   ├── env-setup.js            # Environment setup
+│   ├── auto-tasks.cjs/ps1/sh   # Auto task runners
+│   ├── agents/                 # Autonomous agents
+│   │   ├── AutoFixer.js
+│   │   ├── EvolutionAgent.js
+│   │   ├── HealthMonitor.js
+│   │   └── UpgradeScheduler.js
+│   ├── economics/              # Economic scripts
+│   ├── growth/                 # Growth scripts
+│   └── content/               # Content scripts
+├── server/                       # Backend server (Node.js)
+│   ├── index.js                # Server entry
+│   ├── audit-agent.js          # Audit agent
+│   ├── chain-submit.js         # Chain submission
+│   ├── independence-scorer.js  # Independence scoring
+│   ├── skill-runner.js         # Skill execution
+│   └── jobs.js                 # Background jobs
+├── skills/                       # Seed skill specs (Wave 3)
+│   ├── *.SKILL.md              # Standard skills (10)
+│   └── *.FREESKILL.md          # Freeskills (4)
+├── src/                          # Frontend (React + Vite)
+│   ├── main.jsx                # Entry point
+│   ├── components/             # React components
+│   ├── pages/                  # Page views (UserProfile, Leaderboard, etc.)
+│   ├── services/               # Web3 services (WalletService, etc.)
+│   ├── hooks/                  # Custom React hooks
+│   ├── i18n/                   # Internationalization
+│   ├── styles/                 # CSS styles
+│   └── abi/                    # Contract ABIs
+├── test/                         # Test files
+│   ├── contracts/              # Solidity tests
+│   └── e2e/                    # E2E tests
+├── wallets/                      # Wallet configs
+└── uploads/                      # Upload directory
 ```
 
 ## WHERE TO LOOK
-| Task | Location |
-|------|----------|
-| **Project constitution** | CONSTITUTION.md (zero-startup, anti-financing) |
-| **Milestones + whip-system** | ROADMAP.md (check every Monday) |
-| Tokenomics parameters | A-tokenomics-design.md (§2-8) |
-| Smart contract code | B-technical-implementation.md (§2, Solidity snippets) |
-| DAO governance rules | C-dao-governance.md (§2-3) |
-| Community growth strategy | D-community-growth.md (§2-4) |
-| Paper sections/theory | paper-draft-en.md (§1-4) |
+| Task | Location | Notes |
+|------|----------|-------|
+| **Project constitution** | CONSTITUTION.md | zero-startup, anti-financing |
+| **Milestones + whip-system** | ROADMAP.md | check every Monday |
+| Tokenomics parameters | A-tokenomics-design.md (§2-8) | ASK token, staking, slash |
+| Smart contract code | contracts/AGENTS.md | Solidity contracts overview |
+| Individual contracts | contracts/ | See individual .sol files |
+| Contract deployment | contracts/scripts/ | deploy.js, test.js |
+| DAO governance rules | C-dao-governance.md (§2-3) | voting, proposals |
+| Community growth strategy | D-community-growth.md (§2-4) | cold start, user tiers |
+| Paper sections/theory | paper-draft-en.md (§1-4) | RQ1/RQ2, literature, framework |
+| Frontend code | src/AGENTS.md | React + Vite MVP |
+| GSD planning system | .planning/ | phases, roadmap, state |
+| Automation scripts | scripts/ | agents, economics, growth |
+| Seed skills | skills/ | .SKILL.md and .FREESKILL.md |
+| Backend server | server/ | Node.js API, audit, scoring |
+| Test files | test/ | contract tests, E2E |
+| Deployment configs | deployments/ | network configs |
+| Daily reports | REPORTS/ | audit and progress logs |
+| Paper submission | paper-submission/ | drafts, cover letters |
 
 ## CONVENTIONS
 - Markdown only, no code files
@@ -88,6 +159,8 @@ skillsSecurity/
 # No build/test — research-only project
 # To review paper: read paper-draft-en.md
 # To update tokenomics: edit A-tokenomics-design.md
+# To compile contracts: npx hardhat compile
+# To run contract tests: npx hardhat test
 ```
 
 ## NOTES
