@@ -6,13 +6,14 @@ import Leaderboard from './pages/Leaderboard'
 import ProtocolDemo from './pages/ProtocolDemo'
 import DeployerDashboard from './pages/DeployerDashboard'
 import SelfOpsPanel from './pages/SelfOpsPanel'
+import LandingPage from './pages/LandingPage'
 import WalletService from './services/WalletService'
 import './styles/components.css'
 import './styles/enhanced.css'
 
 function App() {
   const [user, setUser] = useState(null)
-  const [page, setPage] = useState('browser')
+  const [page, setPage] = useState('start')
 
   useEffect(() => {
     // 初始化钱包（宪法第二条：低摩擦参与）
@@ -20,6 +21,7 @@ function App() {
   }, [])
 
   const navItems = [
+    { id: 'start', label: '开始' },
     { id: 'browser', label: '技能浏览器' },
     { id: 'demo', label: '协议演示' },
     { id: 'leaderboard', label: '排行榜' },
@@ -54,6 +56,7 @@ function App() {
       </header>
 
       <main className="app-main">
+        {page === 'start' && <LandingPage onStart={setPage} />}
         {page === 'browser' && <SkillBrowser user={user} />}
         {page === 'demo' && <ProtocolDemo />}
         {page === 'leaderboard' && <Leaderboard />}
