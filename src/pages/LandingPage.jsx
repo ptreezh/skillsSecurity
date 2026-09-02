@@ -88,6 +88,42 @@ export default function LandingPage({ onStart }) {
           </p>
         </div>
       </section>
+
+      <section id="faq" className="container prototype-section">
+        <div className="section-header">
+          <span className="section-label">常见问题</span>
+          <h2 className="section-title">你还有这些疑问吗？</h2>
+          <p className="section-desc">
+            我们整理了大多数新用户最关心的问题，帮你更快判断 AgentSkills 是否适合你。
+          </p>
+        </div>
+        <div className="faq-list">
+          <div className="faq-item">
+            <h3 className="faq-question">参与 AgentSkills 需要付费吗？</h3>
+            <p className="faq-answer">不需要。浏览技能、注册账户、提交基础反馈都不收费。你只需投入时间和专业能力，就能获得对应的声誉记录。</p>
+          </div>
+          <div className="faq-item">
+            <h3 className="faq-question">没有技术背景可以参与吗？</h3>
+            <p className="faq-answer">当然可以。你可以作为使用者发现并评价技能；如果你有业务经验，也可以从实际应用角度提交反馈。技术和非技术视角的审核同样有价值。</p>
+          </div>
+          <div className="faq-item">
+            <h3 className="faq-question">发布技能后我能获得什么？</h3>
+            <p className="faq-answer">你的技能会被收录进可搜索的技能库，被更多用户发现；通过验证后还会获得声誉加成，提升你在生态中的可见度和信任度。</p>
+          </div>
+          <div className="faq-item">
+            <h3 className="faq-question">声誉到底有什么用？</h3>
+            <p className="faq-answer">声誉是你在这个生态中的可信度凭证。声誉越高，你可以发布和验证的技能等级越高，参与重要决策的权重也越大，同时更容易被其他用户和合作方信任。</p>
+          </div>
+          <div className="faq-item">
+            <h3 className="faq-question">怎么保证技能质量？</h3>
+            <p className="faq-answer">每个 Skill 都需要经过社区测试、风险评估和同行审核；所有审核记录和贡献者声誉都公开透明。低质或恶意技能会被标记，优质技能会自然获得更高排名。</p>
+          </div>
+          <div className="faq-item">
+            <h3 className="faq-question">我的贡献会被记录吗？</h3>
+            <p className="faq-answer">会。你发布的技能、提交的验证、提供的反馈都会被记录为不可篡改的声誉记录，成为你长期可信度的组成部分。</p>
+          </div>
+        </div>
+      </section>
     </div>
   )
 }
