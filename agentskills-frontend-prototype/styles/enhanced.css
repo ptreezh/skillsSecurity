@@ -39,7 +39,6 @@
   animation: spin 0.8s linear infinite;
 }
 
-/* === Subtle hover lift (for cards) === */
 .hover-lift {
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
@@ -49,13 +48,11 @@
   box-shadow: var(--shadow-md);
 }
 
-/* === Focus ring for custom elements === */
 .focus-ring:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
 
-/* === Reduced motion preference === */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

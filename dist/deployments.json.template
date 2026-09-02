@@ -1,0 +1,16 @@
+{
+  "network": "polygonAmoy",
+  "chainId": 80002,
+  "timestamp": "",
+  "contracts": {
+    "ASKToken": "",
+    "SkillRegistry": "",
+    "StakingManager": "",
+    "Attribution": "",
+    "GovernanceTimelock": "",
+    "AgentPausable": "",
+    "AgentTimelock": "",
+    "AgentVotes": "",
+    "AgentGovernor": ""
+  }
+}

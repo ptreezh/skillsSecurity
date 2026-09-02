@@ -1,8 +1,6 @@
 /**
  * DeployerDashboard Styles
  * Phase 19: Deployer Rewards Frontend
- *
- * Glassmorphism design with tier-based color accents.
  */
 
 @import '../styles/tokens.css';
@@ -20,15 +18,7 @@
   border-radius: var(--radius-xl);
   padding: var(--space-6);
   border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-md);
-
-  /* Glassmorphism effect */
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.95) 0%,
-    rgba(255, 255, 255, 0.85) 100%
-  );
-  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-sm);
 }
 
 /* === Panel Header === */
@@ -39,6 +29,8 @@
   margin-bottom: var(--space-6);
   padding-bottom: var(--space-4);
   border-bottom: 1px solid var(--color-border-light);
+  gap: var(--space-4);
+  flex-wrap: wrap;
 }
 
 .panel-title h2 {
@@ -63,6 +55,24 @@
   letter-spacing: 0.5px;
 }
 
+.tier-badge-bronze {
+  background: var(--color-gray-100);
+  color: var(--color-gray-500);
+  border-color: var(--color-gray-300);
+}
+
+.tier-badge-silver {
+  background: var(--color-primary-50);
+  color: var(--color-primary-500);
+  border-color: var(--color-primary-200);
+}
+
+.tier-badge-gold {
+  background: var(--color-warning-light);
+  color: var(--color-warning);
+  border-color: var(--risk-medium-border);
+}
+
 /* === Stats Grid === */
 .stats-grid {
   display: grid;
@@ -83,6 +93,12 @@
   padding: var(--space-4);
   text-align: center;
   border: 1px solid var(--color-border-light);
+  transition: box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+
+.stat-card:hover {
+  box-shadow: var(--shadow-xs);
+  border-color: var(--color-border);
 }
 
 .stat-label {
@@ -109,36 +125,9 @@
   margin-top: var(--space-1);
 }
 
-/* Highlight stat (total rewards) */
 .stat-highlight {
-  background: linear-gradient(
-    135deg,
-    rgba(37, 99, 235, 0.1) 0%,
-    rgba(124, 58, 237, 0.1) 100%
-  );
+  background: var(--color-primary-light);
   border: 2px solid var(--color-primary);
-  position: relative;
-  overflow: hidden;
-}
-
-.stat-highlight::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(
-    circle,
-    rgba(37, 99, 235, 0.1) 0%,
-    transparent 70%
-  );
-  animation: shimmer 3s infinite;
-}
-
-@keyframes shimmer {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
 }
 
 .stat-highlight .stat-value {
@@ -171,33 +160,21 @@
   font-family: var(--font-mono);
   background: var(--color-bg-secondary);
   color: var(--color-text-primary);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .referral-input:focus {
   border-color: var(--color-primary);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  box-shadow: 0 0 0 3px var(--color-primary-subtle);
 }
 
-.btn-copy {
-  padding: var(--space-3) var(--space-5);
-  background: var(--color-primary);
-  color: var(--color-text-inverse);
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  min-width: 80px;
-}
-
-.btn-copy:hover {
-  background: var(--color-primary-hover);
-}
-
-.btn-copy.copied {
+.btn.copied {
   background: var(--color-success);
+}
+
+.btn.copied:hover {
+  background: var(--color-success-hover);
 }
 
 /* === Tier Progress === */
@@ -218,11 +195,17 @@
   align-items: center;
   margin-bottom: var(--space-3);
   font-size: var(--text-sm);
+  gap: var(--space-2);
+  flex-wrap: wrap;
 }
 
 .current-tier {
   font-weight: var(--font-semibold);
 }
+
+.tier-text-bronze { color: var(--color-gray-500); }
+.tier-text-silver { color: var(--color-primary-500); }
+.tier-text-gold { color: var(--color-warning); }
 
 .next-tier {
   color: var(--color-text-secondary);
@@ -249,7 +232,12 @@
   height: 100%;
   border-radius: var(--radius-full);
   transition: width var(--transition-normal);
+  background: var(--color-primary);
 }
+
+.progress-fill-bronze { background: var(--color-gray-400); }
+.progress-fill-silver { background: var(--color-primary-400); }
+.progress-fill-gold { background: var(--color-warning); }
 
 .tier-markers {
   display: flex;
@@ -258,34 +246,37 @@
   color: var(--color-text-tertiary);
 }
 
-/* === States === */
+.tier-marker-bronze { color: var(--color-gray-500); }
+.tier-marker-silver { color: var(--color-primary-500); }
+.tier-marker-gold { color: var(--color-warning); }
 
-/* Not Connected */
-.not-connected {
+/* === States === */
+.not-connected,
+.not-registered,
+.loading {
   text-align: center;
   padding: var(--space-8) var(--space-4);
 }
 
-.not-connected-icon {
+.not-connected-icon,
+.not-registered-icon {
   font-size: 48px;
   margin-bottom: var(--space-4);
 }
 
-.not-connected h2 {
+.not-connected h2,
+.not-registered h2,
+.loading h2 {
   margin: 0 0 var(--space-3) 0;
   font-size: var(--text-xl);
   color: var(--color-text-primary);
 }
 
-.not-connected p {
+.not-connected p,
+.not-registered > p,
+.loading p {
   margin: 0 0 var(--space-5) 0;
   color: var(--color-text-secondary);
-}
-
-/* Loading */
-.loading {
-  text-align: center;
-  padding: var(--space-8) var(--space-4);
 }
 
 .spinner {
@@ -296,37 +287,6 @@
   border-radius: 50%;
   margin: 0 auto var(--space-4) auto;
   animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.loading p {
-  color: var(--color-text-secondary);
-  margin: 0;
-}
-
-/* Not Registered */
-.not-registered {
-  text-align: center;
-  padding: var(--space-6) var(--space-4);
-}
-
-.not-registered-icon {
-  font-size: 48px;
-  margin-bottom: var(--space-4);
-}
-
-.not-registered h2 {
-  margin: 0 0 var(--space-3) 0;
-  font-size: var(--text-xl);
-  color: var(--color-text-primary);
-}
-
-.not-registered > p {
-  margin: 0 0 var(--space-5) 0;
-  color: var(--color-text-secondary);
 }
 
 .tier-preview {
@@ -359,17 +319,14 @@
   font-size: var(--text-sm);
 }
 
+.tier-item-bronze { border-left-color: var(--color-gray-400); }
+.tier-item-silver { border-left-color: var(--color-primary-400); }
+.tier-item-gold { border-left-color: var(--color-warning); }
+
 .tier-name {
   font-weight: var(--font-semibold);
 }
 
-/* Error Banner */
-.error-banner {
-  margin-top: var(--space-4);
-  padding: var(--space-3) var(--space-4);
-  background: var(--color-warning-light);
-  border-radius: var(--radius-md);
-  font-size: var(--text-sm);
-  color: #92400e;
-  text-align: center;
-}
+.tier-name-bronze { color: var(--color-gray-500); }
+.tier-name-silver { color: var(--color-primary-500); }
+.tier-name-gold { color: var(--color-warning); }

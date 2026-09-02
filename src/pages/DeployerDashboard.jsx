@@ -10,10 +10,12 @@ import './DeployerDashboard.css'
 import ContractService from '../services/ContractService.jsx'
 
 // Tier configuration
+const TIER_KEY = { 0: 'bronze', 1: 'silver', 2: 'gold' }
+
 const TIER_CONFIG = {
-  0: { name: '青铜', color: '#94a3b8', bg: '#f1f5f9' },
-  1: { name: '白银', color: '#60a5fa', bg: '#dbeafe' },
-  2: { name: '黄金', color: '#fbbf24', bg: '#fef3c7' }
+  0: { name: '青铜', key: 'bronze' },
+  1: { name: '白银', key: 'silver' },
+  2: { name: '黄金', key: 'gold' }
 }
 
 // Tier thresholds (number of users)
@@ -139,7 +141,7 @@ export default function DeployerDashboard({ user }) {
   // NOT CONNECTED STATE
   if (!user) {
     return (
-      <div className="deployer-dashboard">
+      <div className="deployer-dashboard animate-fade-in">
         <div className="deployer-card">
           <div className="not-connected">
             <div className="not-connected-icon">🔗</div>
@@ -157,7 +159,7 @@ export default function DeployerDashboard({ user }) {
   // LOADING STATE
   if (loading) {
     return (
-      <div className="deployer-dashboard">
+      <div className="deployer-dashboard animate-fade-in">
         <div className="deployer-card">
           <div className="loading">
             <div className="spinner"></div>
@@ -171,30 +173,27 @@ export default function DeployerDashboard({ user }) {
   // NOT REGISTERED STATE
   if (!isRegistered || !stats) {
     return (
-      <div className="deployer-dashboard">
+      <div className="deployer-dashboard animate-fade-in">
         <div className="deployer-card">
           <div className="not-registered">
             <div className="not-registered-icon">🎯</div>
             <h2>注册成为部署者获取推荐奖励</h2>
-            <p>推荐用户使用 AgentSkills，获得 10% 的staking奖励</p>
+            <p>推荐用户使用 AgentSkills，获得 10% 的 staking 奖励</p>
             <button className="btn btn-primary" onClick={handleRegister}>
               立即注册
             </button>
             <div className="tier-preview">
               <h3>等级特权</h3>
               <div className="tier-list">
-                <div className="tier-item" style={{ borderLeftColor: TIER_CONFIG[0].color }}>
-                  <span className="tier-name" style={{ color: TIER_CONFIG[0].color }}>{TIER_CONFIG[0].name}</span>
-                  <span>0+ 用户 | 基础奖励</span>
-                </div>
-                <div className="tier-item" style={{ borderLeftColor: TIER_CONFIG[1].color }}>
-                  <span className="tier-name" style={{ color: TIER_CONFIG[1].color }}>{TIER_CONFIG[1].name}</span>
-                  <span>50+ 用户 | 额外 5%</span>
-                </div>
-                <div className="tier-item" style={{ borderLeftColor: TIER_CONFIG[2].color }}>
-                  <span className="tier-name" style={{ color: TIER_CONFIG[2].color }}>{TIER_CONFIG[2].name}</span>
-                  <span>100+ 用户 | VIP 支持</span>
-                </div>
+                {Object.entries(TIER_CONFIG).map(([tier, config]) => (
+                  <div key={tier} className={`tier-item tier-item-${config.key}`}>
+                    <span className={`tier-name tier-name-${config.key}`}>{config.name}</span>
+                    <span>
+                      {TIER_THRESHOLDS[tier]}+ 用户 |{' '}
+                      {tier === '0' ? '基础奖励' : tier === '1' ? '额外 5%' : 'VIP 支持'}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -205,10 +204,11 @@ export default function DeployerDashboard({ user }) {
 
   // REGISTERED STATE - SHOW FULL DASHBOARD
   const tierInfo = TIER_CONFIG[stats.tier] || TIER_CONFIG[0]
+  const tierKey = TIER_KEY[stats.tier] || 'bronze'
   const progress = getProgressToNextTier()
 
   return (
-    <div className="deployer-dashboard">
+    <div className="deployer-dashboard animate-fade-in">
       <div className="deployer-card">
         {/* Panel Header */}
         <div className="panel-header">
@@ -216,14 +216,7 @@ export default function DeployerDashboard({ user }) {
             <h2>部署者激励面板</h2>
             <span className="domain-label">{stats.domain}</span>
           </div>
-          <span
-            className="tier-badge"
-            style={{
-              backgroundColor: tierInfo.bg,
-              color: tierInfo.color,
-              borderColor: tierInfo.color
-            }}
-          >
+          <span className={`tier-badge tier-badge-${tierKey}`}>
             {tierInfo.name}
           </span>
         </div>
@@ -251,7 +244,7 @@ export default function DeployerDashboard({ user }) {
 
         {/* Referral Section */}
         <div className="referral-section">
-          <h3>你的推荐链接</h3>
+          <h3>推荐链接</h3>
           <div className="referral-link-container">
             <input
               type="text"
@@ -260,7 +253,7 @@ export default function DeployerDashboard({ user }) {
               readOnly
             />
             <button
-              className={`btn-copy ${copied ? 'copied' : ''}`}
+              className={`btn btn-primary ${copied ? 'copied' : ''}`}
               onClick={handleCopyLink}
             >
               {copied ? '已复制' : '复制'}
@@ -272,40 +265,38 @@ export default function DeployerDashboard({ user }) {
         <div className="tier-progress">
           <h3>等级进度</h3>
           <div className="progress-info">
-            <span className="current-tier" style={{ color: tierInfo.color }}>
-              {tierInfo.name} {stats.totalUsers} 用户
+            <span className={`current-tier tier-text-${tierKey}`}>
+              {tierInfo.name} · {stats.totalUsers} 用户
             </span>
-            {progress.nextTier && (
+            {progress.nextTier ? (
               <span className="next-tier">
                 距离{progress.nextTier.name}还差 {progress.next - progress.current} 用户
               </span>
-            )}
-            {stats.tier >= 2 && (
+            ) : (
               <span className="max-tier">已达最高等级</span>
             )}
           </div>
           <div className="progress-bar-container">
             <div className="progress-bar-bg">
               <div
-                className="progress-bar-fill"
-                style={{
-                  width: `${progress.progress}%`,
-                  backgroundColor: tierInfo.color
-                }}
+                className={`progress-bar-fill progress-fill-${tierKey}`}
+                style={{ width: `${progress.progress}%` }}
               />
             </div>
           </div>
           <div className="tier-markers">
-            <span className="marker" style={{ color: TIER_CONFIG[0].color }}>青铜 0</span>
-            <span className="marker" style={{ color: TIER_CONFIG[1].color }}>白银 50</span>
-            <span className="marker" style={{ color: TIER_CONFIG[2].color }}>黄金 100</span>
+            {Object.entries(TIER_CONFIG).map(([tier, config]) => (
+              <span key={tier} className={`marker tier-marker-${config.key}`}>
+                {config.name} {TIER_THRESHOLDS[tier]}
+              </span>
+            ))}
           </div>
         </div>
 
         {/* Error display */}
         {error && (
-          <div className="error-banner">
-            <span>数据加载部分失败，使用演示数据</span>
+          <div className="alert alert-warning" style={{ marginTop: 'var(--space-4)' }}>
+            数据加载部分失败，使用演示数据
           </div>
         )}
       </div>

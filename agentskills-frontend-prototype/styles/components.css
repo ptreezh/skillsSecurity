@@ -1,12 +1,5 @@
-/*
- * Component Classes - AgentSkills UI Design System
- * Phase 17: Frontend UI Design (Optimized)
- * Version: 1.1.0
- */
-
 @import './tokens.css';
 
-/* === Reset & Base === */
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -20,7 +13,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* === Utility Classes === */
 .text-primary { color: var(--color-text-primary); }
 .text-secondary { color: var(--color-text-secondary); }
 .text-tertiary { color: var(--color-text-tertiary); }
@@ -101,7 +93,6 @@ body {
   padding: var(--space-6) var(--container-padding);
 }
 
-/* === App Layout === */
 .app {
   min-height: 100vh;
   background: var(--gradient-hero);
@@ -115,7 +106,6 @@ body {
   padding-top: var(--header-height);
 }
 
-/* === Header === */
 .app-header {
   position: fixed;
   top: 0;
@@ -184,6 +174,7 @@ body {
   cursor: pointer;
   transition: background var(--transition-fast), color var(--transition-fast);
   white-space: nowrap;
+  text-decoration: none;
 }
 
 .app-nav-btn:hover {
@@ -225,7 +216,6 @@ body {
   }
 }
 
-/* === Button Variants === */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -240,6 +230,7 @@ body {
   transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
   border: 1px solid transparent;
   line-height: 1.5;
+  text-decoration: none;
 }
 
 .btn:focus-visible {
@@ -333,7 +324,6 @@ body {
   font-size: var(--text-base);
 }
 
-/* === Card Styles === */
 .card {
   background: var(--color-bg-surface);
   border-radius: var(--radius-xl);
@@ -427,7 +417,6 @@ body {
   }
 }
 
-/* === Input Styles === */
 .input {
   padding: 10px 14px;
   border: 1px solid var(--color-border);
@@ -469,7 +458,6 @@ body {
   outline: none;
 }
 
-/* === Badge Styles === */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -483,7 +471,6 @@ body {
   line-height: 1.4;
 }
 
-/* Risk Level Badges */
 .badge-risk-low {
   background: var(--risk-low-bg);
   color: var(--risk-low-text);
@@ -508,7 +495,6 @@ body {
   border: 1px solid var(--risk-critical-border);
 }
 
-/* Reputation Tier Badges */
 .badge-tier {
   padding: 5px 12px;
   border-radius: var(--radius-full);
@@ -524,7 +510,6 @@ body {
 .badge-tier-4 { background: var(--color-purple-100); color: var(--color-purple-600); }
 .badge-tier-5 { background: var(--color-cta-subtle); color: var(--color-cta); }
 
-/* Verification Badge */
 .badge-verified {
   width: 20px;
   height: 20px;
@@ -539,7 +524,6 @@ body {
   padding: 0;
 }
 
-/* Status Badges */
 .badge-success {
   background: var(--color-success-light);
   color: var(--color-success);
@@ -560,7 +544,6 @@ body {
   color: var(--color-info);
 }
 
-/* === Modal Styles === */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -603,7 +586,6 @@ body {
   justify-content: flex-end;
 }
 
-/* === Avatar === */
 .avatar {
   width: 56px;
   height: 56px;
@@ -628,7 +610,6 @@ body {
   font-size: var(--text-2xl);
 }
 
-/* === Stats Display === */
 .stat {
   display: inline-flex;
   flex-direction: column;
@@ -650,7 +631,6 @@ body {
   color: var(--color-text-tertiary);
 }
 
-/* === Progress Bar === */
 .progress {
   height: 8px;
   background: var(--color-border);
@@ -666,7 +646,6 @@ body {
   box-shadow: 0 0 10px rgba(13, 148, 136, 0.3);
 }
 
-/* === Table Styles === */
 .table-header {
   display: grid;
   grid-template-columns: 60px 1fr 120px 100px 90px 80px 120px;
@@ -680,7 +659,6 @@ body {
   color: var(--color-text-secondary);
 }
 
-/* === Rank Badges === */
 .rank-badge {
   font-weight: var(--font-bold);
   display: inline-flex;
@@ -708,7 +686,6 @@ body {
   background: var(--color-orange-100);
 }
 
-/* === Grid Layouts === */
 .grid-auto {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -722,7 +699,6 @@ body {
   margin-bottom: var(--space-6);
 }
 
-/* === Empty State === */
 .empty-state {
   text-align: center;
   padding: var(--space-12) var(--space-6);
@@ -736,7 +712,6 @@ body {
   color: var(--color-text-tertiary);
 }
 
-/* === Loading State === */
 .loading-state {
   display: flex;
   flex-direction: column;
@@ -760,7 +735,6 @@ body {
   to { transform: rotate(360deg); }
 }
 
-/* === Focus States === */
 button:focus-visible,
 input:focus-visible,
 select:focus-visible,
@@ -773,7 +747,6 @@ a:focus-visible {
   outline: none;
 }
 
-/* === Page Section === */
 .page-header {
   margin-bottom: var(--space-6);
 }
@@ -791,7 +764,6 @@ a:focus-visible {
   margin: 0;
 }
 
-/* === Toolbar === */
 .toolbar {
   display: flex;
   gap: var(--space-3);
@@ -815,7 +787,6 @@ a:focus-visible {
   }
 }
 
-/* === Alert / Banner === */
 .alert {
   padding: var(--space-4);
   border-radius: var(--radius-lg);

@@ -141,7 +141,7 @@ const OpsDashboard = () => {
                       cx={x}
                       cy={y}
                       r={3}
-                      fill={point.fast > 80 ? '#ef4444' : point.fast > 50 ? '#f59e0b' : '#10b981'}
+                      fill={point.fast > 80 ? 'var(--color-danger)' : point.fast > 50 ? 'var(--color-warning)' : 'var(--color-success)'}
                     />
                   );
                 })}
@@ -220,18 +220,18 @@ const OpsDashboard = () => {
           padding: 4px 12px;
           border-radius: 12px;
           font-size: 12px;
-          background: #10b981;
+          background: var(--color-success);
           color: white;
         }
 
         .status-badge:not([class*="disconnect"]) {
-          background: #10b981;
+          background: var(--color-success);
         }
 
         .error-banner {
-          background: #fef2f2;
-          border: 1px solid #ef4444;
-          color: #991b1b;
+          background: var(--color-danger-light);
+          border: 1px solid var(--color-danger);
+          color: var(--color-danger-hover);
           padding: 12px;
           border-radius: 8px;
           margin-bottom: 20px;
@@ -245,8 +245,8 @@ const OpsDashboard = () => {
         }
 
         .stat-card {
-          background: white;
-          border: 1px solid #e5e7eb;
+          background: var(--color-bg-surface);
+          border: 1px solid var(--color-border);
           border-radius: 12px;
           padding: 16px;
         }
@@ -255,7 +255,7 @@ const OpsDashboard = () => {
           margin: 0 0 8px;
           font-size: 12px;
           text-transform: uppercase;
-          color: #6b7280;
+          color: var(--color-gray-500);
         }
 
         .stat-card .value {
@@ -265,17 +265,17 @@ const OpsDashboard = () => {
         }
 
         .stat-card .value.critical {
-          color: #ef4444;
+          color: var(--color-danger);
         }
 
         .stat-card .unit {
           font-size: 16px;
-          color: #6b7280;
+          color: var(--color-gray-500);
         }
 
         .stat-card .sub-text {
           font-size: 12px;
-          color: #9ca3af;
+          color: var(--color-text-tertiary);
         }
 
         .indicator {
@@ -286,13 +286,13 @@ const OpsDashboard = () => {
           margin-top: 8px;
         }
 
-        .indicator.high { background: #fef2f2; color: #991b1b; }
-        .indicator.medium { background: #fffbeb; color: #92400e; }
-        .indicator.low { background: #ecfdf5; color: #065f46; }
+        .indicator.high { background: var(--color-danger-light); color: var(--color-danger-hover); }
+        .indicator.medium { background: var(--color-warning-light); color: var(--color-warning-hover); }
+        .indicator.low { background: var(--color-success-light); color: var(--color-success-hover); }
 
         .chart-section {
-          background: white;
-          border: 1px solid #e5e7eb;
+          background: var(--color-bg-surface);
+          border: 1px solid var(--color-border);
           border-radius: 12px;
           padding: 16px;
           margin-bottom: 24px;
@@ -306,7 +306,7 @@ const OpsDashboard = () => {
         .gas-chart-svg {
           width: 100%;
           height: 150px;
-          background: #f9fafb;
+          background: var(--color-bg-primary);
           border-radius: 8px;
         }
 
@@ -315,7 +315,7 @@ const OpsDashboard = () => {
           gap: 16px;
           margin-top: 8px;
           font-size: 12px;
-          color: #6b7280;
+          color: var(--color-gray-500);
         }
 
         .chart-legend .dot {
@@ -326,13 +326,13 @@ const OpsDashboard = () => {
           margin-right: 4px;
         }
 
-        .chart-legend .dot.high { background: #ef4444; }
-        .chart-legend .dot.medium { background: #f59e0b; }
-        .chart-legend .dot.low { background: #10b981; }
+        .chart-legend .dot.high { background: var(--color-danger); }
+        .chart-legend .dot.medium { background: var(--color-warning); }
+        .chart-legend .dot.low { background: var(--color-success); }
 
         .alerts-section {
-          background: white;
-          border: 1px solid #e5e7eb;
+          background: var(--color-bg-surface);
+          border: 1px solid var(--color-border);
           border-radius: 12px;
           padding: 16px;
         }
@@ -362,9 +362,9 @@ const OpsDashboard = () => {
           cursor: pointer;
         }
 
-        .test-btn.info { background: #ecfdf5; color: #065f46; }
-        .test-btn.high { background: #fffbeb; color: #92400e; }
-        .test-btn.critical { background: #fef2f2; color: #991b1b; }
+        .test-btn.info { background: var(--color-success-light); color: var(--color-success-hover); }
+        .test-btn.high { background: var(--color-warning-light); color: var(--color-warning-hover); }
+        .test-btn.critical { background: var(--color-danger-light); color: var(--color-danger-hover); }
 
         .alerts-table {
           width: 100%;
@@ -375,14 +375,14 @@ const OpsDashboard = () => {
         .alerts-table td {
           padding: 8px;
           text-align: left;
-          border-bottom: 1px solid #e5e7eb;
+          border-bottom: 1px solid var(--color-border);
         }
 
         .alerts-table th {
           font-weight: 600;
           font-size: 12px;
           text-transform: uppercase;
-          color: #6b7280;
+          color: var(--color-gray-500);
         }
 
         .severity-badge {
@@ -392,20 +392,20 @@ const OpsDashboard = () => {
           font-weight: 600;
         }
 
-        .severity-badge.info { background: #ecfdf5; color: #065f46; }
-        .severity-badge.high { background: #fffbeb; color: #92400e; }
-        .severity-badge.critical { background: #fef2f2; color: #991b1b; }
-        .severity-badge.medium { background: #eff6ff; color: #1e40af; }
+        .severity-badge.info { background: var(--color-success-light); color: var(--color-success-hover); }
+        .severity-badge.high { background: var(--color-warning-light); color: var(--color-warning-hover); }
+        .severity-badge.critical { background: var(--color-danger-light); color: var(--color-danger-hover); }
+        .severity-badge.medium { background: var(--color-primary-light); color: var(--color-primary-800); }
 
         code {
-          background: #f3f4f6;
+          background: var(--color-bg-secondary);
           padding: 2px 6px;
           border-radius: 4px;
           font-size: 12px;
         }
 
         .no-data {
-          color: #9ca3af;
+          color: var(--color-text-tertiary);
           text-align: center;
           padding: 24px;
         }
@@ -421,8 +421,8 @@ const OpsDashboard = () => {
         .spinner {
           width: 40px;
           height: 40px;
-          border: 3px solid #e5e7eb;
-          border-top-color: #3b82f6;
+          border: 3px solid var(--color-border);
+          border-top-color: var(--color-primary-500);
           border-radius: 50%;
           animation: spin 1s linear infinite;
         }

@@ -1,0 +1,33 @@
+{
+  "data": [
+    {
+      "id": "page-index",
+      "title": "AgentSkills 前端设计原型",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1788299857000,
+      "canvasData": {
+        "x": 0,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 4134,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-bac46d07",
+          "measuredAt": 1788301302481
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/index.html",
+        "interactions": []
+      }
+    }
+  ],
+  "config": {
+    "autoLayout": true,
+    "deviceType": "desktop",
+    "projectName": "AgentSkills 前端设计原型",
+    "designLibrary": null
+  }
+}

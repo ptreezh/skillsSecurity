@@ -1,0 +1,1577 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgentSkills 前端设计原型</title>
+    <style id="theme-vars">
+:root {
+  /* === Brand Primary Scale === */
+  --color-primary-50: #f0fdfa;
+  --color-primary-100: #ccfbf1;
+  --color-primary-200: #99f6e4;
+  --color-primary-300: #5eead4;
+  --color-primary-400: #2dd4bf;
+  --color-primary-500: #14b8a6;
+  --color-primary-600: #0d9488;
+  --color-primary-700: #0f766e;
+  --color-primary-800: #115e59;
+  --color-primary-900: #134e4a;
+
+  --color-primary: var(--color-primary-600);
+  --color-primary-hover: var(--color-primary-700);
+  --color-primary-light: var(--color-primary-50);
+  --color-primary-subtle: var(--color-primary-100);
+
+  /* === Semantic Colors === */
+  --color-success: #16a34a;
+  --color-success-light: #dcfce7;
+  --color-success-hover: #15803d;
+
+  --color-warning: #ca8a04;
+  --color-warning-light: #fef9c3;
+  --color-warning-hover: #a16207;
+
+  --color-danger: #dc2626;
+  --color-danger-light: #fee2e2;
+  --color-danger-hover: #b91c1c;
+
+  --color-info: #0891b2;
+  --color-info-light: #cffafe;
+  --color-info-hover: #0e7490;
+  --color-info-lighter: #a5f3fc;
+
+  /* === Rank / Tier Accent Colors === */
+  --color-amber-50: #fffbeb;
+  --color-amber-100: #fef3c7;
+  --color-amber-700: #b45309;
+  --color-amber-800: #92400e;
+  --color-amber-900: #78350f;
+
+  --color-orange-50: #fff7ed;
+  --color-orange-100: #ffedd5;
+  --color-orange-800: #9a3412;
+  --color-orange-900: #7c2d12;
+
+  --color-purple-100: #f3e8ff;
+  --color-purple-500: #8b5cf6;
+  --color-purple-600: #7c3aed;
+  --color-purple-700: #6d28d9;
+
+  /* === Risk Level Colors === */
+  --risk-low-bg: #dcfce7;
+  --risk-low-text: #16a34a;
+  --risk-low-border: #86efac;
+
+  --risk-medium-bg: #fef9c3;
+  --risk-medium-text: #a16207;
+  --risk-medium-border: #fde047;
+
+  --risk-high-bg: #ffedd5;
+  --risk-high-text: #c2410c;
+  --risk-high-border: #fdba74;
+
+  --risk-critical-bg: #fee2e2;
+  --risk-critical-text: #b91c1c;
+  --risk-critical-border: #fca5a5;
+
+  /* === Neutral Scale === */
+  --color-white: #ffffff;
+  --color-gray-50: #f8fafc;
+  --color-gray-100: #f1f5f9;
+  --color-gray-200: #e2e8f0;
+  --color-gray-300: #cbd5e1;
+  --color-gray-400: #94a3b8;
+  --color-gray-500: #64748b;
+  --color-gray-600: #475569;
+  --color-gray-700: #334155;
+  --color-gray-800: #1e293b;
+  --color-gray-900: #0f172a;
+
+  --color-text-primary: var(--color-gray-900);
+  --color-text-secondary: var(--color-gray-600);
+  --color-text-tertiary: var(--color-gray-400);
+  --color-text-inverse: var(--color-white);
+
+  --color-bg-primary: var(--color-gray-50);
+  --color-bg-secondary: var(--color-gray-100);
+  --color-bg-surface: var(--color-white);
+
+  --color-border: var(--color-gray-200);
+
+  /* === Tailwind Semantic Aliases === */
+  --background: var(--color-bg-primary);
+  --foreground: var(--color-text-primary);
+  --color-card: var(--color-bg-surface);
+  --color-card-foreground: var(--color-text-primary);
+  --color-primary-foreground: var(--color-text-inverse);
+  --color-muted: var(--color-bg-secondary);
+  --color-muted-foreground: var(--color-text-tertiary);
+  --color-destructive: var(--color-danger);
+  --color-destructive-foreground: var(--color-text-inverse);
+  --color-input: var(--color-border);
+  --color-ring: var(--color-primary);
+  --color-border-light: var(--color-gray-100);
+  --color-divider: var(--color-gray-200);
+
+  /* === Spacing Scale (8pt) === */
+  --space-0: 0px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* === Warm Accent Scale (CTA / Rewards) === */
+  --color-accent-50: #fff7ed;
+  --color-accent-100: #ffedd5;
+  --color-accent-200: #fed7aa;
+  --color-accent-300: #fdba74;
+  --color-accent-400: #fb923c;
+  --color-accent-500: #f97316;
+  --color-accent-600: #ea580c;
+  --color-accent-700: #c2410c;
+  --color-accent-800: #9a3412;
+
+  --color-cta: var(--color-accent-600);
+  --color-cta-hover: var(--color-accent-700);
+  --color-cta-light: var(--color-accent-50);
+  --color-cta-subtle: var(--color-accent-100);
+
+  /* === Border Radius === */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* === Shadow System === */
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 2px 4px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 4px 8px rgba(15, 23, 42, 0.05), 0 2px 4px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 10px 20px rgba(15, 23, 42, 0.06), 0 4px 8px rgba(15, 23, 42, 0.04);
+  --shadow-xl: 0 20px 30px rgba(15, 23, 42, 0.08), 0 8px 16px rgba(15, 23, 42, 0.04);
+  --shadow-float: 0 20px 40px rgba(15, 23, 42, 0.12), 0 10px 20px rgba(15, 23, 42, 0.08);
+  --shadow-glow-primary: 0 4px 20px rgba(13, 148, 136, 0.25);
+  --shadow-glow-cta: 0 4px 20px rgba(234, 88, 12, 0.25);
+
+  /* === Gradients === */
+  --gradient-primary: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-700) 100%);
+  --gradient-primary-soft: linear-gradient(135deg, var(--color-primary-50) 0%, var(--color-bg-primary) 100%);
+  --gradient-cta: linear-gradient(135deg, var(--color-accent-500) 0%, var(--color-accent-700) 100%);
+  --gradient-hero: linear-gradient(180deg, var(--color-primary-50) 0%, var(--color-bg-primary) 60%, var(--color-bg-primary) 100%);
+  --gradient-surface: linear-gradient(180deg, var(--color-bg-surface) 0%, var(--color-bg-primary) 100%);
+
+  /* === Typography === */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans SC', sans-serif;
+  --font-mono: 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace;
+
+  /* === Transitions === */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 350ms ease;
+
+  /* === Typography Sizes === */
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 18px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+  --text-3xl: 30px;
+  --text-4xl: 36px;
+
+  /* === Font Weights === */
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+  /* === Layout === */
+  --header-height: 64px;
+  --container-max-width: 1200px;
+  --container-padding: var(--space-5);
+}
+
+    </style>
+    <style id="component-vars">
+@import './tokens.css';
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--color-text-primary);
+  background: var(--color-bg-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.text-primary { color: var(--color-text-primary); }
+.text-secondary { color: var(--color-text-secondary); }
+.text-tertiary { color: var(--color-text-tertiary); }
+.text-success { color: var(--color-success); }
+.text-danger { color: var(--color-danger); }
+.text-warning { color: var(--color-warning); }
+.text-info { color: var(--color-info); }
+
+.bg-surface { background: var(--color-bg-surface); }
+.bg-primary { background: var(--color-bg-primary); }
+.bg-secondary { background: var(--color-bg-secondary); }
+
+/* === Gradient Utilities === */
+.text-gradient {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.text-gradient-cta {
+  background: var(--gradient-cta);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.bg-gradient-hero {
+  background: var(--gradient-hero);
+}
+
+.bg-gradient-surface {
+  background: var(--gradient-surface);
+}
+
+.rounded-sm { border-radius: var(--radius-sm); }
+.rounded-md { border-radius: var(--radius-md); }
+.rounded-lg { border-radius: var(--radius-lg); }
+.rounded-xl { border-radius: var(--radius-xl); }
+.rounded-full { border-radius: var(--radius-full); }
+
+.shadow-xs { box-shadow: var(--shadow-xs); }
+.shadow-sm { box-shadow: var(--shadow-sm); }
+.shadow-md { box-shadow: var(--shadow-md); }
+.shadow-lg { box-shadow: var(--shadow-lg); }
+
+.p-4 { padding: var(--space-4); }
+.p-6 { padding: var(--space-6); }
+.mb-4 { margin-bottom: var(--space-4); }
+.mb-6 { margin-bottom: var(--space-6); }
+
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap: var(--space-2); }
+.gap-4 { gap: var(--space-4); }
+
+.grid { display: grid; }
+.grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.container {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: var(--space-6) var(--container-padding);
+}
+
+.app {
+  min-height: 100vh;
+  background: var(--gradient-hero);
+  background-attachment: fixed;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-main {
+  flex: 1;
+  padding-top: var(--header-height);
+}
+
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  height: var(--header-height);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px) saturate(180%);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: var(--shadow-sm);
+}
+
+.app-header-inner {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--container-padding);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.app-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.app-brand-logo {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-lg);
+  background: var(--gradient-primary);
+  color: var(--color-text-inverse);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--font-bold);
+  font-size: var(--text-lg);
+  box-shadow: var(--shadow-glow-primary);
+}
+
+.app-brand-title {
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: var(--color-text-primary);
+  letter-spacing: -0.02em;
+}
+
+.app-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.app-nav-btn {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.app-nav-btn:hover {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+}
+
+.app-nav-btn.active {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-weight: var(--font-semibold);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.app-nav-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .app-nav {
+    gap: var(--space-1);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .app-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .app-nav-btn {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-xs);
+  }
+
+  .app-brand-title {
+    font-size: var(--text-lg);
+  }
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 10px 18px;
+  border-radius: var(--radius-md);
+  font-weight: var(--font-medium);
+  font-size: var(--text-sm);
+  font-family: inherit;
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+  border: 1px solid transparent;
+  line-height: 1.5;
+  text-decoration: none;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.btn-primary {
+  background: var(--gradient-primary);
+  color: var(--color-text-inverse);
+  box-shadow: var(--shadow-glow-primary), 0 2px 4px rgba(13, 148, 136, 0.2);
+  border: none;
+}
+
+.btn-primary:hover {
+  background: var(--gradient-primary);
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-glow-primary), 0 6px 12px rgba(13, 148, 136, 0.25);
+}
+
+.btn-primary:active {
+  transform: translateY(1px);
+  box-shadow: var(--shadow-glow-primary);
+}
+
+.btn-primary:disabled {
+  background: var(--color-gray-300);
+  color: var(--color-text-inverse);
+  cursor: not-allowed;
+  box-shadow: none;
+  filter: none;
+}
+
+.btn-secondary {
+  background: var(--color-bg-surface);
+  color: var(--color-text-primary);
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-xs);
+}
+
+.btn-secondary:hover {
+  background: var(--color-bg-secondary);
+  border-color: var(--color-primary-200);
+  color: var(--color-primary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-secondary:active {
+  transform: translateY(1px);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-text-secondary);
+  border-color: transparent;
+}
+
+.btn-ghost:hover {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+}
+
+.btn-danger {
+  background: var(--color-danger);
+  color: var(--color-text-inverse);
+}
+
+.btn-danger:hover {
+  background: var(--color-danger-hover);
+}
+
+.btn-danger:disabled {
+  background: var(--color-gray-300);
+  cursor: not-allowed;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: var(--text-xs);
+}
+
+.btn-lg {
+  padding: 14px 24px;
+  font-size: var(--text-base);
+}
+
+.card {
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary-200);
+  transform: translateY(-2px);
+}
+
+.card-skill {
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-4);
+  transition: box-shadow var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.card-skill:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-primary-300);
+  transform: translateY(-3px);
+}
+
+@media (max-width: 768px) {
+  .card-skill {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.card-user {
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.card-leaderboard {
+  display: grid;
+  grid-template-columns: 60px 1fr 120px 100px 90px 80px 120px;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: transparent;
+  border-radius: var(--radius-md);
+  align-items: center;
+  border: 1px solid transparent;
+  transition: background var(--transition-fast);
+}
+
+.card-leaderboard:hover {
+  background: var(--color-bg-secondary);
+}
+
+.card-leaderboard.top-3 {
+  background: var(--color-cta-light);
+  border-color: var(--color-accent-200);
+}
+
+.card-leaderboard.flagged {
+  background: var(--color-danger-light);
+}
+
+@media (max-width: 768px) {
+  .card-leaderboard,
+  .table-header {
+    grid-template-columns: 40px 1fr 80px !important;
+    gap: var(--space-2);
+  }
+
+  .card-leaderboard > :nth-child(4),
+  .card-leaderboard > :nth-child(5),
+  .card-leaderboard > :nth-child(6),
+  .table-header > :nth-child(4),
+  .table-header > :nth-child(5),
+  .table-header > :nth-child(6) {
+    display: none;
+  }
+}
+
+.input {
+  padding: 10px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  font-family: inherit;
+  background: var(--color-bg-surface);
+  color: var(--color-text-primary);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-subtle);
+  outline: none;
+}
+
+.input:disabled {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-tertiary);
+  cursor: not-allowed;
+}
+
+.input-search {
+  padding: 10px 14px 10px 40px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  font-family: inherit;
+  background: var(--color-bg-surface);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 12px center;
+}
+
+.input-search:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-subtle);
+  outline: none;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1.4;
+}
+
+.badge-risk-low {
+  background: var(--risk-low-bg);
+  color: var(--risk-low-text);
+  border: 1px solid var(--risk-low-border);
+}
+
+.badge-risk-medium {
+  background: var(--risk-medium-bg);
+  color: var(--risk-medium-text);
+  border: 1px solid var(--risk-medium-border);
+}
+
+.badge-risk-high {
+  background: var(--risk-high-bg);
+  color: var(--risk-high-text);
+  border: 1px solid var(--risk-high-border);
+}
+
+.badge-risk-critical {
+  background: var(--risk-critical-bg);
+  color: var(--risk-critical-text);
+  border: 1px solid var(--risk-critical-border);
+}
+
+.badge-tier {
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.badge-tier-1 { background: var(--color-gray-100); color: var(--color-gray-500); }
+.badge-tier-2 { background: var(--color-success-light); color: var(--color-success); }
+.badge-tier-3 { background: var(--color-primary-light); color: var(--color-primary); }
+.badge-tier-4 { background: var(--color-purple-100); color: var(--color-purple-600); }
+.badge-tier-5 { background: var(--color-cta-subtle); color: var(--color-cta); }
+
+.badge-verified {
+  width: 20px;
+  height: 20px;
+  background: var(--color-success);
+  color: var(--color-text-inverse);
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: var(--font-bold);
+  padding: 0;
+}
+
+.badge-success {
+  background: var(--color-success-light);
+  color: var(--color-success);
+}
+
+.badge-warning {
+  background: var(--color-warning-light);
+  color: var(--color-warning);
+}
+
+.badge-danger {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+.badge-info {
+  background: var(--color-info-light);
+  color: var(--color-info);
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  max-width: 480px;
+  width: 90%;
+  box-shadow: var(--shadow-float);
+}
+
+.modal-header {
+  margin-bottom: var(--space-4);
+}
+
+.modal-title {
+  font-size: var(--text-xl);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.modal-body {
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-6);
+}
+
+.modal-footer {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: flex-end;
+}
+
+.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--font-bold);
+  font-size: var(--text-lg);
+  flex-shrink: 0;
+}
+
+.avatar-sm {
+  width: 32px;
+  height: 32px;
+  font-size: var(--text-xs);
+}
+
+.avatar-lg {
+  width: 72px;
+  height: 72px;
+  font-size: var(--text-2xl);
+}
+
+.stat {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-value {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.stat-label {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+}
+
+.progress {
+  height: 8px;
+  background: var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-sm);
+  transition: width var(--transition-normal);
+  box-shadow: 0 0 10px rgba(13, 148, 136, 0.3);
+}
+
+.table-header {
+  display: grid;
+  grid-template-columns: 60px 1fr 120px 100px 90px 80px 120px;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-secondary);
+}
+
+.rank-badge {
+  font-weight: var(--font-bold);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  font-size: var(--text-xs);
+}
+
+.rank-gold {
+  color: var(--color-cta-hover);
+  background: var(--color-cta-subtle);
+  box-shadow: 0 2px 8px rgba(234, 88, 12, 0.2);
+}
+
+.rank-silver {
+  color: var(--color-gray-700);
+  background: var(--color-gray-100);
+}
+
+.rank-bronze {
+  color: var(--color-orange-900);
+  background: var(--color-orange-100);
+}
+
+.grid-auto {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-4);
+}
+
+.grid-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.empty-state {
+  text-align: center;
+  padding: var(--space-12) var(--space-6);
+  color: var(--color-text-secondary);
+}
+
+.empty-state-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto var(--space-4);
+  color: var(--color-text-tertiary);
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12);
+  color: var(--color-text-secondary);
+  gap: var(--space-3);
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.page-header {
+  margin-bottom: var(--space-6);
+}
+
+.page-title {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-2) 0;
+}
+
+.page-subtitle {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.toolbar {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: var(--space-6);
+}
+
+.toolbar-spacer {
+  flex: 1;
+}
+
+@media (max-width: 768px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toolbar-spacer {
+    display: none;
+  }
+}
+
+.alert {
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  border: 1px solid transparent;
+}
+
+.alert-warning {
+  background: var(--color-warning-light);
+  color: var(--color-warning);
+  border-color: var(--risk-medium-border);
+}
+
+.alert-danger {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+  border-color: var(--risk-critical-border);
+}
+
+.alert-success {
+  background: var(--color-success-light);
+  color: var(--color-success);
+  border-color: var(--risk-low-border);
+}
+
+.alert-info {
+  background: var(--color-info-light);
+  color: var(--color-info);
+  border-color: var(--color-info-lighter);
+}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--color-card);
+    --color-card-foreground: var(--color-card-foreground);
+    --color-primary: var(--color-primary);
+    --color-primary-foreground: var(--color-primary-foreground);
+    --color-muted: var(--color-muted);
+    --color-muted-foreground: var(--color-muted-foreground);
+    --color-destructive: var(--color-destructive);
+    --color-destructive-foreground: var(--color-destructive-foreground);
+    --color-border: var(--color-border);
+    --color-input: var(--color-input);
+    --color-ring: var(--color-ring);
+    --radius-sm: var(--radius-sm);
+    --radius-md: var(--radius-md);
+    --radius-lg: var(--radius-lg);
+    --radius-xl: var(--radius-xl);
+  }
+  @layer base {
+    body { background: var(--background); color: var(--foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--background); }
+      .text-background { color: var(--background); }
+      .border-background { border-color: var(--background); }
+      .ring-background { --tw-ring-color: var(--background); }
+      .bg-foreground { background-color: var(--foreground); }
+      .text-foreground { color: var(--foreground); }
+      .border-foreground { border-color: var(--foreground); }
+      .ring-foreground { --tw-ring-color: var(--foreground); }
+      .bg-card { background-color: var(--color-card); }
+      .text-card { color: var(--color-card); }
+      .border-card { border-color: var(--color-card); }
+      .ring-card { --tw-ring-color: var(--color-card); }
+      .bg-card-foreground { background-color: var(--color-card-foreground); }
+      .text-card-foreground { color: var(--color-card-foreground); }
+      .border-card-foreground { border-color: var(--color-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--color-card-foreground); }
+      .bg-primary { background-color: var(--color-primary); }
+      .text-primary { color: var(--color-primary); }
+      .border-primary { border-color: var(--color-primary); }
+      .ring-primary { --tw-ring-color: var(--color-primary); }
+      .bg-primary-foreground { background-color: var(--color-primary-foreground); }
+      .text-primary-foreground { color: var(--color-primary-foreground); }
+      .border-primary-foreground { border-color: var(--color-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--color-primary-foreground); }
+      .bg-muted { background-color: var(--color-muted); }
+      .text-muted { color: var(--color-muted); }
+      .border-muted { border-color: var(--color-muted); }
+      .ring-muted { --tw-ring-color: var(--color-muted); }
+      .bg-muted-foreground { background-color: var(--color-muted-foreground); }
+      .text-muted-foreground { color: var(--color-muted-foreground); }
+      .border-muted-foreground { border-color: var(--color-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--color-muted-foreground); }
+      .bg-destructive { background-color: var(--color-destructive); }
+      .text-destructive { color: var(--color-destructive); }
+      .border-destructive { border-color: var(--color-destructive); }
+      .ring-destructive { --tw-ring-color: var(--color-destructive); }
+      .bg-destructive-foreground { background-color: var(--color-destructive-foreground); }
+      .text-destructive-foreground { color: var(--color-destructive-foreground); }
+      .border-destructive-foreground { border-color: var(--color-destructive-foreground); }
+      .ring-destructive-foreground { --tw-ring-color: var(--color-destructive-foreground); }
+      .bg-border { background-color: var(--color-border); }
+      .text-border { color: var(--color-border); }
+      .border-border { border-color: var(--color-border); }
+      .ring-border { --tw-ring-color: var(--color-border); }
+      .bg-input { background-color: var(--color-input); }
+      .text-input { color: var(--color-input); }
+      .border-input { border-color: var(--color-input); }
+      .ring-input { --tw-ring-color: var(--color-input); }
+      .bg-ring { background-color: var(--color-ring); }
+      .text-ring { color: var(--color-ring); }
+      .border-ring { border-color: var(--color-ring); }
+      .ring-ring { --tw-ring-color: var(--color-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="app">
+  <header class="app-header">
+    <div class="app-header-inner">
+      <div class="app-brand">
+        <div class="app-brand-logo">A</div>
+        <h1 class="app-brand-title">AgentSkills</h1>
+      </div>
+      <nav class="app-nav" aria-label="主导航">
+        <a href="#browser" class="app-nav-btn">技能浏览器</a>
+        <a href="#demo" class="app-nav-btn">协议演示</a>
+        <a href="#leaderboard" class="app-nav-btn">排行榜</a>
+        <a href="#profile" class="app-nav-btn">我的声誉</a>
+        <a href="#dashboard" class="app-nav-btn">激励面板</a>
+        <a href="#selfops" class="app-nav-btn">四自系统</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <section id="browser" class="container prototype-section animate-fade-in">
+      <div class="page-header">
+        <h2 class="page-title">技能浏览器</h2>
+        <p class="page-subtitle">发现、验证和使用可信 Agent Skills</p>
+      </div>
+      <div class="toolbar">
+        <input type="search" class="input-search" placeholder="搜索技能..." style="flex:1;min-width:240px;">
+        <div class="toolbar-spacer"></div>
+        <button class="btn btn-primary">上传技能</button>
+      </div>
+      <div class="grid-auto">
+        <div class="card-skill">
+          <div>
+            <div style="font-weight:var(--font-semibold);color:var(--color-text-primary);">邮件发送助手</div>
+            <div style="font-size:var(--text-sm);color:var(--color-text-secondary);">根据模板自动起草邮件</div>
+          </div>
+          <span class="badge badge-risk-low">LOW</span>
+        </div>
+        <div class="card-skill">
+          <div>
+            <div style="font-weight:var(--font-semibold);color:var(--color-text-primary);">文件整理器</div>
+            <div style="font-size:var(--text-sm);color:var(--color-text-secondary);">按规则分类和重命名文件</div>
+          </div>
+          <span class="badge badge-risk-medium">MEDIUM</span>
+        </div>
+        <div class="card-skill">
+          <div>
+            <div style="font-weight:var(--font-semibold);color:var(--color-text-primary);">数据分析器</div>
+            <div style="font-size:var(--text-sm);color:var(--color-text-secondary);">读取 CSV 并生成统计摘要</div>
+          </div>
+          <span class="badge badge-risk-high">HIGH</span>
+        </div>
+        <div class="card-skill">
+          <div>
+            <div style="font-weight:var(--font-semibold);color:var(--color-text-primary);">社交发布器</div>
+            <div style="font-size:var(--text-sm);color:var(--color-text-secondary);">多平台内容发布与排期</div>
+          </div>
+          <span class="badge badge-risk-medium">MEDIUM</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="demo" class="container prototype-section animate-fade-in">
+      <div class="page-header">
+        <h2 class="page-title">协议演示</h2>
+        <p class="page-subtitle">探索 Skills 标准、责任机制与上链流程</p>
+      </div>
+      <div class="card" style="margin-bottom:var(--space-6);">
+        <h3 style="margin-top:0;margin-bottom:var(--space-4);color:var(--color-text-primary);font-size:var(--text-lg);font-weight:var(--font-semibold);">协议流程</h3>
+        <div style="display:flex;align-items:center;justify-content:center;gap:var(--space-2);flex-wrap:wrap;">
+          <div class="card" style="padding:var(--space-3) var(--space-4);text-align:center;">
+            <div style="font-weight:var(--font-semibold);color:var(--color-primary);">1. 创建技能</div>
+          </div>
+          <span style="color:var(--color-text-tertiary);">→</span>
+          <div class="card" style="padding:var(--space-3) var(--space-4);text-align:center;">
+            <div style="font-weight:var(--font-semibold);color:var(--color-primary);">2. 风险评估</div>
+          </div>
+          <span style="color:var(--color-text-tertiary);">→</span>
+          <div class="card" style="padding:var(--space-3) var(--space-4);text-align:center;">
+            <div style="font-weight:var(--font-semibold);color:var(--color-primary);">3. 安全审核</div>
+          </div>
+          <span style="color:var(--color-text-tertiary);">→</span>
+          <div class="card" style="padding:var(--space-3) var(--space-4);text-align:center;">
+            <div style="font-weight:var(--font-semibold);color:var(--color-primary);">4. 质押锁定</div>
+          </div>
+          <span style="color:var(--color-text-tertiary);">→</span>
+          <div class="card" style="padding:var(--space-3) var(--space-4);text-align:center;">
+            <div style="font-weight:var(--font-semibold);color:var(--color-primary);">5. 上链完成</div>
+          </div>
+        </div>
+      </div>
+      <div class="grid-auto">
+        <div class="card" style="border-left:4px solid var(--color-success);">
+          <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-3);">
+            <div class="avatar avatar-sm" style="background:var(--color-success-light);color:var(--color-success);">+</div>
+            <div style="font-weight:var(--font-bold);color:var(--color-success);">LOW</div>
+          </div>
+          <p style="color:var(--color-text-secondary);margin:0;">只读操作，无风险。质押 10 ASK。</p>
+        </div>
+        <div class="card" style="border-left:4px solid var(--color-warning);">
+          <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-3);">
+            <div class="avatar avatar-sm" style="background:var(--color-warning-light);color:var(--color-warning);">!</div>
+            <div style="font-weight:var(--font-bold);color:var(--color-warning);">MEDIUM</div>
+          </div>
+          <p style="color:var(--color-text-secondary);margin:0;">有限写入操作。质押 50 ASK。</p>
+        </div>
+        <div class="card" style="border-left:4px solid var(--color-warning);">
+          <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-3);">
+            <div class="avatar avatar-sm" style="background:var(--color-warning-light);color:var(--color-warning);">!!</div>
+            <div style="font-weight:var(--font-bold);color:var(--color-warning);">HIGH</div>
+          </div>
+          <p style="color:var(--color-text-secondary);margin:0;">涉及资金或重要数据。质押 100 ASK。</p>
+        </div>
+        <div class="card" style="border-left:4px solid var(--color-danger);">
+          <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-3);">
+            <div class="avatar avatar-sm" style="background:var(--color-danger-light);color:var(--color-danger);">!!!</div>
+            <div style="font-weight:var(--font-bold);color:var(--color-danger);">CRITICAL</div>
+          </div>
+          <p style="color:var(--color-text-secondary);margin:0;">不可逆关键操作。质押 200 ASK。</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="leaderboard" class="container prototype-section animate-fade-in">
+      <div class="page-header">
+        <h2 class="page-title">全球声誉排行榜</h2>
+        <p class="page-subtitle">按声誉积分排序，前 3 名获得特殊标记</p>
+      </div>
+      <div class="toolbar">
+        <div style="display:flex;gap:var(--space-2);">
+          <button class="btn btn-primary btn-sm">按声誉排序</button>
+          <button class="btn btn-secondary btn-sm">按点赞数排序</button>
+        </div>
+        <div class="toolbar-spacer"></div>
+        <select class="input" style="min-width:180px;">
+          <option>全部</option>
+          <option>守护者/信用者（L3+）</option>
+          <option>观察员/贡献者（L1-2）</option>
+        </select>
+      </div>
+      <div class="card" style="padding:var(--space-4);">
+        <div class="table-header">
+          <span>排名</span>
+          <span>地址</span>
+          <span>等级</span>
+          <span style="text-align:right;">声誉积分</span>
+          <span style="text-align:right;">创建技能</span>
+          <span style="text-align:right;">获赞数</span>
+          <span>状态</span>
+        </div>
+        <div class="card-leaderboard top-3">
+          <span class="rank-badge rank-gold">G</span>
+          <span style="font-family:var(--font-mono);font-size:var(--text-sm);">0x1234...abcd</span>
+          <span><span class="badge badge-tier badge-tier-4">L4 守护者</span></span>
+          <span style="text-align:right;font-weight:var(--font-bold);color:var(--color-primary);">5000</span>
+          <span style="text-align:right;color:var(--color-text-secondary);">15</span>
+          <span style="text-align:right;color:var(--color-text-secondary);">1200</span>
+          <span style="color:var(--color-success);font-size:var(--text-sm);">无违规</span>
+        </div>
+        <div class="card-leaderboard top-3">
+          <span class="rank-badge rank-silver">S</span>
+          <span style="font-family:var(--font-mono);font-size:var(--text-sm);">0x5678...efab</span>
+          <span><span class="badge badge-tier badge-tier-3">L3 信用者</span></span>
+          <span style="text-align:right;font-weight:var(--font-bold);color:var(--color-primary);">3000</span>
+          <span style="text-align:right;color:var(--color-text-secondary);">8</span>
+          <span style="text-align:right;color:var(--color-text-secondary);">800</span>
+          <span style="color:var(--color-success);font-size:var(--text-sm);">无违规</span>
+        </div>
+        <div class="card-leaderboard top-3">
+          <span class="rank-badge rank-bronze">B</span>
+          <span style="font-family:var(--font-mono);font-size:var(--text-sm);">0x9abc...1234</span>
+          <span><span class="badge badge-tier badge-tier-3">L3 信用者</span></span>
+          <span style="text-align:right;font-weight:var(--font-bold);color:var(--color-primary);">1500</span>
+          <span style="text-align:right;color:var(--color-text-secondary);">5</span>
+          <span style="text-align:right;color:var(--color-text-secondary);">400</span>
+          <span style="color:var(--color-success);font-size:var(--text-sm);">无违规</span>
+        </div>
+        <div class="card-leaderboard">
+          <span class="rank-badge">#4</span>
+          <span style="font-family:var(--font-mono);font-size:var(--text-sm);">0xdef0...5678</span>
+          <span><span class="badge badge-tier badge-tier-2">L2 贡献者</span></span>
+          <span style="text-align:right;font-weight:var(--font-bold);color:var(--color-primary);">800</span>
+          <span style="text-align:right;color:var(--color-text-secondary);">3</span>
+          <span style="text-align:right;color:var(--color-text-secondary);">200</span>
+          <span style="color:var(--color-success);font-size:var(--text-sm);">无违规</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="profile" class="container prototype-section animate-fade-in">
+      <div class="page-header">
+        <h2 class="page-title">用户声誉中心</h2>
+        <p class="page-subtitle">管理你的声誉、等级与变现进度</p>
+      </div>
+      <div class="card card-user" style="margin-bottom:var(--space-4);">
+        <div class="avatar avatar-lg" style="background:var(--color-primary-light);color:var(--color-primary);">0X</div>
+        <div>
+          <h3 style="margin:0 0 var(--space-2) 0;color:var(--color-text-primary);font-size:var(--text-sm);font-family:var(--font-mono);word-break:break-all;">0x1234...abcd</h3>
+          <span class="badge badge-tier badge-tier-3">L3 信用者</span>
+        </div>
+      </div>
+      <div class="grid-stats" style="margin-bottom:var(--space-6);">
+        <div class="card stat" style="text-align:center;">
+          <div style="font-size:var(--text-sm);color:var(--color-text-secondary);margin-bottom:var(--space-2);">声誉积分</div>
+          <div style="font-size:var(--text-3xl);font-weight:var(--font-bold);color:var(--color-primary);">1280</div>
+          <div style="font-size:var(--text-xs);color:var(--color-text-tertiary);margin-top:var(--space-1);">不可转让</div>
+        </div>
+        <div class="card stat" style="text-align:center;">
+          <div style="font-size:var(--text-sm);color:var(--color-text-secondary);margin-bottom:var(--space-2);">全球排名</div>
+          <div style="font-size:var(--text-3xl);font-weight:var(--font-bold);color:var(--color-success);">#42</div>
+          <div style="font-size:var(--text-xs);color:var(--color-text-tertiary);margin-top:var(--space-1);">宪法第三条</div>
+        </div>
+        <div class="card stat" style="text-align:center;">
+          <div style="font-size:var(--text-sm);color:var(--color-text-secondary);margin-bottom:var(--space-2);">今日点赞</div>
+          <div style="font-size:var(--text-3xl);font-weight:var(--font-bold);color:var(--color-text-primary);">2 / 5</div>
+          <div style="font-size:var(--text-xs);color:var(--color-text-tertiary);margin-top:var(--space-1);">免费限额</div>
+        </div>
+        <div class="card stat" style="text-align:center;">
+          <div style="font-size:var(--text-sm);color:var(--color-text-secondary);margin-bottom:var(--space-2);">钱包余额</div>
+          <div style="font-size:var(--text-3xl);font-weight:var(--font-bold);color:var(--color-warning);">350</div>
+          <div style="font-size:var(--text-xs);color:var(--color-text-tertiary);margin-top:var(--space-1);">ASK</div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:var(--space-6);">
+        <h3 style="margin-top:0;margin-bottom:var(--space-4);color:var(--color-text-primary);font-size:var(--text-lg);font-weight:var(--font-semibold);">变现进度</h3>
+        <div class="progress" style="margin-bottom:var(--space-3);">
+          <div class="progress-bar" style="width:45%;"></div>
+        </div>
+        <p style="color:var(--color-warning);margin:0 0 var(--space-4) 0;">距离解锁变现还需 720 声誉</p>
+        <button class="btn btn-secondary" style="width:100%;">申请变现</button>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;margin-bottom:var(--space-4);color:var(--color-text-primary);font-size:var(--text-lg);font-weight:var(--font-semibold);">等级体系</h3>
+        <div style="display:grid;gap:var(--space-3);">
+          <div class="card" style="padding:var(--space-3);display:flex;align-items:center;gap:var(--space-3);border-color:var(--color-border);">
+            <div class="avatar avatar-sm" style="background:var(--color-gray-100);color:var(--color-gray-500);">L1</div>
+            <div style="flex:1;">
+              <div style="font-weight:var(--font-semibold);color:var(--color-text-primary);">观察员</div>
+              <div style="font-size:var(--text-xs);color:var(--color-text-secondary);">邮箱验证 → 只积累声誉</div>
+            </div>
+          </div>
+          <div class="card" style="padding:var(--space-3);display:flex;align-items:center;gap:var(--space-3);border-color:var(--color-border);">
+            <div class="avatar avatar-sm" style="background:var(--color-success-light);color:var(--color-success);">L2</div>
+            <div style="flex:1;">
+              <div style="font-weight:var(--font-semibold);color:var(--color-text-primary);">贡献者</div>
+              <div style="font-size:var(--text-xs);color:var(--color-text-secondary);">完成3次行为 → 创建/改进/测试</div>
+            </div>
+          </div>
+          <div class="card" style="padding:var(--space-3);display:flex;align-items:center;gap:var(--space-3);background:var(--color-primary-light);border-color:var(--color-primary);border-width:2px;">
+            <div class="avatar avatar-sm" style="background:var(--color-primary);color:var(--color-text-inverse);">L3</div>
+            <div style="flex:1;">
+              <div style="font-weight:var(--font-semibold);color:var(--color-text-primary);">信用者</div>
+              <div style="font-size:var(--text-xs);color:var(--color-text-secondary);">声誉≥500 → 全功能+30%变现</div>
+            </div>
+            <span style="color:var(--color-primary);font-weight:var(--font-semibold);font-size:var(--text-sm);">当前</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="dashboard" class="container prototype-section animate-fade-in">
+      <div class="page-header">
+        <h2 class="page-title">部署者激励面板</h2>
+        <p class="page-subtitle">查看推荐数据、等级进度与待领取奖励</p>
+      </div>
+      <div class="deployer-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:var(--space-6);padding-bottom:var(--space-4);border-bottom:1px solid var(--color-border-light);gap:var(--space-4);flex-wrap:wrap;">
+          <div>
+            <h3 style="margin:0 0 var(--space-2) 0;font-size:var(--text-xl);font-weight:var(--font-semibold);color:var(--color-text-primary);">部署者激励面板</h3>
+            <span style="font-size:var(--text-sm);color:var(--color-text-secondary);">demo.agent-skills.xyz</span>
+          </div>
+          <span class="tier-badge tier-badge-silver">白银</span>
+        </div>
+        <div class="grid-stats" style="margin-bottom:var(--space-6);">
+          <div class="card stat" style="text-align:center;">
+            <div style="font-size:var(--text-xs);color:var(--color-text-secondary);margin-bottom:var(--space-2);">总用户</div>
+            <div style="font-size:var(--text-2xl);font-weight:var(--font-bold);color:var(--color-text-primary);">23</div>
+          </div>
+          <div class="card stat" style="text-align:center;">
+            <div style="font-size:var(--text-xs);color:var(--color-text-secondary);margin-bottom:var(--space-2);">活跃用户</div>
+            <div style="font-size:var(--text-2xl);font-weight:var(--font-bold);color:var(--color-text-primary);">18</div>
+          </div>
+          <div class="card stat" style="text-align:center;background:var(--color-primary-light);border:2px solid var(--color-primary);">
+            <div style="font-size:var(--text-xs);color:var(--color-text-secondary);margin-bottom:var(--space-2);">累计奖励</div>
+            <div style="font-size:var(--text-2xl);font-weight:var(--font-bold);color:var(--color-primary);">4,500</div>
+            <div style="font-size:var(--text-xs);color:var(--color-text-tertiary);margin-top:var(--space-1);">ASK</div>
+          </div>
+          <div class="card stat" style="text-align:center;">
+            <div style="font-size:var(--text-xs);color:var(--color-text-secondary);margin-bottom:var(--space-2);">待领取</div>
+            <div style="font-size:var(--text-2xl);font-weight:var(--font-bold);color:var(--color-warning);">1,200</div>
+          </div>
+        </div>
+        <div style="margin-bottom:var(--space-6);">
+          <h3 style="margin:0 0 var(--space-3) 0;font-size:var(--text-base);font-weight:var(--font-semibold);color:var(--color-text-primary);">推荐链接</h3>
+          <div style="display:flex;gap:var(--space-2);">
+            <input type="text" class="input" value="https://agent-skills.xyz/ref/a1b2c3d4" readonly style="flex:1;font-family:var(--font-mono);font-size:var(--text-sm);">
+            <button class="btn btn-primary">复制</button>
+          </div>
+        </div>
+        <div>
+          <h3 style="margin:0 0 var(--space-3) 0;font-size:var(--text-base);font-weight:var(--font-semibold);color:var(--color-text-primary);">等级进度</h3>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-3);font-size:var(--text-sm);flex-wrap:wrap;gap:var(--space-2);">
+            <span style="font-weight:var(--font-semibold);color:var(--color-primary-500);">白银 · 23 用户</span>
+            <span style="color:var(--color-text-secondary);">距离黄金还差 27 用户</span>
+          </div>
+          <div class="progress-bar-bg" style="margin-bottom:var(--space-2);">
+            <div class="progress-bar-fill progress-fill-silver" style="width:46%;"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:var(--text-xs);color:var(--color-text-tertiary);">
+            <span style="color:var(--color-gray-500);">青铜 0</span>
+            <span style="color:var(--color-primary-500);">白银 50</span>
+            <span style="color:var(--color-warning);">黄金 100</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="selfops" class="container prototype-section animate-fade-in">
+      <div class="page-header">
+        <h2 class="page-title">四自运营面板</h2>
+        <p class="page-subtitle">收益、推广、治理与健康报告一站式管理</p>
+      </div>
+      <div class="self-ops-tabs">
+        <button class="self-ops-tab active"><span style="font-size:var(--text-lg);">💰</span> 收益</button>
+        <button class="self-ops-tab"><span style="font-size:var(--text-lg);">📣</span> 推广</button>
+        <button class="self-ops-tab"><span style="font-size:var(--text-lg);">🏛️</span> 治理</button>
+        <button class="self-ops-tab"><span style="font-size:var(--text-lg);">🧬</span> 健康</button>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;margin-bottom:var(--space-4);color:var(--color-text-primary);font-size:var(--text-lg);font-weight:var(--font-semibold);">收益概览</h3>
+        <div class="grid-stats" style="margin-bottom:var(--space-4);">
+          <div class="card stat" style="text-align:center;">
+            <div style="font-size:var(--text-xs);color:var(--color-text-secondary);margin-bottom:var(--space-2);">累计分红</div>
+            <div style="font-size:var(--text-2xl);font-weight:var(--font-bold);color:var(--color-primary);">1,250</div>
+            <div style="font-size:var(--text-xs);color:var(--color-text-tertiary);margin-top:var(--space-1);">ASK</div>
+          </div>
+          <div class="card stat" style="text-align:center;">
+            <div style="font-size:var(--text-xs);color:var(--color-text-secondary);margin-bottom:var(--space-2);">待领取</div>
+            <div style="font-size:var(--text-2xl);font-weight:var(--font-bold);color:var(--color-warning);">320</div>
+            <div style="font-size:var(--text-xs);color:var(--color-text-tertiary);margin-top:var(--space-1);">ASK</div>
+          </div>
+        </div>
+        <div style="height:160px;background:var(--color-bg-secondary);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;color:var(--color-text-tertiary);">
+          [ 收益趋势图表占位 ]
+        </div>
+      </div>
+      <div class="card" style="margin-top:var(--space-6);">
+        <h3 style="margin-top:0;margin-bottom:var(--space-4);color:var(--color-text-primary);font-size:var(--text-lg);font-weight:var(--font-semibold);">健康行动</h3>
+        <div class="health-actions">
+          <div class="health-action-card">
+            <span style="font-size:var(--text-2xl);">🐛</span>
+            <span style="font-weight:var(--font-semibold);font-size:var(--text-sm);color:var(--color-text-primary);">漏洞报告</span>
+            <span style="font-size:var(--text-xs);font-weight:var(--font-semibold);padding:var(--space-1) var(--space-2);border-radius:var(--radius-full);background:var(--color-success-light);color:var(--color-success);">+50 ASK</span>
+          </div>
+          <div class="health-action-card">
+            <span style="font-size:var(--text-2xl);">📊</span>
+            <span style="font-weight:var(--font-semibold);font-size:var(--text-sm);color:var(--color-text-primary);">状态报告</span>
+            <span style="font-size:var(--text-xs);font-weight:var(--font-semibold);padding:var(--space-1) var(--space-2);border-radius:var(--radius-full);background:var(--color-info-light);color:var(--color-info);">+10 ASK</span>
+          </div>
+          <div class="health-action-card">
+            <span style="font-size:var(--text-2xl);">⚡</span>
+            <span style="font-weight:var(--font-semibold);font-size:var(--text-sm);color:var(--color-text-primary);">压力测试</span>
+            <span style="font-size:var(--text-xs);font-weight:var(--font-semibold);padding:var(--space-1) var(--space-2);border-radius:var(--radius-full);background:var(--color-warning-light);color:var(--color-warning);">+100 ASK</span>
+          </div>
+        </div>
+        <div style="display:inline-flex;align-items:center;gap:var(--space-2);padding:var(--space-3) var(--space-4);background:var(--color-bg-secondary);border:1px solid var(--color-border);border-radius:var(--radius-md);">
+          <span style="font-size:var(--text-sm);color:var(--color-text-secondary);">本月剩余提交次数：</span>
+          <span style="font-size:var(--text-sm);font-weight:var(--font-bold);color:var(--color-text-primary);">7 / 10</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+    <style>
+    .prototype-section { scroll-margin-top: calc(var(--header-height) + var(--space-6)); }
+    .deployer-card { background: var(--color-bg-surface); border-radius: var(--radius-xl); padding: var(--space-6); border: 1px solid var(--color-border); box-shadow: var(--shadow-sm); }
+    .tier-badge { padding: var(--space-2) var(--space-4); border-radius: var(--radius-full); font-size: var(--text-sm); font-weight: var(--font-semibold); border: 2px solid; }
+    .tier-badge-silver { background: var(--color-primary-50); color: var(--color-primary-500); border-color: var(--color-primary-200); }
+    .progress-bar-bg { height: 12px; background: var(--color-bg-secondary); border-radius: var(--radius-full); overflow: hidden; border: 1px solid var(--color-border-light); }
+    .progress-bar-fill { height: 100%; border-radius: var(--radius-full); background: var(--color-primary); }
+    .progress-fill-silver { background: var(--color-primary-400); }
+    .self-ops-tabs { display: flex; gap: var(--space-2); margin-bottom: var(--space-4); overflow-x: auto; }
+    .self-ops-tab { display: inline-flex; align-items: center; gap: var(--space-2); padding: var(--space-3) var(--space-4); background: var(--color-bg-secondary); border: 1px solid transparent; border-radius: var(--radius-md); cursor: pointer; font-size: var(--text-sm); font-weight: var(--font-medium); color: var(--color-text-secondary); white-space: nowrap; }
+    .self-ops-tab.active { background: var(--color-bg-surface); color: var(--color-primary); border-color: var(--color-primary-200); box-shadow: var(--shadow-xs); }
+    .health-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); margin-bottom: var(--space-4); }
+    .health-action-card { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); padding: var(--space-5); background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius: var(--radius-lg); }
+    .proposal-list { list-style: none; padding: 0; margin: var(--space-4) 0 0; display: grid; gap: var(--space-3); }
+    .proposal-item { display: flex; align-items: center; gap: var(--space-4); padding: var(--space-4); background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius: var(--radius-md); }
+    @media (max-width: 768px) {
+      .health-actions { grid-template-columns: 1fr; }
+      .proposal-item { flex-direction: column; align-items: flex-start; }
+    }
+
+    :root {
+      --animate-fade-in: fadeIn 0.3s ease-out;
+      --animate-slide-up: slideUp 0.3s ease-out;
+      --animate-pulse: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .animate-fade-in {
+      animation: var(--animate-fade-in);
+    }
+
+    .animate-slide-up {
+      animation: var(--animate-slide-up);
+    }
+
+    .animate-pulse {
+      animation: var(--animate-pulse);
+    }
+
+    .animate-spin {
+      animation: spin 0.8s linear infinite;
+    }
+
+    .hover-lift {
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .hover-lift:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .focus-ring:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</body>
+</html>
