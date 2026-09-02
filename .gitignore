@@ -5,5 +5,11 @@
 .env.production
 wallets/
 
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
 # Claude worktrees and local settings
 .claude/
