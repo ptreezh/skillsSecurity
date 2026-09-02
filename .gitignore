@@ -4,3 +4,6 @@
 .env.local
 .env.production
 wallets/
+
+# Claude worktrees and local settings
+.claude/
