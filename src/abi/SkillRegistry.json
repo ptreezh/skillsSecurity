@@ -4,11 +4,6 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_token",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
           "name": "_stakingManager",
           "type": "address"
         }

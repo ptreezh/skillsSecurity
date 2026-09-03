@@ -8,7 +8,11 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "hardhat test",
-    "coverage": "hardhat coverage"
+    "coverage": "hardhat coverage",
+    "start": "node server/index.js",
+    "server": "node server/index.js",
+    "deploy:hardhat": "npx hardhat run scripts/deploy-all.js --network hardhat",
+    "deploy:amoy": "npx hardhat run scripts/deploy-all.js --network polygonAmoy"
   },
   "dependencies": {
     "cors": "^2.8.5",

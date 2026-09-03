@@ -339,14 +339,15 @@ cp .env.example .env
 # 编辑 .env：填入 PRIVATE_KEY、POLYGON_AMOY_RPC
 
 # 2. 部署核心合约
-npx hardhat run scripts/deployCore.js --network polygonAmoy
+npm run deploy:amoy
 
-# 3. 生成前端 deployments.json
-npx hardhat run scripts/verify-deployment.js --network polygonAmoy
+# 本地测试网快速验证
+npm run deploy:hardhat
 ```
 
 部署成功后会生成：
 - `deployments/core-latest.json`：完整部署信息
+- `deployments.json`：根目录配置
 - `public/deployments.json`：前端读取的合约地址
 
 ### 10.2 运行后端服务
