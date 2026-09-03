@@ -11,5 +11,9 @@ node_modules/
 # Build output
 dist/
 
+# Logs
+progress.log
+*.log
+
 # Claude worktrees and local settings
 .claude/
