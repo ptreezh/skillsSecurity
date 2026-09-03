@@ -14,6 +14,7 @@ import './styles/enhanced.css'
 function App() {
   const [user, setUser] = useState(null)
   const [page, setPage] = useState('start')
+  const [demoTab, setDemoTab] = useState('standard')
 
   useEffect(() => {
     // 初始化钱包（宪法第二条：低摩擦参与）
@@ -32,6 +33,11 @@ function App() {
     ] : [])
   ]
 
+  const goToUpload = (tab = 'register') => {
+    setDemoTab(tab)
+    setPage('demo')
+  }
+
   return (
     <div className="app">
       <header className="app-header">
@@ -45,20 +51,30 @@ function App() {
               <button
                 key={item.id}
                 className={`app-nav-btn ${page === item.id ? 'active' : ''}`}
-                onClick={() => setPage(item.id)}
+                onClick={() => {
+                  if (item.id === 'demo') setDemoTab('standard')
+                  setPage(item.id)
+                }}
                 aria-current={page === item.id ? 'page' : undefined}
               >
                 {item.label}
               </button>
             ))}
+            <button
+              className="btn btn-primary btn-sm upload-skill-nav-btn"
+              onClick={() => goToUpload('register')}
+              aria-label="上传技能"
+            >
+              上传技能
+            </button>
           </nav>
         </div>
       </header>
 
       <main className="app-main">
-        {page === 'start' && <LandingPage onStart={setPage} />}
-        {page === 'browser' && <SkillBrowser user={user} />}
-        {page === 'demo' && <ProtocolDemo />}
+        {page === 'start' && <LandingPage onStart={setPage} onUpload={() => goToUpload('register')} />}
+        {page === 'browser' && <SkillBrowser user={user} onUpload={() => goToUpload('register')} />}
+        {page === 'demo' && <ProtocolDemo initialTab={demoTab} />}
         {page === 'leaderboard' && <Leaderboard />}
         {page === 'dashboard' && <DeployerDashboard user={user} />}
         {page === 'selfops' && <SelfOpsPanel user={user} deployerStats={user?.deployerStats} />}

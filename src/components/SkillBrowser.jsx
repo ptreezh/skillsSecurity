@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import ContractService from '../services/ContractService.jsx'
 
-export default function SkillBrowser({ user }) {
+export default function SkillBrowser({ user, onUpload }) {
   const [skills, setSkills] = useState([])
   const [search, setSearch] = useState('')
   const [sortBy, setSortBy] = useState('reputation')
@@ -134,6 +134,9 @@ export default function SkillBrowser({ user }) {
           style={{ flex: 1, minWidth: '200px' }}
         />
         <div className="toolbar-spacer" />
+        <button className="btn btn-primary" onClick={onUpload}>
+          上传技能
+        </button>
         <select
           className="input"
           value={sortBy}

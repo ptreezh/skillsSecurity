@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function LandingPage({ onStart }) {
+export default function LandingPage({ onStart, onUpload }) {
   return (
     <div className="animate-fade-in">
       <section className="container hero-section">
@@ -21,6 +21,12 @@ export default function LandingPage({ onStart }) {
             看看你能获得什么
           </button>
         </div>
+        <div className="hero-cta hero-cta-secondary" style={{ marginTop: 'var(--space-4)' }}>
+          <button className="btn btn-primary btn-lg" onClick={onUpload}>
+            上传技能
+          </button>
+          <span className="hero-cta-hint">已有技能？立即发布，获得声誉背书</span>
+        </div>
       </section>
 
       <section id="value" className="container prototype-section">
@@ -38,10 +44,13 @@ export default function LandingPage({ onStart }) {
             <h3>使用者：用得放心</h3>
             <p>浏览经过验证的 Agent Skills，查看评分、审核记录和创作者声誉。降低试错成本，找到真正可靠的工具。</p>
           </div>
-          <div className="value-card">
+          <div className="value-card value-card-highlight">
             <div className="value-icon">🚀</div>
             <h3>创作者：被看见、被信任</h3>
             <p>把你的 Agent 能力发布为 Skill，通过社区验证建立专业声誉。优质技能会获得更多曝光和使用机会。</p>
+            <button className="btn btn-primary btn-sm" onClick={onUpload} style={{ marginTop: 'var(--space-3)' }}>
+              上传技能
+            </button>
           </div>
           <div className="value-card">
             <div className="value-icon">🏅</div>
@@ -64,9 +73,12 @@ export default function LandingPage({ onStart }) {
             <h3>浏览与发现</h3>
             <p>在技能库中按类别、评分、风险等级筛选，找到适合你场景的 Agent Skill。</p>
           </div>
-          <div className="step-card">
+          <div className="step-card step-card-highlight">
             <h3>使用或发布</h3>
             <p>直接调用已验证技能；或者注册自己的 Skill，让社区看到你的能力。</p>
+            <button className="btn btn-primary btn-sm" onClick={onUpload} style={{ marginTop: 'var(--space-3)' }}>
+              上传技能
+            </button>
           </div>
           <div className="step-card">
             <h3>贡献与验证</h3>

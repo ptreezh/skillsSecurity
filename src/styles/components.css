@@ -76,6 +76,15 @@ body {
   flex-wrap: wrap;
 }
 
+.hero-cta-secondary {
+  gap: var(--space-3);
+}
+
+.hero-cta-hint {
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
+}
+
 .section-header {
   text-align: center;
   margin-bottom: var(--space-10);
@@ -473,7 +482,15 @@ body {
   cursor: not-allowed;
 }
 
+.upload-skill-nav-btn {
+  margin-left: var(--space-2);
+  white-space: nowrap;
+}
+
 @media (max-width: 768px) {
+  .upload-skill-nav-btn {
+    display: none;
+  }
   .app-nav {
     gap: var(--space-1);
     overflow-x: auto;
@@ -1114,4 +1131,42 @@ a:focus-visible {
   background: var(--color-info-light);
   color: var(--color-info);
   border-color: var(--color-info-lighter);
+}
+
+/* === Section Upload Entry === */
+.upload-entry-banner {
+  background: var(--color-primary-light);
+  border: 1px solid var(--color-primary-200);
+}
+
+.upload-entry-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.upload-entry-actions {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .upload-entry-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+  }
+
+  .upload-entry-actions {
+    width: 100%;
+  }
+
+  .upload-entry-actions .btn,
+  .upload-entry-content > .btn {
+    width: 100%;
+  }
 }

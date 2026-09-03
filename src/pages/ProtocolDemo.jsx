@@ -13,8 +13,8 @@ import {
  * ProtocolDemo - 协议演示页
  * 展示 AgentSkills 协议的核心机制
  */
-export default function ProtocolDemo() {
-  const [activeTab, setActiveTab] = useState('standard');
+export default function ProtocolDemo({ initialTab = 'standard' }) {
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [demoSkill, setDemoSkill] = useState({
     name: '',
     description: '',
@@ -39,6 +39,10 @@ export default function ProtocolDemo() {
     initializeWallet();
     loadContractAddresses();
   }, []);
+
+  useEffect(() => {
+    setActiveTab(initialTab);
+  }, [initialTab]);
 
   useEffect(() => {
     if (walletConnected) {
@@ -179,7 +183,7 @@ export default function ProtocolDemo() {
     { id: 'antislas', label: '反噬机制' },
     { id: 'register', label: '上传技能' },
     { id: 'freeskill', label: 'FreeSkill' },
-    { id: 'metaskills', label: '元技能' }
+    { id: 'templates', label: '技能模板' }
   ];
 
   const sectionTitle = { marginTop: 0, marginBottom: 'var(--space-4)', color: 'var(--color-text-primary)', fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)' };
@@ -578,6 +582,27 @@ export default function ProtocolDemo() {
               基于 SKILLS_STANDARD.md v1.1 规范，上传符合 AgentSkills 标准的技能包
             </p>
 
+            <div className="card upload-entry-banner" style={{ marginBottom: 'var(--space-6)' }}>
+              <div className="upload-entry-content">
+                <div>
+                  <h3 style={{ margin: '0 0 var(--space-2) 0', fontSize: 'var(--text-lg)', color: 'var(--color-text-primary)' }}>
+                    需要更严格的治理标准？
+                  </h3>
+                  <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)' }}>
+                    使用 FreeSkill 扩展或技能模板，快速生成带责任声明、反噬机制和验证流程的技能包。
+                  </p>
+                </div>
+                <div className="upload-entry-actions">
+                  <button className="btn btn-secondary" onClick={() => setActiveTab('freeskill')}>
+                    查看 FreeSkill
+                  </button>
+                  <button className="btn btn-primary" onClick={() => setActiveTab('templates')}>
+                    浏览技能模板
+                  </button>
+                </div>
+              </div>
+            </div>
+
             <div className="grid-auto" style={{ marginBottom: 'var(--space-6)' }}>
               <div className="card">
                 <h3 style={{ marginTop: 0, marginBottom: 'var(--space-3)', color: 'var(--color-text-primary)', fontSize: 'var(--text-base)' }}>.SKILL.md 格式</h3>
@@ -761,6 +786,22 @@ humanAuth:
               基于 AgentSkills 的可信技能治理标准，补充完整责任链。
             </p>
 
+            <div className="card upload-entry-banner" style={{ marginBottom: 'var(--space-6)' }}>
+              <div className="upload-entry-content">
+                <div>
+                  <h3 style={{ margin: '0 0 var(--space-2) 0', fontSize: 'var(--text-lg)', color: 'var(--color-text-primary)' }}>
+                    准备好发布技能了吗？
+                  </h3>
+                  <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)' }}>
+                    你的 FreeSkill 规范技能可以直接上传到协议中，获得声誉背书与链上验证。
+                  </p>
+                </div>
+                <button className="btn btn-primary" onClick={() => setActiveTab('register')}>
+                  立即上传技能
+                </button>
+              </div>
+            </div>
+
             <div className="card" style={{ background: 'var(--color-primary)', color: 'var(--color-text-inverse)', marginBottom: 'var(--space-6)' }}>
               <h3 style={{ marginTop: 0, color: 'inherit', fontSize: 'var(--text-xl)' }}>核心理念</h3>
               <p style={{ fontSize: 'var(--text-lg)', margin: '0 0 var(--space-2) 0', fontWeight: 'var(--font-semibold)' }}>
@@ -892,12 +933,28 @@ humanAuth:
           </section>
         )}
 
-        {activeTab === 'metaskills' && (
+        {activeTab === 'templates' && (
           <section className="animate-fade-in">
-            <h2 style={sectionTitle}>FreeSkill 元技能</h2>
+            <h2 style={sectionTitle}>FreeSkill 技能模板</h2>
             <p style={{ color: 'var(--color-text-secondary)', marginBottom: 'var(--space-6)' }}>
-              基于 FreeSkill 规范的元技能，用于创建和升级符合治理标准的技能
+              基于 FreeSkill 规范的技能模板，用于创建和升级符合治理标准的技能
             </p>
+
+            <div className="card upload-entry-banner" style={{ marginBottom: 'var(--space-6)' }}>
+              <div className="upload-entry-content">
+                <div>
+                  <h3 style={{ margin: '0 0 var(--space-2) 0', fontSize: 'var(--text-lg)', color: 'var(--color-text-primary)' }}>
+                    从模板开始，更快发布
+                  </h3>
+                  <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)' }}>
+                    下载技能模板并按需修改后，上传到协议中完成验证与上链。
+                  </p>
+                </div>
+                <button className="btn btn-primary" onClick={() => setActiveTab('register')}>
+                  上传技能
+                </button>
+              </div>
+            </div>
 
             <div style={{ display: 'grid', gap: 'var(--space-6)', marginBottom: 'var(--space-8)' }}>
               {[
