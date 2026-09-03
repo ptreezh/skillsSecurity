@@ -327,4 +327,72 @@ vercel --prod
 
 ---
 
+## 10. Polygon Amoy 测试网 + 后端部署实操
+
+GitHub Pages 只能托管静态前端，上传技能、AI 审计、上链提交需要单独运行后端服务。
+
+### 10.1 部署合约到 Polygon Amoy
+
+```bash
+# 1. 配置环境变量
+cp .env.example .env
+# 编辑 .env：填入 PRIVATE_KEY、POLYGON_AMOY_RPC
+
+# 2. 部署核心合约
+npx hardhat run scripts/deployCore.js --network polygonAmoy
+
+# 3. 生成前端 deployments.json
+npx hardhat run scripts/verify-deployment.js --network polygonAmoy
+```
+
+部署成功后会生成：
+- `deployments/core-latest.json`：完整部署信息
+- `public/deployments.json`：前端读取的合约地址
+
+### 10.2 运行后端服务
+
+#### 方式 A：Docker（推荐）
+
+```bash
+# 创建 .env 文件，至少包含：
+#   PRIVATE_KEY=0x...
+#   SKILL_REGISTRY_ADDRESS=0x...
+#   CORS_ORIGIN=https://你的域名
+
+docker compose up -d
+```
+
+#### 方式 B：直接运行
+
+```bash
+npm install
+node server/index.js
+```
+
+### 10.3 配置 GitHub Pages 前端
+
+在仓库 **Settings → Secrets and variables → Actions** 中添加：
+
+| Secret | 示例值 | 说明 |
+|--------|--------|------|
+| `VITE_API_URL` | `https://api.yourdomain.com` | 后端 API 地址 |
+
+重新 push 到 `main`，GitHub Actions 会自动把该地址打包进前端。
+
+### 10.4 验证上传链路
+
+```bash
+curl https://api.yourdomain.com/api/health
+```
+
+应返回 `status: ok` 且 `chain.configured: true`。
+
+### 10.5 安全提示
+
+- `PRIVATE_KEY` 仅用于后端支付 Gas，**不要提交到 GitHub**。
+- 生产环境建议使用专用低权限钱包，而非部署者主钱包。
+- 后端服务器需通过 HTTPS 暴露，避免私钥和上传流量被中间人窃取。
+
+---
+
 *本文档定义了 AgentSkills 的去中心化部署架构*

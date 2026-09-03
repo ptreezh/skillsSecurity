@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const multer = require('multer');
 const cors = require('cors');
@@ -12,14 +13,32 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Ensure directories exist
-const UPLOADS_DIR = path.join(__dirname, '..', 'uploads');
+const UPLOADS_DIR = process.env.UPLOADS_DIR || path.join(__dirname, '..', 'uploads');
 const TEMP_DIR = path.join(UPLOADS_DIR, 'temp');
 if (!fs.existsSync(TEMP_DIR)) {
   fs.mkdirSync(TEMP_DIR, { recursive: true });
 }
 
+// CORS: allow local dev and configured production origins
+const CORS_ORIGIN = process.env.CORS_ORIGIN;
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    const allowed = ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173'];
+    if (CORS_ORIGIN) {
+      CORS_ORIGIN.split(',').forEach(o => allowed.push(o.trim()));
+    }
+    if (allowed.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS blocked: ${origin}`));
+    }
+  },
+  credentials: true
+};
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Configure multer for file uploads
@@ -50,7 +69,18 @@ const upload = multer({
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    chain: {
+      configured: !!(
+        process.env.PRIVATE_KEY &&
+        process.env.SKILL_REGISTRY_ADDRESS
+      ),
+      network: 'Polygon Amoy',
+      skillRegistry: process.env.SKILL_REGISTRY_ADDRESS || null
+    }
+  });
 });
 
 // Upload endpoint
@@ -149,11 +179,17 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`FreeSkill API server running on port ${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`AgentSkills API server running on port ${PORT}`);
   console.log(`Upload endpoint: POST http://localhost:${PORT}/api/upload`);
   console.log(`Status endpoint: GET http://localhost:${PORT}/api/status/:jobId`);
   console.log(`Chain endpoint: POST http://localhost:${PORT}/api/chain`);
+  console.log(`Health endpoint: GET http://localhost:${PORT}/api/health`);
+  if (process.env.CORS_ORIGIN) {
+    console.log(`CORS origins: ${process.env.CORS_ORIGIN}`);
+  } else {
+    console.log('CORS origins: localhost only (set CORS_ORIGIN for production)');
+  }
 });
 
 module.exports = app;
