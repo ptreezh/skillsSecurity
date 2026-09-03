@@ -46,7 +46,7 @@ jobs:
           ls -la results.json 2>/dev/null || echo "No results file generated"
 
       - name: Upload Slither results
-        if: always() && fileExists('results.json')
+        if: always() && hashFiles('results.json') != ''
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: results.json
