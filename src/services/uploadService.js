@@ -2,7 +2,15 @@
  * Upload Service - Frontend API client for FreeSkill backend
  */
 
+import i18n from '../i18n'
+
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
+function getHeaders() {
+  return {
+    'Accept-Language': i18n.language || 'zh-CN'
+  }
+}
 
 /**
  * Upload a skill file and start audit
@@ -17,6 +25,7 @@ export async function uploadSkill(file, onProgress) {
   try {
     const response = await fetch(`${API_BASE}/api/upload`, {
       method: 'POST',
+      headers: getHeaders(),
       body: formData
     });
 
@@ -46,9 +55,11 @@ export async function pollJobStatus(jobId, interval = 2000, onStatusChange) {
 
     const poll = async () => {
       try {
-        const response = await fetch(`${API_BASE}/api/status/${jobId}`);
+        const response = await fetch(`${API_BASE}/api/status/${jobId}`, {
+          headers: getHeaders()
+        });
         if (!response.ok) {
-          throw new Error('Failed to get job status');
+          throw new Error(i18n.t('browser.loadError'));
         }
 
         const job = await response.json();
@@ -83,7 +94,7 @@ export async function pollJobStatus(jobId, interval = 2000, onStatusChange) {
 export async function submitToChain(jobId) {
   const response = await fetch(`${API_BASE}/api/chain`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...getHeaders() },
     body: JSON.stringify({ jobId })
   });
 
@@ -106,7 +117,7 @@ export async function fullAuditFlow(file, callbacks = {}) {
 
   try {
     // Step 1: Upload
-    onStatusChange?.({ status: 'uploading', message: 'Uploading skill...' });
+    onStatusChange?.({ status: 'uploading', message: i18n.t('demo.status.uploading') });
     const { jobId } = await uploadSkill(file);
 
     // Step 2: Poll status
@@ -114,10 +125,10 @@ export async function fullAuditFlow(file, callbacks = {}) {
 
     // Step 3: Check result
     if (finalResult.status === 'approved') {
-      onStatusChange?.({ status: 'approved', message: 'Audit passed!' });
+      onStatusChange?.({ status: 'approved', message: i18n.t('demo.status.approved') });
 
       // Step 4: Submit to chain
-      onStatusChange?.({ status: 'submitting', message: 'Submitting to blockchain...' });
+      onStatusChange?.({ status: 'submitting', message: i18n.t('demo.status.submitting') });
       const chainResult = await submitToChain(jobId);
 
       onComplete?.({
@@ -129,12 +140,12 @@ export async function fullAuditFlow(file, callbacks = {}) {
 
       return chainResult;
     } else if (finalResult.status === 'review') {
-      onStatusChange?.({ status: 'review', message: 'Needs manual review' });
+      onStatusChange?.({ status: 'review', message: i18n.t('demo.status.review') });
       onComplete?.({ success: false, status: 'review', auditResult: finalResult.result });
       return { success: false, status: 'review' };
     } else {
-      onError?.({ status: finalResult.status, error: 'Audit failed', auditResult: finalResult.result });
-      throw new Error(`Audit failed: ${finalResult.status}`);
+      onError?.({ status: finalResult.status, error: i18n.t('demo.status.rejected'), auditResult: finalResult.result });
+      throw new Error(`${i18n.t('demo.audit.rejected')}: ${finalResult.status}`);
     }
   } catch (error) {
     onError?.({ error: error.message });

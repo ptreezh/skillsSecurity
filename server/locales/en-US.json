@@ -1,0 +1,35 @@
+{
+  "upload": {
+    "noFile": "No file uploaded",
+    "success": "File uploaded, audit in progress"
+  },
+  "job": {
+    "notFound": "Job not found",
+    "notApproved": "Job not approved",
+    "auditRequired": "Audit must pass before on-chain submission",
+    "fileNotFound": "Job file not found"
+  },
+  "chain": {
+    "jobIdRequired": "jobId required",
+    "submitting": "Submitting to chain...",
+    "onChain": "On chain",
+    "notConfigured": "Real chain not configured, falling back to mock submission",
+    "configHint": "Set PRIVATE_KEY and SKILL_REGISTRY_ADDRESS to enable real submission",
+    "balanceTooLow": "Submit wallet balance too low: {{balance}} MATIC"
+  },
+  "audit": {
+    "auditing": "Security audit in progress (AI Agent scan)...",
+    "serviceUnavailable": "Audit service unavailable",
+    "completedWithWarnings": "Audit completed with warnings",
+    "criticalIssues": "Found {{count}} critical security issue(s). Please fix before resubmitting.",
+    "highIssues": "Found {{count}} high-risk issue(s). Recommended to fix for better security.",
+    "missingGovernance": "Missing required governance fields. Add FreeSkill metadata for full compliance.",
+    "approvedWithWarnings": "Skill approved. Consider fixing warnings for better quality.",
+    "approvedMinor": "Skill approved. Minor suggestions available.",
+    "approvedAll": "Excellent! Skill passed all checks.",
+    "summary": "Audit complete: {{critical}} critical, {{high}} high, {{medium}} medium, {{low}} low"
+  },
+  "file": {
+    "invalidType": "Invalid file type. Allowed: {{types}}"
+  }
+}

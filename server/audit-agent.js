@@ -8,24 +8,55 @@ const yaml = require('js-yaml');
 const { spawn } = require('child_process');
 const { updateJob, getJob } = require('./jobs');
 const { calculateIndependenceScore } = require('./independence-scorer');
+const { t } = require('./i18n');
 
 /**
  * 处理审核任务
  */
-async function processAuditJob(jobId, filePath, originalName) {
+async function processAuditJob(jobId, filePath, originalName, locale = 'zh-CN') {
+	const _t = (key, data) => t(locale, key, data);
 	console.log(`[Audit Agent] Starting job ${jobId} for ${originalName}`);
 
-	updateJob(jobId, { status: 'auditing' });
+	updateJob(jobId, { status: 'auditing', message: _t('audit.auditing') });
 
 	try {
 		const skillContent = fs.readFileSync(filePath, 'utf-8');
-		const result = await runAudit(skillContent, originalName);
+		const result = await runAudit(skillContent, originalName, locale);
+
+		// Localize user-facing audit messages
+		const counts = result.counts || {};
+		const critical = counts.critical || 0;
+		const high = counts.high || 0;
+		const medium = counts.medium || 0;
+		const low = counts.low || 0;
+		const tier4Errors = result.tier4?.errors?.length || 0;
+		const tier4Warnings = result.tier4?.warnings?.length || 0;
+		const tier3Warnings = result.tier3?.warnings?.length || 0;
+
+		let message;
+		if (critical > 0) {
+			message = _t('audit.criticalIssues', { count: critical });
+		} else if (high > 0) {
+			message = _t('audit.highIssues', { count: high });
+		} else if (tier4Errors > 0) {
+			message = _t('audit.missingGovernance');
+		} else if (medium > 0 || tier4Warnings > 0 || tier3Warnings > 0) {
+			message = _t('audit.approvedWithWarnings');
+		} else if (low > 0) {
+			message = _t('audit.approvedMinor');
+		} else {
+			message = _t('audit.approvedAll');
+		}
+
+		result.message = message;
+		result.summary = _t('audit.summary', { critical, high, medium, low });
 
 		const finalStatus = result.passed ? 'approved' :
 		                  result.recommendation === 'needs_review' ? 'review' : 'rejected';
 
 		updateJob(jobId, {
 			status: finalStatus,
+			message,
 			result,
 			completedAt: new Date().toISOString()
 		});
@@ -46,7 +77,7 @@ async function processAuditJob(jobId, filePath, originalName) {
 /**
  * 运行审核
  */
-async function runAudit(skillContent, skillName) {
+async function runAudit(skillContent, skillName, locale = 'zh-CN') {
 	let skillData = {};
 	try {
 		const parts = skillContent.split('---');
@@ -102,7 +133,7 @@ async function runAudit(skillContent, skillName) {
 				resolve({
 					passed: true,
 					score: 70,
-					summary: stderr || 'Audit completed with warnings',
+					summary: stderr || t(locale, 'audit.completedWithWarnings'),
 					recommendation: 'needs_review',
 					error: stderr,
 					independence: independenceScore
@@ -115,7 +146,7 @@ async function runAudit(skillContent, skillName) {
 			resolve({
 				passed: true,
 				score: 60,
-				summary: 'Audit service unavailable',
+				summary: t(locale, 'audit.serviceUnavailable'),
 				recommendation: 'needs_review',
 				error: err.message,
 				independence: calculateIndependenceScore(skillContent)

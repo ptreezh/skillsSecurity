@@ -8,6 +8,7 @@ const { v4: uuidv4 } = require('uuid');
 const { processAuditJob } = require('./audit-agent');
 const { submitToChain } = require('./chain-submit');
 const { jobs, addJob, updateJob, getJob } = require('./jobs');
+const { localeMiddleware } = require('./locale-middleware');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -40,6 +41,7 @@ const corsOptions = {
 // Middleware
 app.use(cors(corsOptions));
 app.use(express.json());
+app.use(localeMiddleware);
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -62,7 +64,7 @@ const upload = multer({
     if (allowedExts.includes(ext)) {
       cb(null, true);
     } else {
-      cb(new Error(`Invalid file type. Allowed: ${allowedExts.join(', ')}`));
+      cb(new Error(req.t('file.invalidType', { types: allowedExts.join(', ') })));
     }
   }
 });
@@ -87,7 +89,7 @@ app.get('/api/health', (req, res) => {
 app.post('/api/upload', upload.single('file'), async (req, res) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ error: 'No file uploaded' });
+      return res.status(400).json({ error: req.t('upload.noFile') });
     }
 
     const jobId = uuidv4();
@@ -104,7 +106,7 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
     });
 
     // Start audit process asynchronously
-    processAuditJob(jobId, filePath, originalName).catch(err => {
+    processAuditJob(jobId, filePath, originalName, req.locale).catch(err => {
       console.error(`Audit job ${jobId} failed:`, err);
       updateJob(jobId, { status: 'failed', error: err.message });
     });
@@ -112,7 +114,7 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
     res.json({
       jobId,
       status: 'pending',
-      message: 'File uploaded, audit in progress'
+      message: req.t('upload.success')
     });
   } catch (error) {
     console.error('Upload error:', error);
@@ -123,9 +125,9 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
 // Get job status
 app.get('/api/status/:jobId', (req, res) => {
   const job = getJob(req.params.jobId);
-  if (!job) {
-    return res.status(404).json({ error: 'Job not found' });
-  }
+    if (!job) {
+      return res.status(404).json({ error: req.t('job.notFound') });
+    }
   res.json(job);
 });
 
@@ -134,28 +136,29 @@ app.post('/api/chain', async (req, res) => {
   try {
     const { jobId } = req.body;
     if (!jobId) {
-      return res.status(400).json({ error: 'jobId required' });
+      return res.status(400).json({ error: req.t('chain.jobIdRequired') });
     }
 
     const job = getJob(jobId);
     if (!job) {
-      return res.status(404).json({ error: 'Job not found' });
+      return res.status(404).json({ error: req.t('job.notFound') });
     }
 
     if (job.status !== 'approved') {
       return res.status(400).json({
-        error: 'Job not approved',
+        error: req.t('job.notApproved'),
         status: job.status,
-        message: 'Audit must pass before on-chain submission'
+        message: req.t('job.auditRequired')
       });
     }
 
     // Submit to chain
-    updateJob(jobId, { status: 'submitting' });
-    const result = await submitToChain(job);
+    updateJob(jobId, { status: 'submitting', message: req.t('chain.submitting') });
+    const result = await submitToChain(job, req.locale);
 
     updateJob(jobId, {
       status: 'on_chain',
+      message: req.t('chain.onChain'),
       skillId: result.skillId,
       txHash: result.txHash
     });

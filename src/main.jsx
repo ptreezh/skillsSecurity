@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import ReactDOM from 'react-dom/client'
+import { useTranslation } from 'react-i18next'
 import SkillBrowser from './components/SkillBrowser'
 import UserProfile from './pages/UserProfile'
 import Leaderboard from './pages/Leaderboard'
@@ -7,11 +8,14 @@ import ProtocolDemo from './pages/ProtocolDemo'
 import DeployerDashboard from './pages/DeployerDashboard'
 import SelfOpsPanel from './pages/SelfOpsPanel'
 import LandingPage from './pages/LandingPage'
+import LanguageSwitcher from './components/LanguageSwitcher'
 import WalletService from './services/WalletService'
+import './i18n'
 import './styles/components.css'
 import './styles/enhanced.css'
 
 function App() {
+  const { t } = useTranslation()
   const [user, setUser] = useState(null)
   const [page, setPage] = useState('start')
   const [demoTab, setDemoTab] = useState('standard')
@@ -22,14 +26,14 @@ function App() {
   }, [])
 
   const navItems = [
-    { id: 'start', label: '开始' },
-    { id: 'browser', label: '技能浏览器' },
-    { id: 'demo', label: '协议演示' },
-    { id: 'leaderboard', label: '排行榜' },
+    { id: 'start', label: t('nav.start') },
+    { id: 'browser', label: t('nav.browser') },
+    { id: 'demo', label: t('nav.demo') },
+    { id: 'leaderboard', label: t('nav.leaderboard') },
     ...(user ? [
-      { id: 'dashboard', label: '激励面板' },
-      { id: 'selfops', label: '四自系统' },
-      { id: 'profile', label: `我的声誉 (${user.reputation || 0})` }
+      { id: 'dashboard', label: t('nav.dashboard') },
+      { id: 'selfops', label: t('nav.selfops') },
+      { id: 'profile', label: `${t('nav.profile')} (${user.reputation || 0})` }
     ] : [])
   ]
 
@@ -57,19 +61,20 @@ function App() {
                 }}
                 aria-current={page === item.id ? 'page' : undefined}
               >
-                {item.label}
-              </button>
-            ))}
-            <button
-              className="btn btn-primary btn-sm upload-skill-nav-btn"
-              onClick={() => goToUpload('register')}
-              aria-label="上传技能"
-            >
-              上传技能
+              {item.label}
             </button>
-          </nav>
-        </div>
-      </header>
+          ))}
+          <button
+            className="btn btn-primary btn-sm upload-skill-nav-btn"
+            onClick={() => goToUpload('register')}
+            aria-label={t('nav.uploadSkill')}
+          >
+            {t('nav.uploadSkill')}
+          </button>
+          <LanguageSwitcher />
+        </nav>
+      </div>
+    </header>
 
       <main className="app-main">
         {page === 'start' && <LandingPage onStart={setPage} onUpload={() => goToUpload('register')} />}

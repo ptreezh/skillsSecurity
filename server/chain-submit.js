@@ -17,6 +17,7 @@ const path = require('path');
 const yaml = require('js-yaml');
 const { ethers } = require('ethers');
 const { getJob } = require('./jobs');
+const { t } = require('./i18n');
 
 const SkillRegistryAbi = require('../src/abi/SkillRegistry.json').abi;
 
@@ -38,9 +39,9 @@ function isConfigured() {
 /**
  * 从上传的技能文件中解析注册所需字段
  */
-function parseSkillFromJob(job) {
+function parseSkillFromJob(job, locale = 'zh-CN') {
   if (!job || !job.filePath || !fs.existsSync(job.filePath)) {
-    throw new Error('Job file not found');
+    throw new Error(t(locale, 'job.fileNotFound'));
   }
 
   const content = fs.readFileSync(job.filePath, 'utf-8');
@@ -77,7 +78,7 @@ function parseSkillFromJob(job) {
 /**
  * 真实链上提交
  */
-async function submitToChainReal(job) {
+async function submitToChainReal(job, locale = 'zh-CN') {
   const rpcUrl = process.env.POLYGON_AMOY_RPC || 'https://rpc-amoy.polygon.technology';
   const privateKey = process.env.PRIVATE_KEY;
   const skillRegistryAddress = process.env.SKILL_REGISTRY_ADDRESS;
@@ -87,12 +88,12 @@ async function submitToChainReal(job) {
 
   const balance = await provider.getBalance(wallet.address);
   if (balance < ethers.parseEther('0.001')) {
-    throw new Error(`Submit wallet balance too low: ${ethers.formatEther(balance)} MATIC`);
+    throw new Error(t(locale, 'chain.balanceTooLow', { balance: ethers.formatEther(balance) }));
   }
 
   const skillRegistry = new ethers.Contract(skillRegistryAddress, SkillRegistryAbi, wallet);
 
-  const skill = parseSkillFromJob(job);
+  const skill = parseSkillFromJob(job, locale);
   console.log(`[Chain] Submitting skill: ${skill.name} (risk=${skill.riskLevel})`);
 
   const tx = await skillRegistry.registerSkill(
@@ -137,7 +138,7 @@ async function submitToChainReal(job) {
 /**
  * Mock 提交（未配置真实链时降级使用）
  */
-async function submitToChainMock(job) {
+async function submitToChainMock(job, locale = 'zh-CN') {
   console.log(`[Chain] Mock submit for job ${job?.id}`);
   await new Promise(resolve => setTimeout(resolve, 1000));
   return {
@@ -150,14 +151,14 @@ async function submitToChainMock(job) {
 /**
  * 提交已审核通过的技能到链上
  */
-async function submitToChain(job) {
+async function submitToChain(job, locale = 'zh-CN') {
   if (!isConfigured()) {
-    console.warn('[Chain] Real chain not configured, falling back to mock submission');
-    console.warn('        Set PRIVATE_KEY and SKILL_REGISTRY_ADDRESS to enable real submission');
-    return submitToChainMock(job);
+    console.warn(t(locale, 'chain.notConfigured'));
+    console.warn(t(locale, 'chain.configHint'));
+    return submitToChainMock(job, locale);
   }
 
-  return submitToChainReal(job);
+  return submitToChainReal(job, locale);
 }
 
 async function getTransactionReceipt(txHash) {

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import ContractService from '../services/ContractService.jsx'
 
 export default function SkillBrowser({ user, onUpload }) {
+  const { t } = useTranslation()
   const [skills, setSkills] = useState([])
   const [search, setSearch] = useState('')
   const [sortBy, setSortBy] = useState('reputation')
@@ -9,9 +11,9 @@ export default function SkillBrowser({ user, onUpload }) {
   const [error, setError] = useState(null)
 
   const demoSkills = [
-    { id: 1, name: 'email-sender', description: '通过 AI 代理发送邮件，支持模板与收件人管理', owner: '0x1234...abcd', verified: true, riskLevel: 0, likes: 120, reputation: 340 },
-    { id: 2, name: 'web-search', description: '使用 AI 进行网络搜索并汇总结果', owner: '0x5678...efab', verified: true, riskLevel: 1, likes: 80, reputation: 210 },
-    { id: 3, name: 'calendar-helper', description: '管理日程安排、提醒与会议预订', owner: '0x9abc...1234', verified: false, riskLevel: 0, likes: 40, reputation: 95 },
+    { id: 1, name: 'email-sender', description: t('browser.demoSkills.emailSender'), owner: '0x1234...abcd', verified: true, riskLevel: 0, likes: 120, reputation: 340 },
+    { id: 2, name: 'web-search', description: t('browser.demoSkills.webSearch'), owner: '0x5678...efab', verified: true, riskLevel: 1, likes: 80, reputation: 210 },
+    { id: 3, name: 'calendar-helper', description: t('browser.demoSkills.calendarHelper'), owner: '0x9abc...1234', verified: false, riskLevel: 0, likes: 40, reputation: 95 },
   ]
 
   useEffect(() => {
@@ -39,8 +41,8 @@ export default function SkillBrowser({ user, onUpload }) {
   }, [user?.address])
 
   const handleLike = async (skillId) => {
-    if (!user) return alert('请先注册')
-    if (user.dailyLikes >= 5) return alert('每日限制: 5 次点赞 (宪法第二条)')
+    if (!user) return alert(t('common.loginRequired'))
+    if (user.dailyLikes >= 5) return alert(t('browser.dailyLimit'))
 
     try {
       if (ContractService.isInitialized()) {
@@ -53,14 +55,14 @@ export default function SkillBrowser({ user, onUpload }) {
           user.reputation += 2
           return
         } else {
-          alert('交易失败: ' + result.error)
+          alert(t('common.txFailed') + ': ' + result.error)
           return
         }
       }
 
       const skill = skills.find(s => s.id === skillId)
       if (skill?.verified === false) {
-        alert('Warning: You liked an unverified skill!')
+        alert(t('common.unverifiedSkillWarning'))
       }
 
       user.dailyLikes++
@@ -70,7 +72,7 @@ export default function SkillBrowser({ user, onUpload }) {
       ))
     } catch (err) {
       console.error('Error liking skill:', err)
-      alert('点赞失败')
+      alert(t('browser.likeFailed'))
     }
   }
 
@@ -97,8 +99,8 @@ export default function SkillBrowser({ user, onUpload }) {
   }
 
   const getRiskLabel = (level) => {
-    const labels = { 0: 'LOW', 1: 'MEDIUM', 2: 'HIGH', 3: 'CRITICAL' }
-    return labels[level] || 'LOW'
+    const keys = { 0: 'low', 1: 'medium', 2: 'high', 3: 'critical' }
+    return t(`browser.riskLevels.${keys[level] || 'low'}`)
   }
 
   if (loading) {
@@ -106,7 +108,7 @@ export default function SkillBrowser({ user, onUpload }) {
       <div className="container">
         <div className="loading-state">
           <div className="loading-spinner" />
-          <span>加载技能中...</span>
+          <span>{t('common.loading')}</span>
         </div>
       </div>
     )
@@ -115,27 +117,27 @@ export default function SkillBrowser({ user, onUpload }) {
   return (
     <div className="container animate-fade-in">
       <div className="page-header">
-        <h2 className="page-title">技能浏览器</h2>
-        <p className="page-subtitle">探索社区技能，按声誉排序（宪法第三条）</p>
+        <h2 className="page-title">{t('browser.title')}</h2>
+        <p className="page-subtitle">{t('browser.subtitle')}</p>
       </div>
 
       {ContractService.isInitialized() && (
         <div className="badge badge-success" style={{ marginBottom: 'var(--space-4)' }}>
-          已连接到合约
+          {t('browser.stats.verified')}
         </div>
       )}
 
       <div className="toolbar">
         <input
           className="input input-search"
-          placeholder="搜索技能..."
+          placeholder={t('browser.searchPlaceholder')}
           value={search}
           onChange={e => setSearch(e.target.value)}
           style={{ flex: 1, minWidth: '200px' }}
         />
         <div className="toolbar-spacer" />
         <button className="btn btn-primary" onClick={onUpload}>
-          上传技能
+          {t('nav.uploadSkill')}
         </button>
         <select
           className="input"
@@ -143,14 +145,14 @@ export default function SkillBrowser({ user, onUpload }) {
           onChange={e => setSortBy(e.target.value)}
           style={{ minWidth: '180px' }}
         >
-          <option value="reputation">按声誉排序</option>
-          <option value="likes">按点赞数</option>
+          <option value="reputation">{t('browser.sortOptions.reputation')}</option>
+          <option value="likes">{t('browser.sortOptions.likes')}</option>
         </select>
       </div>
 
       {filteredSkills.length === 0 && !loading ? (
         <div className="card empty-state">
-          {skills.length === 0 ? '暂无技能。部署合约后可查看。' : '没有找到匹配的技能'}
+          {skills.length === 0 ? t('browser.empty') : t('browser.empty')}
         </div>
       ) : (
         <div style={{ display: 'grid', gap: 'var(--space-4)' }}>
@@ -172,10 +174,10 @@ export default function SkillBrowser({ user, onUpload }) {
                     {skill.description}
                   </p>
                   <div style={{ display: 'flex', gap: 'var(--space-4)', fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)', flexWrap: 'wrap' }}>
-                    <span>声誉: {skill.reputation || skill.likes || 0}</span>
-                    <span>点赞: {skill.likes || 0}</span>
+                    <span>{t('profile.reputation')}: {skill.reputation || skill.likes || 0}</span>
+                    <span>{t('browser.likes')}: {skill.likes || 0}</span>
                     <span style={{ fontFamily: 'var(--font-mono)' }}>
-                      创建者: {typeof skill.owner === 'string' ? skill.owner.slice(0, 10) + '...' : skill.creator || 'unknown'}
+                      {t('leaderboard.address')}: {typeof skill.owner === 'string' ? skill.owner.slice(0, 10) + '...' : skill.creator || 'unknown'}
                     </span>
                   </div>
                 </div>
@@ -184,9 +186,9 @@ export default function SkillBrowser({ user, onUpload }) {
                     className={!skill.verified ? 'btn btn-danger btn-sm' : canLike ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm'}
                     onClick={() => handleLike(skill.id)}
                     disabled={!canLike}
-                    aria-label={`点赞技能 ${skill.name}`}
+                    aria-label={`Like skill ${skill.name}`}
                   >
-                    {!skill.verified ? '未验证' : `点赞 (${user?.dailyLikes || 0}/5)`}
+                    {!skill.verified ? t('browser.stats.pending') : `${t('browser.like')} (${user?.dailyLikes || 0}/5)`}
                   </button>
                 </div>
               </div>
@@ -197,7 +199,7 @@ export default function SkillBrowser({ user, onUpload }) {
 
       {error && (
         <div className="alert alert-danger" style={{ marginTop: 'var(--space-4)' }}>
-          错误: {error}
+          {t('common.error')}: {error}
         </div>
       )}
     </div>

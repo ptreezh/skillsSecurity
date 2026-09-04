@@ -1,0 +1,407 @@
+{
+  "language": {
+    "name": "English",
+    "switch": "Switch Language",
+    "zh": "中文",
+    "en": "English"
+  },
+  "nav": {
+    "start": "Start",
+    "browser": "Skill Browser",
+    "demo": "Protocol Demo",
+    "leaderboard": "Leaderboard",
+    "dashboard": "Rewards",
+    "selfops": "Self-Ops",
+    "profile": "My Reputation",
+    "uploadSkill": "Upload Skill"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "submit": "Submit",
+    "close": "Close",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "all": "All",
+    "none": "None",
+    "yes": "Yes",
+    "no": "No",
+    "copy": "Copy",
+    "copied": "Copied",
+    "loginRequired": "Please sign in first",
+    "txFailed": "Transaction failed",
+    "unverifiedSkillWarning": "You liked an unverified skill"
+  },
+  "landing": {
+    "badge": "Trustworthy Agent Skill Marketplace",
+    "title": "Discover and Build High-Quality Agent Skills",
+    "subtitle": "AgentSkills connects skill creators, users, and domain experts. Every Skill is publicly verified and reputation-backed, so you can find tools with confidence, publish skills that get noticed, and earn reputation for audits.",
+    "exploreSkills": "Explore Skills",
+    "seeValue": "See What You Can Gain",
+    "uploadSkill": "Upload Skill",
+    "uploadHint": "Already have a skill? Publish it now and earn reputation backing.",
+    "valueSection": {
+      "label": "Platform Value",
+      "title": "Every Role Can Capture Trustworthy Value Here",
+      "desc": "Whether you want to use Agent skills, publish your own, or become a quality auditor, AgentSkills offers transparent, verifiable reputation and opportunity.",
+      "user": {
+        "title": "Users: Use with Confidence",
+        "desc": "Browse verified Agent Skills with ratings, audit history, and creator reputation. Reduce trial-and-error costs and find truly reliable tools."
+      },
+      "creator": {
+        "title": "Creators: Get Seen and Trusted",
+        "desc": "Publish your Agent capabilities as Skills and build professional reputation through community verification. Quality skills gain more exposure and usage."
+      },
+      "auditor": {
+        "title": "Auditors: Build Expert Influence",
+        "desc": "Back quality skills through testing, evaluation, and peer review. Your professional judgment becomes portable industry reputation."
+      }
+    },
+    "howSection": {
+      "label": "Get Started",
+      "title": "Three Steps into the Agent Skill Ecosystem",
+      "desc": "No complex onboarding—go from browsing to contributing in minutes.",
+      "browse": {
+        "title": "Browse and Discover",
+        "desc": "Filter the skill library by category, rating, and risk level to find the right Agent Skill for your scenario."
+      },
+      "publish": {
+        "title": "Use or Publish",
+        "desc": "Call verified skills directly, or register your own Skill so the community can see your capabilities."
+      },
+      "contribute": {
+        "title": "Contribute and Verify",
+        "desc": "Submit usage feedback, test reports, or review opinions. Valuable contributions are recorded in your reputation profile."
+      },
+      "reputation": {
+        "title": "Build Reputation",
+        "desc": "Higher reputation unlocks higher-level skill publishing and verification, along with greater voice and opportunity in the ecosystem."
+      }
+    },
+    "trustBanner": {
+      "title": "Why AgentSkills Is More Trustworthy",
+      "desc": "Every Skill's behavior record, verification history, and contributor reputation are publicly auditable. No black boxes—only verifiable quality. We believe good skills speak for themselves, and good contributors get seen."
+    },
+    "faq": {
+      "label": "FAQ",
+      "title": "Still Have Questions?",
+      "desc": "We've collected the most common questions from new users to help you decide if AgentSkills is right for you.",
+      "q1": "Does it cost anything to join AgentSkills?",
+      "a1": "No. Browsing skills, registering an account, and submitting basic feedback are all free. You only need to invest time and expertise to earn corresponding reputation records.",
+      "q2": "Can I participate without a technical background?",
+      "a2": "Absolutely. You can discover and rate skills as a user; if you have business experience, you can also submit feedback from a practical application perspective. Technical and non-technical reviews are equally valuable.",
+      "q3": "What do I get after publishing a skill?",
+      "a3": "Your skill is indexed in a searchable library and discovered by more users. After verification, it earns reputation bonuses that increase your visibility and trustworthiness in the ecosystem.",
+      "q4": "What is reputation actually good for?",
+      "a4": "Reputation is your credibility credential in this ecosystem. Higher reputation lets you publish and verify higher-level skills, carries more weight in important decisions, and makes you more trustworthy to other users and partners.",
+      "q5": "How is skill quality guaranteed?",
+      "a5": "Every Skill must pass community testing, risk assessment, and peer review. All audit records and contributor reputations are publicly transparent. Low-quality or malicious skills are flagged, while quality skills naturally rank higher.",
+      "q6": "Will my contributions be recorded?",
+      "a6": "Yes. Skills you publish, verifications you submit, and feedback you provide are all recorded as tamper-proof reputation records that become part of your long-term credibility."
+    }
+  },
+  "browser": {
+    "title": "Skill Browser",
+    "subtitle": "Explore community-verified Agent skills",
+    "searchPlaceholder": "Search by skill name, author, or tags...",
+    "filters": {
+      "category": "Category",
+      "riskLevel": "Risk Level",
+      "sortBy": "Sort By"
+    },
+    "riskLevels": {
+      "low": "Low Risk",
+      "medium": "Medium Risk",
+      "high": "High Risk",
+      "critical": "Critical Risk"
+    },
+    "stats": {
+      "totalSkills": "{{count}} skills total",
+      "verified": "Verified",
+      "pending": "Pending"
+    },
+    "empty": "No matching skills found",
+    "loadError": "Failed to load skill list",
+    "uploadPrompt": "Have a skill to share?",
+    "uploadButton": "Upload Now",
+    "likesLeft": "{{count}} likes remaining today",
+    "like": "Like",
+    "likes": "Likes",
+    "dailyLimit": "Daily limit: 5 likes",
+    "likeFailed": "Like failed",
+    "sortOptions": {
+      "reputation": "By Reputation",
+      "likes": "By Likes"
+    },
+    "demoSkills": {
+      "emailSender": "Send emails via an AI agent with templates and recipient management",
+      "webSearch": "Use AI to search the web and summarize results",
+      "calendarHelper": "Manage schedules, reminders, and meeting bookings"
+    }
+  },
+  "demo": {
+    "title": "Protocol Demo",
+    "subtitle": "Experience skill registration, FreeSkill, skill templates, and on-chain verification flows",
+    "live": {
+      "title": "Live Data Demo",
+      "onChainSkills": "On-Chain Skills",
+      "skillList": "On-Chain Skill List",
+      "refresh": "Refresh Data",
+      "noData": "No on-chain skill data yet",
+      "demoHint": "Currently in demo mode. Connect wallet to view live data.",
+      "skill": "Skill",
+      "noDescription": "No description",
+      "stake": "Stake",
+      "flow": {
+        "title": "Protocol Flow",
+        "create": "Create Skill",
+        "risk": "Risk Assessment",
+        "audit": "Security Audit",
+        "stake": "Stake Lock",
+        "finish": "On-Chain Finish"
+      }
+    },
+    "tabs": {
+      "live": "Live Demo",
+      "standard": "Standard",
+      "risk": "Risk Levels",
+      "fingerprint": "Fingerprint",
+      "antislas": "Anti-Slash",
+      "register": "Upload Skill",
+      "freeskill": "FreeSkill",
+      "templates": "Templates",
+      "audit": "Audit Result",
+      "chain": "On-Chain Record"
+    },
+    "status": {
+      "uploading": "Uploading...",
+      "pending": "Pending audit...",
+      "auditing": "Security audit in progress (AI Agent scan)...",
+      "approved": "Audit Approved!",
+      "review": "Needs Manual Review",
+      "rejected": "Audit Rejected",
+      "submitting": "Submitting to chain...",
+      "onChain": "On chain",
+      "failed": "Submission failed"
+    },
+    "register": {
+      "title": "Upload Skill Package",
+      "desc": "Upload a skill package that conforms to the AgentSkills SKILLS_STANDARD.md v1.1",
+      "dropHint": "Drag and drop files here, or click to select",
+      "supportedFormats": "Supports .SKILL.md, .skill.zip, or folder",
+      "selectFile": "Select File",
+      "processing": "Processing...",
+      "submit": "Submit for Audit",
+      "uploadSuccess": "File uploaded, auditing...",
+      "fillRequired": "Please fill in the skill name and description",
+      "formatSkillMd": ".SKILL.md Format",
+      "formatSkillMdDesc": "Single-file format (recommended)\nIncludes YAML frontmatter\nAnd full code",
+      "formatFolder": "Folder Format",
+      "formatFolderDesc": "skill-name/\n├── skill.json (required)\n├── main.py (required)\n└── README.md",
+      "exampleTitle": "Standard Format Example",
+      "exampleDesc": "FreeSkill extends AgentSkills.io. First satisfy base fields, then add governance fields.",
+      "baseFieldsLabel": "AgentSkills.io Base Fields (required)",
+      "baseFieldsCode": "name, description, trigger,\nmetadata (version, author, riskLevel),\nscripts (name, language, code),\nresources",
+      "extensionFieldsLabel": "FreeSkill Governance Extension (add on top)",
+      "extensionFieldsCode": "freeskill (fingerprint, ipfsHash...),\nresponsibility (liability...),\nantiSlash (enabled, slashRate...),\nhumanAuth (required...)",
+      "exampleCode": "---\nname: skill-name                              # AgentSkills base\ndescription: Feature description\ntrigger: \"trigger condition {param}\"\nmetadata:\n  version: \"1.0.0\"\n  author: \"0x...\"\n  riskLevel: \"LOW\"\nscripts:\n  - name: \"main\"\n    language: \"python\"\n    code: |\n      def main(param):\n          return {\"status\": \"ok\"}\nresources: []\n\n# === FreeSkill governance extension ===\nfreeskill:\n  fingerprint: \"0x...\"\n  creator: \"0x...\"\n  ipfsHash: \"Qm...\"\n  stakeRequired: 10\n  standard: \"freeskill\"\nresponsibility:\n  liabilityDeclaration: \"I take full responsibility for this skill's behavior\"\n  scopeDeclaration: \"This skill only accesses declared resources\"\nantiSlash:\n  enabled: true\n  slashRate: 0.5\nhumanAuth:\n  required: [\"stake\", \"submit\"]\n---",
+      "workflowTitle": "Upload Workflow",
+      "workflowSteps": ["Upload", "Auto Parse", "Risk Assessment", "Security Audit", "On-Chain"],
+      "altEntries": {
+        "title": "Need stricter governance standards?",
+        "desc": "Use FreeSkill extensions or skill templates to quickly generate packages with liability declarations, anti-slash mechanisms, and verification workflows.",
+        "freeskill": "View FreeSkill",
+        "templates": "Browse Templates"
+      }
+    },
+    "freeskill": {
+      "title": "FreeSkill Registration",
+      "desc": "Use a minimal declaration format to lower the barrier to publishing.",
+      "uploadEntry": "Back to Standard Upload",
+      "templateEntry": "View Skill Templates",
+      "governanceTitle": "FreeSkill Governance Extension",
+      "governanceDesc": "Based on the AgentSkills trustworthy skill governance standard, complete the responsibility chain.",
+      "readyTitle": "Ready to publish your skill?",
+      "readyDesc": "Your FreeSkill-compliant skill can be uploaded directly to the protocol to earn reputation backing and on-chain verification.",
+      "uploadNow": "Upload Skill Now",
+      "coreIdea": "Core Philosophy",
+      "tagline": "Free by default. Trusted by design.",
+      "taglineDesc": "Freedom from chaos for Skills — making AI skills traceable, attributable, verifiable, and punishable.",
+      "responsibilityChain": "Responsibility Chain",
+      "chainSteps": ["Creator signs liability declaration", "Verifier attests", "Fingerprint anchored to IPFS", "Usage records", "Audit trail on-chain", "Anti-slash penalty"],
+      "comparisonTitle": "Trusted Skill vs Regular Skill",
+      "comparisonDimensions": ["Traceability", "Attribution", "Verification", "Authorization", "Anti-Slash"],
+      "comparisonRegular": "Regular Skill",
+      "comparisonFreeskill": "FreeSkill",
+      "requiredFieldsTitle": "FreeSkill Required Fields",
+      "requiredFieldsCode": "{\n  \"freeskill\": {\n    \"fingerprint\": \"0x...\",\n    \"creator\": \"0x...\",\n    \"ipfsHash\": \"QmXxx...\",\n    \"riskLevel\": \"LOW/MEDIUM/HIGH/CRITICAL\",\n    \"stakeRequired\": 100,\n    \"auditTrail\": []\n  },\n  \"responsibility\": {\n    \"liabilityDeclaration\": \"Liability declaration\"\n  },\n  \"antiSlash\": {\n    \"enabled\": true,\n    \"appealsPeriod\": 7\n  }\n}",
+      "collaborationTitle": "Multi-Agent Collaboration Standards",
+      "collaborationSkills": [
+        { "name": "freeskill-orchestrate", "desc": "Orchestration" },
+        { "name": "freeskill-upgrade", "desc": "Responsibility chain extension" },
+        { "name": "freeskill-audit", "desc": "Security audit" },
+        { "name": "freeskill-evaluate", "desc": "Risk assessment" },
+        { "name": "freeskill-chain", "desc": "On-chain submission" }
+      ],
+      "authCheckpointsTitle": "Human Authorization Checkpoints",
+      "authStepHeader": "Step",
+      "authContentHeader": "Authorization",
+      "authTriggerHeader": "Trigger",
+      "authRows": [
+        { "step": "PRE_UPGRADE", "auth": "Confirm upgrade start", "trigger": "All skills" },
+        { "step": "POST_AUDIT", "auth": "Confirm audit result", "trigger": "HIGH/CRITICAL" },
+        { "step": "RISK_CONFIRM", "auth": "Confirm risk level", "trigger": "All skills" },
+        { "step": "STAKE_CONFIRM", "auth": "Confirm stake", "trigger": "Stake required" },
+        { "step": "CHAIN_SUBMIT", "auth": "Confirm on-chain submission", "trigger": "All submissions" }
+      ]
+    },
+    "templates": {
+      "title": "Skill Templates",
+      "desc": "Start from trusted templates and reuse verified skill structures.",
+      "uploadEntry": "Back to Standard Upload",
+      "freeskillEntry": "Use FreeSkill",
+      "sectionTitle": "FreeSkill Skill Templates",
+      "sectionDesc": "Skill templates based on the FreeSkill standard for creating and upgrading governance-compliant skills.",
+      "bannerTitle": "Start from a Template, Publish Faster",
+      "bannerDesc": "Download a skill template, modify it as needed, then upload it to the protocol for verification and on-chain registration.",
+      "uploadSkill": "Upload Skill",
+      "download": "Download",
+      "templateList": [
+        { "name": "freeskill-create", "desc": "Create a new skill that complies with the FreeSkill standard", "color": "var(--color-primary)", "file": "freeskill-create.FREESKILL.md" },
+        { "name": "freeskill-upgrade", "desc": "Upgrade an existing AgentSkills skill to the FreeSkill standard", "color": "var(--color-purple-600)", "file": "freeskill-upgrade.FREESKILL.md" }
+      ],
+      "stats": {
+        "riskLevel": "Risk Level",
+        "validators": "Validators",
+        "stake": "Stake"
+      },
+      "governanceFieldsTitle": "Added Governance Fields",
+      "fieldHeader": "Field",
+      "descHeader": "Description",
+      "governanceFields": [
+        { "field": "freeskill.fingerprint", "desc": "keccak256 fingerprint for traceability" },
+        { "field": "freeskill.stakeRequired", "desc": "Stake requirement (10/50/100/200 ether)" },
+        { "field": "freeskill.attestationCount", "desc": "Required number of verifiers" },
+        { "field": "responsibility.liabilityDeclaration", "desc": "Creator liability declaration" },
+        { "field": "responsibility.scopeDeclaration", "desc": "Permission boundary declaration" },
+        { "field": "antiSlash.enabled", "desc": "Enable anti-slash mechanism" },
+        { "field": "antiSlash.slashRate", "desc": "Penalty rate (default 50%)" },
+        { "field": "humanAuth.required", "desc": "Human authorization checkpoints" }
+      ]
+    },
+    "audit": {
+      "title": "Audit Details",
+      "rejected": "Audit Failed",
+      "status": {
+        "pending": "Pending Audit",
+        "auditing": "Auditing",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      }
+    },
+    "chain": {
+      "title": "On-Chain Submission",
+      "submitButton": "Submit to Chain",
+      "viewTx": "View Transaction",
+      "success": "On-chain success!",
+      "skillId": "Skill ID",
+      "txHash": "Tx Hash"
+    },
+    "standard": {
+      "title": "Skills Standard v1.1",
+      "coreComponents": "Core Components",
+      "protocolFeatures": "Protocol Features",
+      "components": [
+        { "name": "SkillRegistry", "desc": "Skill registration and state management", "status": "Deployed", "variant": "success" },
+        { "name": "Attribution", "desc": "Contribution attribution and reputation system", "status": "Deployed", "variant": "success" },
+        { "name": "StakingManager", "desc": "Staking and anti-slash mechanism", "status": "Deployed", "variant": "success" },
+        { "name": "ASKToken", "desc": "Point token (delayed issuance)", "status": "Planned", "variant": "warning" }
+      ],
+      "features": [
+        { "title": "Standardized Interface", "desc": "Unified Skill registration, verification, and invocation interface" },
+        { "title": "Fingerprint Traceability", "desc": "keccak256 fingerprints ensure skills are traceable" },
+        { "title": "Risk Tiers", "desc": "LOW/MEDIUM/HIGH/CRITICAL four-level risk assessment" },
+        { "title": "Anti-Slash Mechanism", "desc": "Malicious behavior triggers penalties to protect the community" }
+      ]
+    },
+    "risk": {
+      "title": "Risk Classification",
+      "stakeRequirement": "Stake Requirement",
+      "stakeUnit": "ether",
+      "decisionTreeTitle": "Risk Decision Tree",
+      "decisionTree": "Read-only query → LOW\nUser-controllable files → MEDIUM\nOthers' data/funds → HIGH\nSystem privileges / smart contracts → CRITICAL",
+      "levels": [
+        { "level": "LOW", "icon": "+", "desc": "Read-only operations, no risk", "stake": 10 },
+        { "level": "MEDIUM", "icon": "!", "desc": "Limited write operations", "stake": 50 },
+        { "level": "HIGH", "icon": "!!", "desc": "Involves funds or important data", "stake": 100 },
+        { "level": "CRITICAL", "icon": "!!!", "desc": "Irreversible critical operations", "stake": 200 }
+      ]
+    },
+    "fingerprint": {
+      "title": "Fingerprint Traceability",
+      "howItWorks": "How It Works",
+      "desc": "Each skill generates a unique fingerprint upon creation, used to trace its entire lifecycle. The fingerprint is computed from the IPFS hash, creator address, and timestamp.",
+      "formula": "fingerprint = keccak256(ipfsHash + creator + timestamp)",
+      "inputs": [
+        { "label": "IPFS Hash", "value": "QmXxx...", "desc": "Code storage address" },
+        { "label": "Creator", "value": "0x1234...", "desc": "Wallet address" },
+        { "label": "Timestamp", "value": "1714896000", "desc": "Unix time" }
+      ],
+      "generated": "Fingerprint Generated",
+      "steps": ["Submit to verification pool", "Assign verifiers", "Code review", "Vote consensus", "On-chain finish"],
+      "emptyState": "The fingerprint is generated after the skill passes verification in the on-chain flow and is used to trace its entire lifecycle."
+    },
+    "antislas": {
+      "title": "Anti-Slash Mechanism",
+      "desc": "Malicious behavior triggers penalties to protect the platform and users.",
+      "reputation": "Reputation",
+      "confiscate": "Confiscate {{penalty}}",
+      "penalties": [
+        { "type": "Malicious skill (damaged)", "penalty": "100%", "rep": "-500", "variant": "danger" },
+        { "type": "Malicious skill (no damage)", "penalty": "50%", "rep": "-200", "variant": "warning" },
+        { "type": "Validator negligence", "penalty": "100%", "rep": "-300", "variant": "warning" },
+        { "type": "False report", "penalty": "Full", "rep": "-300", "variant": "info" }
+      ],
+      "appealTitle": "Appeal Process",
+      "appealSteps": ["Receive notice", "Appeal within 7 days", "Elder review", "Result notification"]
+    }
+  },
+  "profile": {
+    "title": "My Reputation",
+    "level": "Current Level",
+    "reputation": "Reputation",
+    "skillsPublished": "Skills Published",
+    "reviewsCompleted": "Reviews Completed",
+    "dailyLikes": "Daily Likes",
+    "levelNames": {
+      "observer": "Observer",
+      "contributor": "Contributor",
+      "trusted": "Trusted",
+      "guardian": "Guardian",
+      "elder": "Elder"
+    }
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "subtitle": "Community contributor reputation ranking",
+    "rank": "Rank",
+    "address": "Address",
+    "reputation": "Reputation",
+    "skills": "Skills",
+    "reviews": "Reviews"
+  },
+  "wallet": {
+    "connect": "Connect Wallet",
+    "connected": "Connected",
+    "disconnect": "Disconnect",
+    "demoMode": "Demo Mode",
+    "status": "Wallet Status",
+    "address": "Address",
+    "balance": "Balance"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "upload": {
+    "noFile": "未上传文件",
+    "success": "文件已上传，审计中"
+  },
+  "job": {
+    "notFound": "任务不存在",
+    "notApproved": "任务未通过审核",
+    "auditRequired": "必须先通过审核才能上链提交",
+    "fileNotFound": "找不到任务文件"
+  },
+  "chain": {
+    "jobIdRequired": "缺少 jobId",
+    "submitting": "正在提交到链上...",
+    "onChain": "已上链",
+    "notConfigured": "未配置真实链，降级为模拟提交",
+    "configHint": "设置 PRIVATE_KEY 和 SKILL_REGISTRY_ADDRESS 以启用真实提交",
+    "balanceTooLow": "提交钱包余额过低：{{balance}} MATIC"
+  },
+  "audit": {
+    "auditing": "安全审核中 (AI Agent 扫描)...",
+    "serviceUnavailable": "审计服务不可用",
+    "completedWithWarnings": "审计完成，但出现警告",
+    "criticalIssues": "发现 {{count}} 个关键安全问题，请在重新提交前修复。",
+    "highIssues": "发现 {{count}} 个高风险问题，建议修复以提升安全性。",
+    "missingGovernance": "缺少必需的治理字段。添加 FreeSkill 元数据以完全合规。",
+    "approvedWithWarnings": "审核通过。建议修复警告以提升质量。",
+    "approvedMinor": "审核通过。有一些小建议可供参考。",
+    "approvedAll": "太棒了！技能通过所有检查。",
+    "summary": "审计完成：{{critical}} 个关键、{{high}} 个高、{{medium}} 个中、{{low}} 个低"
+  },
+  "file": {
+    "invalidType": "不支持的文件类型。允许：{{types}}"
+  }
+}

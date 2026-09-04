@@ -1,0 +1,407 @@
+{
+  "language": {
+    "name": "中文",
+    "switch": "切换语言",
+    "zh": "中文",
+    "en": "English"
+  },
+  "nav": {
+    "start": "开始",
+    "browser": "技能浏览器",
+    "demo": "协议演示",
+    "leaderboard": "排行榜",
+    "dashboard": "激励面板",
+    "selfops": "四自系统",
+    "profile": "我的声誉",
+    "uploadSkill": "上传技能"
+  },
+  "common": {
+    "loading": "加载中...",
+    "error": "出错啦",
+    "retry": "重试",
+    "cancel": "取消",
+    "confirm": "确认",
+    "save": "保存",
+    "submit": "提交",
+    "close": "关闭",
+    "search": "搜索",
+    "filter": "筛选",
+    "sort": "排序",
+    "all": "全部",
+    "none": "无",
+    "yes": "是",
+    "no": "否",
+    "copy": "复制",
+    "copied": "已复制",
+    "loginRequired": "请先注册",
+    "txFailed": "交易失败",
+    "unverifiedSkillWarning": "你点赞了一个未验证技能"
+  },
+  "landing": {
+    "badge": "可信 Agent 技能市场",
+    "title": "发现与共建高质量的 Agent 技能",
+    "subtitle": "AgentSkills 连接技能创作者、使用者和领域专家。每个 Skill 都经过公开验证与声誉背书，让你找工具更放心、发技能被看见、做审核有回报。",
+    "exploreSkills": "探索技能库",
+    "seeValue": "看看你能获得什么",
+    "uploadSkill": "上传技能",
+    "uploadHint": "已有技能？立即发布，获得声誉背书",
+    "valueSection": {
+      "label": "平台价值",
+      "title": "不同角色，都能在这里获得可信价值",
+      "desc": "不管你是想使用 Agent 技能、发布自己的技能，还是成为质量审核专家，AgentSkills 都为你提供透明、可验证的声誉与机会。",
+      "user": {
+        "title": "使用者：用得放心",
+        "desc": "浏览经过验证的 Agent Skills，查看评分、审核记录和创作者声誉。降低试错成本，找到真正可靠的工具。"
+      },
+      "creator": {
+        "title": "创作者：被看见、被信任",
+        "desc": "把你的 Agent 能力发布为 Skill，通过社区验证建立专业声誉。优质技能会获得更多曝光和使用机会。"
+      },
+      "auditor": {
+        "title": "审核者：建立专家影响力",
+        "desc": "通过测试、评估和同行审核为优质技能背书。你的专业判断会转化为可迁移的行业声誉。"
+      }
+    },
+    "howSection": {
+      "label": "如何开始",
+      "title": "三步进入 Agent 技能生态",
+      "desc": "无需复杂流程，从浏览到贡献只需要几分钟。",
+      "browse": {
+        "title": "浏览与发现",
+        "desc": "在技能库中按类别、评分、风险等级筛选，找到适合你场景的 Agent Skill。"
+      },
+      "publish": {
+        "title": "使用或发布",
+        "desc": "直接调用已验证技能；或者注册自己的 Skill，让社区看到你的能力。"
+      },
+      "contribute": {
+        "title": "贡献与验证",
+        "desc": "提交使用反馈、测试报告或审核意见。有价值的贡献会记录在你的声誉档案中。"
+      },
+      "reputation": {
+        "title": "积累声誉",
+        "desc": "声誉越高，你能发布和验证的技能等级越高，在生态中的话语权和机会也越大。"
+      }
+    },
+    "trustBanner": {
+      "title": "为什么 AgentSkills 更可信",
+      "desc": "每个 Skill 的行为记录、验证历史和贡献者声誉都公开可查。没有暗箱操作，只有可验证的质量。我们相信：好技能会自己说话，好贡献者会被看见。"
+    },
+    "faq": {
+      "label": "常见问题",
+      "title": "你还有这些疑问吗？",
+      "desc": "我们整理了大多数新用户最关心的问题，帮你更快判断 AgentSkills 是否适合你。",
+      "q1": "参与 AgentSkills 需要付费吗？",
+      "a1": "不需要。浏览技能、注册账户、提交基础反馈都不收费。你只需投入时间和专业能力，就能获得对应的声誉记录。",
+      "q2": "没有技术背景可以参与吗？",
+      "a2": "当然可以。你可以作为使用者发现并评价技能；如果你有业务经验，也可以从实际应用角度提交反馈。技术和非技术视角的审核同样有价值。",
+      "q3": "发布技能后我能获得什么？",
+      "a3": "你的技能会被收录进可搜索的技能库，被更多用户发现；通过验证后还会获得声誉加成，提升你在生态中的可见度和信任度。",
+      "q4": "声誉到底有什么用？",
+      "a4": "声誉是你在这个生态中的可信度凭证。声誉越高，你可以发布和验证的技能等级越高，参与重要决策的权重也越大，同时更容易被其他用户和合作方信任。",
+      "q5": "怎么保证技能质量？",
+      "a5": "每个 Skill 都需要经过社区测试、风险评估和同行审核；所有审核记录和贡献者声誉都公开透明。低质或恶意技能会被标记，优质技能会自然获得更高排名。",
+      "q6": "我的贡献会被记录吗？",
+      "a6": "会。你发布的技能、提交的验证、提供的反馈都会被记录为不可篡改的声誉记录，成为你长期可信度的组成部分。"
+    }
+  },
+  "browser": {
+    "title": "技能浏览器",
+    "subtitle": "探索社区验证过的 Agent 技能",
+    "searchPlaceholder": "搜索技能名称、作者或标签...",
+    "filters": {
+      "category": "类别",
+      "riskLevel": "风险等级",
+      "sortBy": "排序"
+    },
+    "riskLevels": {
+      "low": "低风险",
+      "medium": "中风险",
+      "high": "高风险",
+      "critical": "极高风险"
+    },
+    "stats": {
+      "totalSkills": "共 {{count}} 个技能",
+      "verified": "已验证",
+      "pending": "审核中"
+    },
+    "empty": "没有找到匹配的技能",
+    "loadError": "加载技能列表失败",
+    "uploadPrompt": "有技能想分享？",
+    "uploadButton": "立即上传",
+    "likesLeft": "今日还可点赞 {{count}} 次",
+    "like": "点赞",
+    "likes": "点赞",
+    "dailyLimit": "每日限制：5 次点赞",
+    "likeFailed": "点赞失败",
+    "sortOptions": {
+      "reputation": "按声誉排序",
+      "likes": "按点赞数"
+    },
+    "demoSkills": {
+      "emailSender": "通过 AI 代理发送邮件，支持模板与收件人管理",
+      "webSearch": "使用 AI 进行网络搜索并汇总结果",
+      "calendarHelper": "管理日程安排、提醒与会议预订"
+    }
+  },
+  "demo": {
+    "title": "协议演示",
+    "subtitle": "体验技能注册、FreeSkill、技能模板与链上验证流程",
+    "live": {
+      "title": "实时数据演示",
+      "onChainSkills": "链上技能",
+      "skillList": "链上技能列表",
+      "refresh": "刷新数据",
+      "noData": "链上暂无技能数据",
+      "demoHint": "当前处于演示模式，连接钱包以查看实时数据",
+      "skill": "技能",
+      "noDescription": "暂无描述",
+      "stake": "质押",
+      "flow": {
+        "title": "协议流程",
+        "create": "创建技能",
+        "risk": "风险评估",
+        "audit": "安全审核",
+        "stake": "质押锁定",
+        "finish": "上链完成"
+      }
+    },
+    "tabs": {
+      "live": "实时演示",
+      "standard": "标准规范",
+      "risk": "风险分类",
+      "fingerprint": "指纹机制",
+      "antislas": "反噬机制",
+      "register": "上传技能",
+      "freeskill": "FreeSkill",
+      "templates": "技能模板",
+      "audit": "审计结果",
+      "chain": "链上记录"
+    },
+    "status": {
+      "uploading": "上传中...",
+      "pending": "等待审核...",
+      "auditing": "安全审核中 (AI Agent 扫描)...",
+      "approved": "审核通过!",
+      "review": "需要人工复审",
+      "rejected": "审核拒绝",
+      "submitting": "提交上链中...",
+      "onChain": "已上链",
+      "failed": "提交失败"
+    },
+    "register": {
+      "title": "上传技能包",
+      "desc": "基于 SKILLS_STANDARD.md v1.1 规范，上传符合 AgentSkills 标准的技能包",
+      "dropHint": "拖拽文件到此处，或点击选择文件",
+      "supportedFormats": "支持 .SKILL.md、.skill.zip 或文件夹",
+      "selectFile": "选择文件",
+      "processing": "处理中...",
+      "submit": "提交审计",
+      "uploadSuccess": "文件已上传，正在审计...",
+      "fillRequired": "请填写技能名称和描述",
+      "formatSkillMd": ".SKILL.md 格式",
+      "formatSkillMdDesc": "单文件格式（推荐）\n包含 YAML frontmatter\n和完整代码",
+      "formatFolder": "文件夹格式",
+      "formatFolderDesc": "skill-name/\n├── skill.json (必需)\n├── main.py (必需)\n└── README.md",
+      "exampleTitle": "标准格式示例",
+      "exampleDesc": "FreeSkill 在 AgentSkills.io 基础上扩展，先满足基础字段，再添加治理字段",
+      "baseFieldsLabel": "AgentSkills.io 基础字段（必须有）",
+      "baseFieldsCode": "name, description, trigger,\nmetadata (version, author, riskLevel),\nscripts (name, language, code),\nresources",
+      "extensionFieldsLabel": "FreeSkill 治理扩展（在其基础上增加）",
+      "extensionFieldsCode": "freeskill (fingerprint, ipfsHash...),\nresponsibility (liability...),\nantiSlash (enabled, slashRate...),\nhumanAuth (required...)",
+      "exampleCode": "---\nname: skill-name                              # AgentSkills 基础\ndescription: 功能描述\ntrigger: \"触发条件 {param}\"\nmetadata:\n  version: \"1.0.0\"\n  author: \"0x...\"\n  riskLevel: \"LOW\"\nscripts:\n  - name: \"main\"\n    language: \"python\"\n    code: |\n      def main(param):\n          return {\"status\": \"ok\"}\nresources: []\n\n# === FreeSkill 治理扩展 ===\nfreeskill:\n  fingerprint: \"0x...\"\n  creator: \"0x...\"\n  ipfsHash: \"Qm...\"\n  stakeRequired: 10\n  standard: \"freeskill\"\nresponsibility:\n  liabilityDeclaration: \"我对此技能行为负全部责任\"\n  scopeDeclaration: \"此技能仅访问声明的资源\"\nantiSlash:\n  enabled: true\n  slashRate: 0.5\nhumanAuth:\n  required: [\"stake\", \"submit\"]\n---",
+      "workflowTitle": "上传后流程",
+      "workflowSteps": ["上传", "自动解析", "风险评估", "安全审核", "上链"],
+      "altEntries": {
+        "title": "需要更严格的治理标准？",
+        "desc": "使用 FreeSkill 扩展或技能模板，快速生成带责任声明、反噬机制和验证流程的技能包。",
+        "freeskill": "查看 FreeSkill",
+        "templates": "浏览技能模板"
+      }
+    },
+    "freeskill": {
+      "title": "FreeSkill 注册",
+      "desc": "使用最小化声明格式，降低发布门槛。",
+      "uploadEntry": "返回标准上传",
+      "templateEntry": "查看技能模板",
+      "governanceTitle": "FreeSkill 治理扩展",
+      "governanceDesc": "基于 AgentSkills 的可信技能治理标准，补充完整责任链。",
+      "readyTitle": "准备好发布技能了吗？",
+      "readyDesc": "你的 FreeSkill 规范技能可以直接上传到协议中，获得声誉背书与链上验证。",
+      "uploadNow": "立即上传技能",
+      "coreIdea": "核心理念",
+      "tagline": "Free by default. Trusted by design.",
+      "taglineDesc": "让 Skill 免于混乱的自由 — 让 AI 技能可追溯、可归因、可验证、可惩罚",
+      "responsibilityChain": "责任链（Responsibility Chain）",
+      "chainSteps": ["创建者签署责任声明", "验证者背书", "指纹锚定 IPFS", "使用记录", "审计追踪上链", "反噬惩罚"],
+      "comparisonTitle": "可信技能 vs 普通技能",
+      "comparisonDimensions": ["追溯", "归因", "验证", "授权", "反噬"],
+      "comparisonRegular": "普通技能",
+      "comparisonFreeskill": "FreeSkill",
+      "requiredFieldsTitle": "FreeSkill 必需字段",
+      "requiredFieldsCode": "{\n  \"freeskill\": {\n    \"fingerprint\": \"0x...\",\n    \"creator\": \"0x...\",\n    \"ipfsHash\": \"QmXxx...\",\n    \"riskLevel\": \"LOW/MEDIUM/HIGH/CRITICAL\",\n    \"stakeRequired\": 100,\n    \"auditTrail\": []\n  },\n  \"responsibility\": {\n    \"liabilityDeclaration\": \"责任声明\"\n  },\n  \"antiSlash\": {\n    \"enabled\": true,\n    \"appealsPeriod\": 7\n  }\n}",
+      "collaborationTitle": "多 Agent 协作标准",
+      "collaborationSkills": [
+        { "name": "freeskill-orchestrate", "desc": "编排协调" },
+        { "name": "freeskill-upgrade", "desc": "补充责任链" },
+        { "name": "freeskill-audit", "desc": "安全审核" },
+        { "name": "freeskill-evaluate", "desc": "风险评估" },
+        { "name": "freeskill-chain", "desc": "链上提交" }
+      ],
+      "authCheckpointsTitle": "人类授权检查点",
+      "authStepHeader": "步骤",
+      "authContentHeader": "授权内容",
+      "authTriggerHeader": "触发条件",
+      "authRows": [
+        { "step": "PRE_UPGRADE", "auth": "确认开始升级", "trigger": "所有技能" },
+        { "step": "POST_AUDIT", "auth": "确认审核结果", "trigger": "HIGH/CRITICAL" },
+        { "step": "RISK_CONFIRM", "auth": "确认风险等级", "trigger": "所有技能" },
+        { "step": "STAKE_CONFIRM", "auth": "确认质押", "trigger": "需要质押" },
+        { "step": "CHAIN_SUBMIT", "auth": "确认链上提交", "trigger": "所有提交" }
+      ]
+    },
+    "templates": {
+      "title": "技能模板",
+      "desc": "从可信模板开始，复用经过验证的技能结构。",
+      "uploadEntry": "返回标准上传",
+      "freeskillEntry": "使用 FreeSkill",
+      "sectionTitle": "FreeSkill 技能模板",
+      "sectionDesc": "基于 FreeSkill 规范的技能模板，用于创建和升级符合治理标准的技能",
+      "bannerTitle": "从模板开始，更快发布",
+      "bannerDesc": "下载技能模板并按需修改后，上传到协议中完成验证与上链。",
+      "uploadSkill": "上传技能",
+      "download": "下载",
+      "templateList": [
+        { "name": "freeskill-create", "desc": "创建符合 FreeSkill 规范的新技能", "color": "var(--color-primary)", "file": "freeskill-create.FREESKILL.md" },
+        { "name": "freeskill-upgrade", "desc": "将现有 AgentSkills 技能升级为 FreeSkill 规范", "color": "var(--color-purple-600)", "file": "freeskill-upgrade.FREESKILL.md" }
+      ],
+      "stats": {
+        "riskLevel": "风险等级",
+        "validators": "验证者",
+        "stake": "质押"
+      },
+      "governanceFieldsTitle": "添加的治理字段",
+      "fieldHeader": "字段",
+      "descHeader": "说明",
+      "governanceFields": [
+        { "field": "freeskill.fingerprint", "desc": "keccak256 指纹，用于追溯" },
+        { "field": "freeskill.stakeRequired", "desc": "质押要求 (10/50/100/200 ether)" },
+        { "field": "freeskill.attestationCount", "desc": "验证者数量要求" },
+        { "field": "responsibility.liabilityDeclaration", "desc": "创建者责任声明" },
+        { "field": "responsibility.scopeDeclaration", "desc": "权限边界声明" },
+        { "field": "antiSlash.enabled", "desc": "启用反噬机制" },
+        { "field": "antiSlash.slashRate", "desc": "惩罚比例 (默认 50%)" },
+        { "field": "humanAuth.required", "desc": "人类授权检查点" }
+      ]
+    },
+    "audit": {
+      "title": "审计详情",
+      "rejected": "审核失败",
+      "status": {
+        "pending": "等待审计",
+        "auditing": "审计中",
+        "approved": "已通过",
+        "rejected": "未通过"
+      }
+    },
+    "chain": {
+      "title": "链上提交",
+      "submitButton": "提交到链上",
+      "viewTx": "查看交易",
+      "success": "上链成功!",
+      "skillId": "Skill ID",
+      "txHash": "Tx Hash"
+    },
+    "standard": {
+      "title": "Skills 标准规范 v1.1",
+      "coreComponents": "核心组件",
+      "protocolFeatures": "协议特性",
+      "components": [
+        { "name": "SkillRegistry", "desc": "技能注册与状态管理", "status": "已部署", "variant": "success" },
+        { "name": "Attribution", "desc": "贡献归因与声望系统", "status": "已部署", "variant": "success" },
+        { "name": "StakingManager", "desc": "质押与反噬机制", "status": "已部署", "variant": "success" },
+        { "name": "ASKToken", "desc": "积分代币（延迟发行）", "status": "规划中", "variant": "warning" }
+      ],
+      "features": [
+        { "title": "标准化接口", "desc": "统一的 Skill 注册、验证、调用接口" },
+        { "title": "指纹追溯", "desc": "keccak256 指纹确保技能可追溯" },
+        { "title": "风险分级", "desc": "LOW/MEDIUM/HIGH/CRITICAL 四级风险评估" },
+        { "title": "反噬机制", "desc": "恶意行为触发惩罚，保护社区" }
+      ]
+    },
+    "risk": {
+      "title": "风险等级分类",
+      "stakeRequirement": "质押要求",
+      "stakeUnit": "ether",
+      "decisionTreeTitle": "风险分类决策树",
+      "decisionTree": "只读查询 → LOW\n用户可控文件 → MEDIUM\n他人数据/资金 → HIGH\n系统权限/智能合约 → CRITICAL",
+      "levels": [
+        { "level": "LOW", "icon": "+", "desc": "只读操作，无风险", "stake": 10 },
+        { "level": "MEDIUM", "icon": "!", "desc": "有限写入操作", "stake": 50 },
+        { "level": "HIGH", "icon": "!!", "desc": "涉及资金或重要数据", "stake": 100 },
+        { "level": "CRITICAL", "icon": "!!!", "desc": "不可逆关键操作", "stake": 200 }
+      ]
+    },
+    "fingerprint": {
+      "title": "指纹追溯机制",
+      "howItWorks": "工作原理",
+      "desc": "每个技能创建时生成唯一指纹（fingerprint），用于追溯整个生命周期。指纹基于 IPFS 哈希、创建者地址和时间戳计算。",
+      "formula": "fingerprint = keccak256(ipfsHash + creator + timestamp)",
+      "inputs": [
+        { "label": "IPFS 哈希", "value": "QmXxx...", "desc": "代码存储地址" },
+        { "label": "创建者", "value": "0x1234...", "desc": "钱包地址" },
+        { "label": "时间戳", "value": "1714896000", "desc": "Unix 时间" }
+      ],
+      "generated": "指纹已生成",
+      "steps": ["提交验证池", "分配验证者", "代码审查", "投票共识", "上链完成"],
+      "emptyState": "指纹在上链技能流程中通过验证后生成，用于追溯整个生命周期"
+    },
+    "antislas": {
+      "title": "反噬机制（Anti-Slash）",
+      "desc": "恶意行为将触发惩罚，保护平台和用户权益。",
+      "reputation": "声望",
+      "confiscate": "没收 {{penalty}}",
+      "penalties": [
+        { "type": "恶意技能（已损害）", "penalty": "100%", "rep": "-500", "variant": "danger" },
+        { "type": "恶意技能（未损害）", "penalty": "50%", "rep": "-200", "variant": "warning" },
+        { "type": "验证者失职", "penalty": "100%", "rep": "-300", "variant": "warning" },
+        { "type": "虚假举报", "penalty": "全额", "rep": "-300", "variant": "info" }
+      ],
+      "appealTitle": "申诉流程",
+      "appealSteps": ["收到通知", "7天内申诉", "长老团审核", "结果通知"]
+    }
+  },
+  "profile": {
+    "title": "我的声誉",
+    "level": "当前等级",
+    "reputation": "声誉值",
+    "skillsPublished": "已发布技能",
+    "reviewsCompleted": "已完成审核",
+    "dailyLikes": "今日点赞",
+    "levelNames": {
+      "observer": "观察员",
+      "contributor": "贡献者",
+      "trusted": "信用者",
+      "guardian": "守护者",
+      "elder": "长者"
+    }
+  },
+  "leaderboard": {
+    "title": "排行榜",
+    "subtitle": "社区贡献者声誉榜单",
+    "rank": "排名",
+    "address": "地址",
+    "reputation": "声誉",
+    "skills": "技能数",
+    "reviews": "审核数"
+  },
+  "wallet": {
+    "connect": "连接钱包",
+    "connected": "已连接",
+    "disconnect": "断开连接",
+    "demoMode": "演示模式",
+    "status": "钱包状态",
+    "address": "地址",
+    "balance": "余额"
+  }
+}
