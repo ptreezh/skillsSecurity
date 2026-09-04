@@ -112,7 +112,7 @@ async function runAudit(skillContent, skillName, locale = 'zh-CN') {
 			try { fs.unlinkSync(tmpScript); } catch (e) {}
 
 			// 计算独立性评分
-			const independenceScore = calculateIndependenceScore(skillContent);
+			const independenceScore = calculateIndependenceScore(skillContent, locale);
 
 			if (code === 0 && stdout) {
 				try {
@@ -149,7 +149,7 @@ async function runAudit(skillContent, skillName, locale = 'zh-CN') {
 				summary: t(locale, 'audit.serviceUnavailable'),
 				recommendation: 'needs_review',
 				error: err.message,
-				independence: calculateIndependenceScore(skillContent)
+				independence: calculateIndependenceScore(skillContent, locale)
 			});
 		});
 	});

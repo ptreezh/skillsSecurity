@@ -31,5 +31,36 @@
   },
   "file": {
     "invalidType": "Invalid file type. Allowed: {{types}}"
+  },
+  "independence": {
+    "features": {
+      "noNetwork": "Pure local computation, no external dependencies",
+      "envVar": "Uses environment variables for secrets",
+      "timeout": "Has timeout settings",
+      "errorHandling": "Has error handling",
+      "tempFile": "Uses temporary files"
+    },
+    "warnings": {
+      "network": "Contains external network calls",
+      "dynamicInstall": "Dynamic package installation (may affect portability)",
+      "noTimeout": "No timeout setting (recommend adding timeout=)",
+      "dangerousDownload": "Downloads executable files (verify source)",
+      "sensitiveNetwork": "Possible data exfiltration (verify target)"
+    },
+    "suggestions": {
+      "addTimeout": "Add timeout parameter: requests.get(url, timeout=30)",
+      "cacheOrOffline": "Consider caching results or providing offline mode",
+      "removeDynamicInstall": "Recommendation: remove dynamic installation and use pre-installed dependencies"
+    },
+    "labels": {
+      "high": "Highly independent",
+      "medium": "Relatively independent",
+      "someDeps": "Has external dependencies",
+      "strongDeps": "Strong external dependencies",
+      "highlyDependent": "Highly dependent"
+    },
+    "summary": "Independence score: {{score}} ({{grade}})",
+    "summaryWithWarnings": "{{summary}}, {{count}} suggestions",
+    "summaryExcellent": "{{summary}}, excellent performance!"
   }
 }

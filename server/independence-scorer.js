@@ -1,24 +1,26 @@
 /**
- * 独立性评分器 (Independence Scorer)
+ * Independence Scorer
  *
- * 原则: 开发者友好，加分制，无阻塞
- * 评分范围: 0-100
+ * Principle: developer-friendly, bonus-based, non-blocking
+ * Score range: 0-100
  *
- * 加分项:
- *   +20: 无外部网络调用 (纯本地计算)
- *   +15: 使用环境变量存储密钥
- *   +10: 有超时设置
- *   +10: 有错误处理
- *   +5: 使用临时文件
+ * Bonus points:
+ *   +20: No external network calls (pure local computation)
+ *   +15: Uses environment variables for secrets
+ *   +10: Has timeout settings
+ *   +10: Has error handling
+ *   +5: Uses temporary files
  *
- * 警告项 (不影响分数):
- *   - 动态包安装
- *   - 下载可执行文件
- *   - 无超时设置
+ * Warnings (do not affect score):
+ *   - Dynamic package installation
+ *   - Downloading executable files
+ *   - No timeout setting
  */
 
+const { t } = require('./i18n');
+
 const PATTERNS = {
-  // 网络调用模式 (警告)
+  // Network call patterns (warning)
   NETWORK_CALLS: [
     /requests\.(get|post|put|delete|patch)/i,
     /urllib\.request|urlopen/i,
@@ -30,12 +32,12 @@ const PATTERNS = {
     /curl\s+/i,
   ],
 
-  // 危险下载模式 (警告)
+  // Dangerous download patterns (warning)
   DANGEROUS_DOWNLOAD: [
     /\.(exe|bat|cmd|vbs|ps1|sh|bash)\s*$/i,
   ],
 
-  // 动态安装模式 (警告)
+  // Dynamic installation patterns (warning)
   DYNAMIC_INSTALL: [
     /pip\s+install/i,
     /pip3\s+install/i,
@@ -44,118 +46,120 @@ const PATTERNS = {
     /os\.system.*install/i,
   ],
 
-  // 加分模式
+  // Bonus patterns
   BONUS_PATTERNS: {
     NO_NETWORK: {
       pattern: /^(?!.*(?:http|requests|urllib|axios|fetch|wget|curl))(?!.*(?:import\s+\w+\s*$))/s,
       score: 20,
-      feature: '纯本地计算，无外部依赖'
+      feature: 'noNetwork'
     },
     ENV_VAR: {
       pattern: /os\.getenv|os\.environ\.get|process\.env/i,
       score: 15,
-      feature: '使用环境变量存储密钥'
+      feature: 'envVar'
     },
     TIMEOUT: {
       pattern: /timeout\s*=\s*[0-9]+|timeout\s*=\s*[a-z_]+\.seconds/i,
       score: 10,
-      feature: '有超时设置'
+      feature: 'timeout'
     },
     ERROR_HANDLING: {
       pattern: /try\s*:|except\s*:|catch\s*\(|if\s+error/i,
       score: 10,
-      feature: '有错误处理'
+      feature: 'errorHandling'
     },
     TEMP_FILE: {
       pattern: /tempfile\.|NamedTemporaryFile|mktemp/i,
       score: 5,
-      feature: '使用临时文件'
+      feature: 'tempFile'
     },
   }
 };
 
-// 警告消息
-const WARNING_MESSAGES = {
-  NETWORK: '包含外部网络调用',
-  DYNAMIC_INSTALL: '动态包安装 (可能影响可移植性)',
-  NO_TIMEOUT: '无超时设置 (建议添加 timeout=)',
-  DANGEROUS_DOWNLOAD: '下载可执行文件 (需确认来源)',
-  SENSITIVE_NETWORK: '可能的数据外发 (需确认目标)',
+const WARNING_KEYS = {
+  NETWORK: 'network',
+  DYNAMIC_INSTALL: 'dynamicInstall',
+  NO_TIMEOUT: 'noTimeout',
+  DANGEROUS_DOWNLOAD: 'dangerousDownload',
+  SENSITIVE_NETWORK: 'sensitiveNetwork',
 };
 
 /**
- * 计算独立性评分
- * @param {string} skillContent - Skill 内容
- * @returns {Object} 评分结果
+ * Calculate independence score
+ * @param {string} skillContent - Skill content
+ * @param {string} locale - Locale, e.g. 'zh-CN' or 'en-US'
+ * @returns {Object} Score result
  */
-function calculateIndependenceScore(skillContent) {
+function calculateIndependenceScore(skillContent, locale = 'zh-CN') {
   const code = skillContent || '';
-  let score = 50; // 基础分
+  let score = 50; // base score
   const features = [];
   const warnings = [];
   const suggestions = [];
 
-  // 检查加分项
+  const _t = (key, data) => t(locale, `independence.${key}`, data);
+
+  // Check bonus points
   const bonuses = [];
 
-  // 1. 无外部网络调用 +20
+  // 1. No external network calls +20
   const hasNetworkCall = PATTERNS.NETWORK_CALLS.some(p => p.test(code));
   const hasDangerousDownload = PATTERNS.DANGEROUS_DOWNLOAD.some(p => p.test(code));
 
   if (!hasNetworkCall && !hasDangerousDownload) {
-    bonuses.push({ score: 20, feature: PATTERNS.BONUS_PATTERNS.NO_NETWORK.feature });
+    bonuses.push({ score: 20, featureKey: PATTERNS.BONUS_PATTERNS.NO_NETWORK.feature });
   }
 
-  // 2. 使用环境变量 +15
+  // 2. Uses environment variables +15
   if (PATTERNS.BONUS_PATTERNS.ENV_VAR.pattern.test(code)) {
-    bonuses.push({ score: 15, feature: PATTERNS.BONUS_PATTERNS.ENV_VAR.feature });
+    bonuses.push({ score: 15, featureKey: PATTERNS.BONUS_PATTERNS.ENV_VAR.feature });
   }
 
-  // 3. 有超时设置 +10
+  // 3. Has timeout setting +10
   if (PATTERNS.BONUS_PATTERNS.TIMEOUT.pattern.test(code)) {
-    bonuses.push({ score: 10, feature: PATTERNS.BONUS_PATTERNS.TIMEOUT.feature });
+    bonuses.push({ score: 10, featureKey: PATTERNS.BONUS_PATTERNS.TIMEOUT.feature });
   } else if (hasNetworkCall) {
-    warnings.push(WARNING_MESSAGES.NO_TIMEOUT);
-    suggestions.push('添加 timeout 参数: requests.get(url, timeout=30)');
+    warnings.push(_t('warnings.noTimeout'));
+    suggestions.push(_t('suggestions.addTimeout'));
   }
 
-  // 4. 有错误处理 +10
+  // 4. Has error handling +10
   if (PATTERNS.BONUS_PATTERNS.ERROR_HANDLING.pattern.test(code)) {
-    bonuses.push({ score: 10, feature: PATTERNS.BONUS_PATTERNS.ERROR_HANDLING.feature });
+    bonuses.push({ score: 10, featureKey: PATTERNS.BONUS_PATTERNS.ERROR_HANDLING.feature });
   }
 
-  // 5. 使用临时文件 +5
+  // 5. Uses temporary files +5
   if (PATTERNS.BONUS_PATTERNS.TEMP_FILE.pattern.test(code)) {
-    bonuses.push({ score: 5, feature: PATTERNS.BONUS_PATTERNS.TEMP_FILE.feature });
+    bonuses.push({ score: 5, featureKey: PATTERNS.BONUS_PATTERNS.TEMP_FILE.feature });
   }
 
-  // 计算总分
+  // Calculate total score
   bonuses.forEach(b => {
     score += b.score;
-    features.push('✓ ' + b.feature);
+    features.push('✓ ' + _t(`features.${b.featureKey}`));
   });
 
-  // 添加警告
+  // Add warnings
   if (hasNetworkCall && !hasDangerousDownload) {
-    warnings.push(WARNING_MESSAGES.NETWORK);
-    suggestions.push('考虑: 缓存结果或提供离线模式');
+    warnings.push(_t('warnings.network'));
+    suggestions.push(_t('suggestions.cacheOrOffline'));
   }
 
   if (hasDangerousDownload) {
-    warnings.push(WARNING_MESSAGES.DANGEROUS_DOWNLOAD);
+    warnings.push(_t('warnings.dangerousDownload'));
   }
 
   PATTERNS.DYNAMIC_INSTALL.forEach(p => {
     if (p.test(code)) {
-      warnings.push(WARNING_MESSAGES.DYNAMIC_INSTALL);
-      suggestions.push('建议: 移除动态安装，改用预装依赖');
+      warnings.push(_t('warnings.dynamicInstall'));
+      suggestions.push(_t('suggestions.removeDynamicInstall'));
     }
   });
 
-  // 边界处理
+  // Boundary handling
   score = Math.max(0, Math.min(100, score));
 
-  // 计算等级
+  // Calculate grade
   const grade = getGrade(score);
 
   return {
@@ -164,15 +168,15 @@ function calculateIndependenceScore(skillContent) {
     features,
     warnings,
     suggestions,
-    summary: getSummary(score, warnings.length),
-    // 兼容性字段
+    summary: getSummary(score, warnings.length, locale),
+    // Compatibility fields
     indep: score,
-    label: getLabel(score),
+    label: getLabel(score, locale),
   };
 }
 
 /**
- * 获取等级
+ * Get grade
  */
 function getGrade(score) {
   if (score >= 90) return 'A';
@@ -183,25 +187,27 @@ function getGrade(score) {
 }
 
 /**
- * 获取标签
+ * Get label
  */
-function getLabel(score) {
-  if (score >= 90) return '高度独立';
-  if (score >= 70) return '较独立';
-  if (score >= 50) return '有外部依赖';
-  if (score >= 30) return '强外部依赖';
-  return '高度依赖';
+function getLabel(score, locale = 'zh-CN') {
+  const _t = (key) => t(locale, `independence.labels.${key}`);
+  if (score >= 90) return _t('high');
+  if (score >= 70) return _t('medium');
+  if (score >= 50) return _t('someDeps');
+  if (score >= 30) return _t('strongDeps');
+  return _t('highlyDependent');
 }
 
 /**
- * 获取摘要
+ * Get summary
  */
-function getSummary(score, warningCount) {
-  const base = `独立性评分: ${score}分 (${getGrade(score)})`;
+function getSummary(score, warningCount, locale = 'zh-CN') {
+  const _t = (key, data) => t(locale, `independence.${key}`, data);
+  const base = _t('summary', { score, grade: getGrade(score) });
   if (warningCount > 0) {
-    return `${base}, 有 ${warningCount} 项建议`;
+    return _t('summaryWithWarnings', { summary: base, count: warningCount });
   }
-  return `${base}, 表现优秀!`;
+  return _t('summaryExcellent', { summary: base });
 }
 
 module.exports = {

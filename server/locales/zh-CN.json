@@ -31,5 +31,36 @@
   },
   "file": {
     "invalidType": "不支持的文件类型。允许：{{types}}"
+  },
+  "independence": {
+    "features": {
+      "noNetwork": "纯本地计算，无外部依赖",
+      "envVar": "使用环境变量存储密钥",
+      "timeout": "有超时设置",
+      "errorHandling": "有错误处理",
+      "tempFile": "使用临时文件"
+    },
+    "warnings": {
+      "network": "包含外部网络调用",
+      "dynamicInstall": "动态包安装（可能影响可移植性）",
+      "noTimeout": "无超时设置（建议添加 timeout=）",
+      "dangerousDownload": "下载可执行文件（需确认来源）",
+      "sensitiveNetwork": "可能的数据外发（需确认目标）"
+    },
+    "suggestions": {
+      "addTimeout": "添加 timeout 参数: requests.get(url, timeout=30)",
+      "cacheOrOffline": "考虑: 缓存结果或提供离线模式",
+      "removeDynamicInstall": "建议: 移除动态安装，改用预装依赖"
+    },
+    "labels": {
+      "high": "高度独立",
+      "medium": "较独立",
+      "someDeps": "有外部依赖",
+      "strongDeps": "强外部依赖",
+      "highlyDependent": "高度依赖"
+    },
+    "summary": "独立性评分: {{score}}分 ({{grade}})",
+    "summaryWithWarnings": "{{summary}}, 有 {{count}} 项建议",
+    "summaryExcellent": "{{summary}}, 表现优秀!"
   }
 }
