@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>责任盾牌 · 宣传短片分镜脚本</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --void:#060912; --shield:#3b5cff; --shield-glow:#6d8bff; --chain:#00e0a4;
+    --warn:#ff4757; --gold:#ffd60a; --text:#e8ecf5; --dim:#8893b0;
+    --card:rgba(18,24,40,.72); --border:rgba(99,102,241,.28);
+  }
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;
+    background:var(--void);color:var(--text);line-height:1.75;overflow-x:hidden;
+  }
+  body::before{
+    content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(ellipse 60% 50% at 20% 15%,rgba(59,92,255,.12),transparent 60%),
+      radial-gradient(ellipse 50% 40% at 85% 80%,rgba(0,224,164,.08),transparent 55%),
+      linear-gradient(180deg,#060912 0%,#080d1a 100%);
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+
+  /* —— HERO —— */
+  .hero{padding:120px 0 80px;text-align:center}
+  .hero .tag{display:inline-block;font-size:12px;letter-spacing:4px;color:var(--shield-glow);
+    border:1px solid var(--border);border-radius:100px;padding:6px 18px;margin-bottom:32px}
+  .hero h1{font-size:clamp(36px,6vw,72px);font-weight:900;letter-spacing:-1px;line-height:1.1;margin-bottom:24px}
+  .hero h1 .void{background:linear-gradient(135deg,#ff4757,#ffd60a);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero h1 .guard{background:linear-gradient(135deg,#3b5cff,#00e0a4);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero .sub{font-size:clamp(15px,2vw,19px);color:var(--dim);max-width:640px;margin:0 auto 16px}
+  .hero .meta{display:flex;gap:32px;justify-content:center;flex-wrap:wrap;margin-top:36px;font-size:13px;color:var(--dim)}
+  .hero .meta b{color:var(--text);font-weight:700}
+
+  /* —— ACT NAV —— */
+  .acts{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:64px 0 0}
+  .acts a{font-size:13px;color:var(--dim);text-decoration:none;padding:8px 20px;border-radius:100px;
+    border:1px solid var(--border);transition:.25s}
+  .acts a:hover{color:var(--text);border-color:var(--shield);background:rgba(59,92,255,.1)}
+
+  /* —— SECTION —— */
+  .section{padding:72px 0;border-top:1px solid rgba(99,102,241,.12)}
+  .act-header{display:flex;align-items:center;gap:20px;margin-bottom:48px}
+  .act-num{font-size:14px;font-weight:800;letter-spacing:3px;color:var(--shield-glow);
+    border:2px solid var(--shield);width:52px;height:52px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .act-title h2{font-size:28px;font-weight:800}
+  .act-title p{color:var(--dim);font-size:14px;margin-top:4px}
+  .act-time{margin-left:auto;font-size:13px;color:var(--shield-glow);font-weight:700;white-space:nowrap}
+
+  /* —— SHOT —— */
+  .shot{display:grid;grid-template-columns:280px 1fr;gap:28px;margin-bottom:36px}
+  .frame{
+    aspect-ratio:16/9;border-radius:14px;overflow:hidden;position:relative;
+    border:1px solid var(--border);background:#0a0f1e;flex-shrink:0;
+  }
+  .frame canvas{width:100%;height:100%;display:block}
+  .frame-badge{position:absolute;top:10px;left:10px;font-size:10px;font-weight:800;
+    letter-spacing:1px;padding:3px 10px;border-radius:100px;backdrop-filter:blur(8px);z-index:2}
+  .frame-badge.void{background:rgba(255,71,87,.2);color:#ff6b7a;border:1px solid rgba(255,71,87,.4)}
+  .frame-badge.guard{background:rgba(59,92,255,.2);color:var(--shield-glow);border:1px solid rgba(59,92,255,.4)}
+  .frame-badge.chain{background:rgba(0,224,164,.15);color:#34e8b8;border:1px solid rgba(0,224,164,.4)}
+  .frame-badge.gold{background:rgba(255,214,10,.15);color:#ffd60a;border:1px solid rgba(255,214,10,.4)}
+  .shot-info{display:flex;flex-direction:column}
+  .shot-head{display:flex;align-items:baseline;gap:12px;margin-bottom:10px}
+  .shot-id{font-size:12px;font-weight:800;color:var(--shield-glow);letter-spacing:1px}
+  .shot-title{font-size:18px;font-weight:700}
+  .shot-time{margin-left:auto;font-size:12px;color:var(--dim);white-space:nowrap}
+  .shot-vis{font-size:13px;color:#aab4cf;margin-bottom:8px;padding:8px 12px;background:rgba(59,92,255,.06);border-radius:8px;border-left:2px solid var(--shield)}
+  .shot-vis b{color:var(--text)}
+  .shot-narr{font-size:14px;color:var(--text);margin-bottom:8px;line-height:1.8}
+  .shot-narr::before{content:'旁白';font-size:10px;font-weight:800;letter-spacing:1px;color:var(--gold);
+    display:inline-block;margin-right:8px;padding:2px 6px;border:1px solid rgba(255,214,10,.3);border-radius:4px;vertical-align:2px}
+  .shot-sfx{font-size:12px;color:var(--dim)}
+  .shot-sfx::before{content:'🔊 ';}
+
+  /* —— STYLE GUIDE —— */
+  .guide{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px}
+  .guide-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px}
+  .guide-card h4{font-size:15px;font-weight:700;margin-bottom:12px;color:var(--shield-glow)}
+  .guide-card p{font-size:13px;color:var(--dim);line-height:1.7}
+  .swatch{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .swatch span{width:32px;height:32px;border-radius:8px;border:1px solid rgba(255,255,255,.1)}
+
+  /* —— TIMELINE —— */
+  .timeline{position:relative;padding:8px 0}
+  .timeline::before{content:'';position:absolute;left:50%;top:0;bottom:0;width:2px;
+    background:linear-gradient(180deg,var(--warn),var(--shield),var(--chain))}
+  .tl-item{display:flex;align-items:center;margin-bottom:28px;position:relative}
+  .tl-item:nth-child(odd){justify-content:flex-end;padding-right:50%}
+  .tl-item:nth-child(even){justify-content:flex-start;padding-left:50%}
+  .tl-dot{position:absolute;left:50%;transform:translateX(-50%);width:14px;height:14px;border-radius:50%;
+    border:2px solid var(--shield);background:var(--void);z-index:1}
+  .tl-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 18px;max-width:340px}
+  .tl-card .t{font-size:12px;color:var(--shield-glow);font-weight:700;margin-bottom:2px}
+  .tl-card .d{font-size:13px;color:var(--dim)}
+
+  /* —— STATS BAND —— */
+  .stats-band{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin:48px 0}
+  .stat{text-align:center;padding:28px 12px;background:var(--card);border:1px solid var(--border);border-radius:14px}
+  .stat .n{font-size:38px;font-weight:900;background:linear-gradient(135deg,#3b5cff,#00e0a4);
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .stat .l{font-size:12px;color:var(--dim);margin-top:6px}
+
+  /* —— CTA —— */
+  .cta{text-align:center;padding:80px 0 60px}
+  .cta h2{font-size:clamp(24px,4vw,36px);font-weight:800;margin-bottom:16px}
+  .cta p{color:var(--dim);font-size:16px;max-width:560px;margin:0 auto 28px}
+  .cta-btn{display:inline-flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:#fff;
+    background:linear-gradient(135deg,var(--shield),#2a45e6);padding:14px 32px;border-radius:12px;
+    text-decoration:none;transition:.25s;box-shadow:0 8px 32px rgba(59,92,255,.4)}
+  .cta-btn:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(59,92,255,.5)}
+
+  footer{text-align:center;padding:40px 0;border-top:1px solid rgba(99,102,241,.12);color:var(--dim);font-size:12px}
+
+  @media(max-width:768px){
+    .shot{grid-template-columns:1fr}
+    .stats-band{grid-template-columns:repeat(2,1fr)}
+    .timeline::before{left:20px}
+    .tl-dot{left:20px}
+    .tl-item:nth-child(odd),.tl-item:nth-child(even){justify-content:flex-start;padding-left:48px;padding-right:0}
+    .act-time{display:none}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <span class="tag">RESPONSIBILITY SHIELD · PROMO FILM</span>
+  <h1>当 <span class="void">真空</span> 吞噬信任<br>谁来 <span class="guard">守护</span> 智能</h1>
+  <p class="sub">AI Agent 技能正以指数级爆发——但 2600+ 技能审计揭示，治理缺失率逼近 100%。这是一部关于"责任真空"与"责任盾牌"的宣传短片设计。</p>
+  <div class="meta">
+    <span><b>90 秒</b> · 时长</span>
+    <span><b>三幕</b> · 结构</span>
+    <span><b>12 镜</b> · 分镜</span>
+    <span><b>无代币</b> · 理念</span>
+  </div>
+  <div class="acts">
+    <a href="#act1">第一幕 · 真空</a>
+    <a href="#act2">第二幕 · 盾牌</a>
+    <a href="#act3">第三幕 · 窗口</a>
+    <a href="#style">视觉风格</a>
+    <a href="#tech">技术规格</a>
+  </div>
+</section>
+
+<!-- ============ STATS BAND ============ -->
+<div class="stats-band">
+  <div class="stat"><div class="n">2600+</div><div class="l">审计技能数</div></div>
+  <div class="stat"><div class="n">100%</div><div class="l">治理缺失率</div></div>
+  <div class="stat"><div class="n">0</div><div class="l">治理字段</div></div>
+  <div class="stat"><div class="n">$0</div><div class="l">启动代币</div></div>
+</div>
+
+<!-- ============ ACT 1 ============ -->
+<section class="section" id="act1">
+  <div class="act-header">
+    <div class="act-num">I</div>
+    <div class="act-title">
+      <h2>第一幕 · 真空</h2>
+      <p>揭示问题：技能爆发式增长，责任却无处安放</p>
+    </div>
+    <div class="act-time">00:00 — 00:30</div>
+  </div>
+
+  <!-- Shot 1 -->
+  <div class="shot">
+    <div class="frame">
+      <span class="frame-badge void">VOID</span>
+      <canvas id="f1"></canvas>
+    </div>
+    <div class="shot-info">
+      <div class="shot-head">
+        <span class="shot-id">S01</span>
+        <span class="shot-title">技能洪流</span>
+        <span class="shot-time">0:00 — 0:05 · 5s</span>
+      </div>
+      <div class="shot-vis"><b>视觉</b>：极深蓝黑空间中，无数半透明技能节点从四面八方汇聚涌动，如同数字洪流。节点发光但毫无结构约束，暗示"无序生长"。</div>
+      <div class="shot-narr">AI Agent 技能——将复杂多轮提示链封装为可复用行为单元——正在以指数级速度爆发。从零到数千，仅用了六个月。</div>
+      <div class="shot-sfx">低频脉冲电子音 + 数据流动白噪</div>
+    </div>
+  </div>
+
+  <!-- Shot 2 -->
+  <div class="shot">
+    <div class="frame">
+      <span class="frame-badge void">VOID</span>
+      <canvas id="f2"></canvas>
+    </div>
+    <div class="shot-info">
+      <div class="shot-head">
+        <span class="shot-id">S02</span>
+        <span class="shot-title">高风险静默</span>
+        <span class="shot-time">0:05 — 0:12 · 7s</span>
+      </div>
+      <div class="shot-vis"><b>视觉</b>：技能节点放大，浮现图标——邮件发送、内容发布、文件写入、支付授权。每个图标旁无任何权限标记或责任链，红色警示脉冲在暗处闪烁。</div>
+      <div class="shot-narr">发送邮件、发布公众号、操作他人数据、执行系统部署——这些不可逆的高风险操作，在传统交互中需要层层确认。而在技能模型中，确认阶段被完全省略。</div>
+      <div class="shot-sfx">心跳节拍渐强 + 金属摩擦不谐和音</div>
+    </div>
+  </div>
+
+  <!-- Shot 3 -->
+  <div class="shot">
+    <div class="frame">
+      <span class="frame-badge void">VOID</span>
+      <canvas id="f3"></canvas>
+    </div>
+    <div class="shot-info">
+      <div class="shot-head">
+        <span class="shot-id">S03</span>
+        <span class="shot-title">审计揭示</span>
+        <span class="shot-time">0:12 — 0:20 · 8s</span>
+      </div>
+      <div class="shot-vis"><b>视觉</b>：五平台名标逐亮（Z.AI · Coze · WorkBuddy · Claude · OpenClaw），数字"2600+"与"100%"以故障毛刺效果弹现，占据画面中心。数据条全部触底飘红。</div>
+      <div class="shot-narr">跨五大平台、2600 余项技能的系统审计揭示：责任声明缺失率、审计机制缺失率、授权流程缺失率——全面逼近百分之百。</div>
+      <div class="shot-sfx">数字计数器速跳声 + 故障撕裂音效</div>
+    </div>
+  </div>
+
+  <!-- Shot 4 -->
+  <div class="shot">
+    <div class="frame">
+      <span class="frame-badge gold">SPEC</span>
+      <canvas id="f4"></canvas>
+    </div>
+    <div class="shot-info">
+      <div class="shot-head">
+        <span class="shot-id">S04</span>
+        <span class="shot-title">规范的沉默</span>
+        <span class="shot-time">0:20 — 0:30 · 10s</span>
+      </div>
+      <div class="shot-vis"><b>视觉</b>：AgentSkills.io 规范文档展开，功能字段（name / description / trigger / metadata）逐行亮绿打勾，治理字段区域全黑，红色"ZERO"烙印缓缓浮现。HKCERT 安全警报角标弹出。</div>
+      <div class="shot-narr">行业唯一公开标准 AgentSkills.io：功能接口完整定义，治理字段——为零。2026 年 3 月，香港安全应急中心证实：供应链投毒、伪造安装器、平台漏洞——真空已从理论风险，演变为真实威胁。</div>
+      <div class="shot-sfx">纸张展开声 + 沉重低音鼓点 + 警报短鸣</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ACT 2 ============ -->
+<section class="section" id="act2">
+  <div class="act-header">
+    <div class="act-num">II</div>
+    <div class="act-title">
+      <h2>第二幕 · 盾牌</h2>
+      <p>展示方案：责任盾牌原型与 R-Skills 治理标准</p>
+    </div>
+    <div class="act-time">00:30 — 00:65</div>
+  </div>
+
+  <!-- Shot 5 -->
+  <div class="shot">
+    <div class="frame">
+      <span class="frame-badge guard">SHIELD</span>
+      <canvas id="f5"></canvas>
+    </div>
+    <div class="shot-info">
+      <div class="shot-head">
+        <span class="shot-id">S05</span>
+        <span class="shot-title">盾牌启动</span>
+        <span class="shot-time">0:30 — 0:38 · 8s</span>
+      </div>
+      <div class="shot-vis"><b>视觉</b>：黑暗技能洪流中央，一道蓝光裂缝撕开虚空。光盾六边形能量结构展开，将无序节点逐一包裹锁定，每个技能被赋予指纹标识（keccak256）。</div>
+      <div class="shot-narr">责任盾牌——Responsibility Shield。在每个技能创建的瞬间，为其生成不可篡改的链上指纹，将"谁创建、何时创建、写了什么"永恒刻入。</div>
+      <div class="shot-sfx">能量充能上升音 + 盾牌展开金属共鸣</div>
+    </div>
+  </div>
+
+  <!-- Shot 6 -->
+  <div class="shot">
+    <div class="frame">
+      <span class="frame-badge guard">SHIELD</span>
+      <canvas id="f6"></canvas>
+    </div>
+    <div class="shot-info">
+      <div class="shot-head">
+        <span class="shot-id">S06</span>
+        <span class="shot-title">三层框架</span>
+        <span class="shot-time">0:38 — 0:48 · 10s</span>
+      </div>
+      <div class="shot-vis"><b>视觉</b>：三层横向发光面板依次升起——"滞后诊断"（红色脉冲线 → 数据曲线）→"风险刻画"（四级风险标签 LOW→CRITICAL 分层着色）→"预见性响应"（蓝色防护罩覆盖全部节点）。</div>
+      <div class="shot-narr">滞后诊断、风险刻画、预见性响应——三层分析框架。从技术治理的步调困境出发，在 Collingridge 窗口关闭之前，嵌入责任追溯机制。</div>
+      <div class="shot-sfx">三层音阶递进 + 每层升调合成器</div>
+    </div>
+  </div>
+
+  <!-- Shot 7 -->
+  <div class="shot">
+    <div class="frame">
+      <span class="frame-badge chain">CHAIN</span>
+      <canvas id="f7"></canvas>
+    </div>
+    <div class="shot-info">
+      <div class="shot-head">
+        <span class="shot-id">S07</span>
+        <span class="shot-title">全链追溯</span>
+        <span class="shot-time">0:48 — 0:56 · 8s</span>
+      </div>
+      <div class="shot-vis"><b>视觉</b>：一条翡翠绿发光链从左到右贯穿画面，五个环节依次点亮——创建（指纹）→验证（审计签名）→使用（调用记录）→测试（Bug追踪）→点赞（反噬）。链节间有锁扣动画。</div>
+      <div class="shot-narr">创建、验证、使用、测试、点赞——每个行为上链记录。错误点赞触发声望反噬，恶意创建面临质押没收。责任不再无处安放，而是不可逃脱。</div>
+      <div class="shot-sfx">锁扣闭合清脆音 × 5 + 链条滑动</div>
+    </div>
+  </div>
+
+  <!-- Shot 8 -->
+  <div class="shot">
+    <div class="frame">
+      <span class="frame-badge gold">NO TOKEN</span>
+      <canvas id="f8"></canvas>
+    </div>
+    <div class="shot-info">
+      <div class="shot-head">
+        <span class="shot-id">S08</span>
+        <span class="shot-title">零启动·无代币</span>
+        <span class="shot-time">0:56 — 0:65 · 9s</span>
+      </div>
+      <div class="shot-vis"><b>视觉</b>：代币符号被红色叉号划除并碎裂消散。取而代之，金色声望星标在用户头像旁逐级亮起（观察员→贡献者→信用者→守护者），Polygon 链底座稳固承托。</div>
+      <div class="shot-narr">无代币发行、无 ICO、无空投——零启动铁律。声望系统替代资本博弈：贡献积累信誉，信誉解锁权限，九成九用户零成本参与。可信，不靠金钱驱动。</div>
+      <div class="shot-sfx">玻璃碎裂（代币消除）+ 上升清亮和弦（声望点亮）</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ACT 3 ============ -->
+<section class="section" id="act3">
+  <div class="act-header">
+    <div class="act-num">III</div>
+    <div class="act-title">
+      <h2>第三幕 · 窗口</h2>
+      <p>呼唤行动：Collingridge 窗口正在关闭，此刻即干预之时</p>
+    </div>
+    <div class="act-time">00:65 — 00:90</div>
+  </div>
+
+  <!-- Shot 9 -->
+  <div class="shot">
+    <div class="frame">
+      <span class="frame-badge void">WINDOW</span>
+      <canvas id="f9"></canvas>
+    </div>
+    <div class="shot-info">
+      <div class="shot-head">
+        <span class="shot-id">S09</span>
+        <span class="shot-title">Collingridge 时钟</span>
+        <span class="shot-time">0:65 — 0:74 · 9s</span>
+      </div>
+      <div class="shot-vis"><b>视觉</b>：一枚巨型环形时钟悬浮于暗空。左半弧标注"可改变"（蓝光），右半弧"已锁定"（灰锁）。指针正在越过临界分界线，缝隙收窄，金色光带标注"干预窗口"。</div>
+      <div class="shot-narr">Collingridge 困境：技术可变之时影响未知，影响显现之时已难改变。此刻，技能标准尚未完全锁定，生态规模仍在可塑期——这是嵌入治理的最后窗口。</div>
+      <div class="shot-sfx">钟摆渐缓 + 缝隙收窄的压迫低频嗡鸣</div>
+    </div>
+  </div>
+
+  <!-- Shot 10 -->
+  <div class="shot">
+    <div class="frame">
+      <span class="frame-badge chain">TRUST</span>
+      <canvas id="f10"></canvas>
+    </div>
+    <div class="shot-info">
+      <div class="shot-head">
+        <span class="shot-id">S10</span>
+        <span class="shot-title">范式跃迁</span>
+        <span class="shot-time">0:74 — 0:82 · 8s</span>
+      </div>
+      <div class="shot-vis"><b>视觉</b>：画面左端"能力竞争"旧时代灰暗褪去，右端"可信赖竞争"新时代日出般亮起。守护者级技能（声望 ≥5000）在光中矗立如灯塔，周围环绕可信生态网络。</div>
+      <div class="shot-narr">从"能力竞争"到"可信赖竞争"——AI 产业正在经历范式跃迁。声望守护者优先展示，经审计技能次优呈现，新技能获得冷启动扶持。信任，成为新的硬通货。</div>
+      <div class="shot-sfx">日出长音延展 + 管弦渐入</div>
+    </div>
+  </div>
+
+  <!-- Shot 11 -->
+  <div class="shot">
+    <div class="frame">
+      <span class="frame-badge guard">JOIN</span>
+      <canvas id="f11"></canvas>
+    </div>
+    <div class="shot-info">
+      <div class="shot-head">
+        <span class="shot-id">S11</span>
+        <span class="shot-title">共建基础设施</span>
+        <span class="shot-time">0:82 — 0:88 · 6s</span>
+      </div>
+      <div class="shot-vis"><b>视觉</b>：多角色剪影汇入画面——开发者上传 .SKILL.md、审计者签署背书、用户反馈点赞。三方协作编织出完整的责任盾牌纹章，纹章放射光芒。</div>
+      <div class="shot-narr">开发者、审计者、使用者——三方共建。标准化、可追溯、可信任、无代币——这是 AI Agent 技能的可信基础设施。</div>
+      <div class="shot-sfx">合声层叠 + 积木拼合音效</div>
+    </div>
+  </div>
+
+  <!-- Shot 12 -->
+  <div class="shot">
+    <div class="frame">
+      <span class="frame-badge gold">END</span>
+      <canvas id="f12"></canvas>
+    </div>
+    <div class="shot-info">
+      <div class="shot-head">
+        <span class="shot-id">S12</span>
+        <span class="shot-title">定格召唤</span>
+        <span class="shot-time">0:88 — 0:90 · 2s</span>
+      </div>
+      <div class="shot-vis"><b>视觉</b>：责任盾牌纹章定格居中，下方浮现"Responsibility Shield"主标与"责任盾牌"中文副标。底部 URL 行：agentskills.io / GitHub 图标 / Discord 图标。背景星点缓动。</div>
+      <div class="shot-narr">（无旁白，仅画面与音乐定格收束）</div>
+      <div class="shot-sfx">弦乐悬停延音 → 渐弱至寂静</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STYLE GUIDE ============ -->
+<section class="section" id="style">
+  <div class="act-header">
+    <div class="act-num">IV</div>
+    <div class="act-title">
+      <h2>视觉风格指南</h2>
+      <p>色彩、字体、动态、节奏的统一基调</p>
+    </div>
+  </div>
+
+  <div class="guide">
+    <div class="guide-card">
+      <h4>色彩体系</h4>
+      <p>真空暗黑（#060912）为底，象征治理缺席的虚空。责任蓝（#3b5cff）为核心主色，信任绿（#00e0a4）为链上追溯色，警示红（#ff4757）标记风险与缺失，金色（#ffd60a）用于声望与关键数据。</p>
+      <div class="swatch">
+        <span style="background:#060912"></span>
+        <span style="background:#3b5cff"></span>
+        <span style="background:#00e0a4"></span>
+        <span style="background:#ff4757"></span>
+        <span style="background:#ffd60a"></span>
+      </div>
+    </div>
+    <div class="guide-card">
+      <h4>字体系统</h4>
+      <p>中文标题用思源黑体 Heavy / PingFang Bold，英文标题用 Inter Black 或 Space Grotesk。正文 PingFang SC / Inter Regular。数字数据用等宽字体 JetBrains Mono 突出科技感与精确性。</p>
+    </div>
+    <div class="guide-card">
+      <h4>动态语言</h4>
+      <p>第一幕用无序涌动、故障毛刺、红色脉冲表达"失控"。第二幕转为有序展开、链式锁扣、能量充能表达"建构"。第三幕用日出渐亮、合声层叠表达"希望与行动"。三幕形成"混沌→秩序→光明"的视觉弧线。</p>
+    </div>
+    <div class="guide-card">
+      <h4>音乐音效</h4>
+      <p>整体风格为暗色电子合成器 + 电影管弦。前30秒低频压迫、不谐和音；中段逐层升调、金属共鸣介入；后段管弦渐入、合声层叠、以悬停延音收束。关键数据弹出使用故障计数器音效。</p>
+    </div>
+    <div class="guide-card">
+      <h4>分镜节奏</h4>
+      <p>12 镜 90 秒，平均每镜 7.5 秒。第一幕快剪（4镜/30秒）制造紧迫感，第二幕中速（4镜/35秒）展开方案，第三幕渐缓（4镜/25秒）升华收束。S04→S05 为全片转折点——从暗到亮的能量翻转。</p>
+    </div>
+    <div class="guide-card">
+      <h4>核心隐喻</h4>
+      <p>"真空"→黑暗虚空中无约束涌动的节点；"盾牌"→蓝光六边形能量结构包裹锁定节点；"链"→翡翠绿发光锁链贯穿全生命周期；"窗口"→环形时钟临界分界线上收窄的光带。四隐喻对应四幕情绪。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TECH SPECS ============ -->
+<section class="section" id="tech">
+  <div class="act-header">
+    <div class="act-num">V</div>
+    <div class="act-title">
+      <h2>技术规格与叙事时间线</h2>
+      <p>制作规格、全片时间线一览</p>
+    </div>
+  </div>
+
+  <div class="guide" style="margin-bottom:48px">
+    <div class="guide-card">
+      <h4>画面规格</h4>
+      <p>分辨率 3840×2160（4K）· 帧率 30fps · 宽高比 16:9 · 色彩空间 Rec.709。预留 9:16 竖版裁切安全区，适配社交媒体分发。H.265 编码，目标码率 25Mbps。</p>
+    </div>
+    <div class="guide-card">
+      <h4>音频规格</h4>
+      <p>48kHz / 24bit · 立体声 + 5.1 混音预留。旁白男声中文普通话，语速 220 字/分钟，混响轻量。BPM：第一幕 140→第二幕 110→第三幕 90，节奏随叙事递缓。</p>
+    </div>
+    <div class="guide-card">
+      <h4>输出格式</h4>
+      <p>主版 MP4（H.265/AAC）· 社交版 MP4（H.264，1080p）· 预告版 15s 竖版 MP4。字幕硬烧中英双语，英文为副。总片长 90s ± 2s。</p>
+    </div>
+    <div class="guide-card">
+      <h4>技术栈映射</h4>
+      <p>S05 盾牌指纹对应 keccak256+IPFS · S07 全链追溯对应 SkillRegistry+Attribution+StakingManager 三合约 · S08 无代币对应宪法第一条 · S10 声望排序对应宪法第三条 3.3。</p>
+    </div>
+  </div>
+
+  <div class="timeline">
+    <div class="tl-item"><div class="tl-dot"></div>
+      <div class="tl-card"><div class="t">0:00-0:05 · S01</div><div class="d">技能洪流——节点无序涌动</div></div></div>
+    <div class="tl-item"><div class="tl-dot"></div>
+      <div class="tl-card"><div class="t">0:05-0:12 · S02</div><div class="d">高风险静默——不可逆操作无确认</div></div></div>
+    <div class="tl-item"><div class="tl-dot"></div>
+      <div class="tl-card"><div class="t">0:12-0:20 · S03</div><div class="d">审计揭示——2600+ 技能 100% 缺失</div></div></div>
+    <div class="tl-item"><div class="tl-dot"></div>
+      <div class="tl-card"><div class="t">0:20-0:30 · S04</div><div class="d">规范沉默——治理字段为零 + 安全警报</div></div></div>
+    <div class="tl-item"><div class="tl-dot" style="border-color:var(--shield-glow)"></div>
+      <div class="tl-card"><div class="t">0:30-0:38 · S05 ★转折</div><div class="d">盾牌启动——蓝光撕开虚空</div></div></div>
+    <div class="tl-item"><div class="tl-dot" style="border-color:var(--shield-glow)"></div>
+      <div class="tl-card"><div class="t">0:38-0:48 · S06</div><div class="d">三层框架——诊断→刻画→响应</div></div></div>
+    <div class="tl-item"><div class="tl-dot" style="border-color:var(--chain)"></div>
+      <div class="tl-card"><div class="t">0:48-0:56 · S07</div><div class="d">全链追溯——五环节锁扣闭合</div></div></div>
+    <div class="tl-item"><div class="tl-dot" style="border-color:var(--gold)"></div>
+      <div class="tl-card"><div class="t">0:56-0:65 · S08</div><div class="d">零启动无代币——声望替代资本</div></div></div>
+    <div class="tl-item"><div class="tl-dot" style="border-color:var(--warn)"></div>
+      <div class="tl-card"><div class="t">0:65-0:74 · S09</div><div class="d">Collingridge 时钟——窗口收窄</div></div></div>
+    <div class="tl-item"><div class="tl-dot" style="border-color:var(--chain)"></div>
+      <div class="tl-card"><div class="t">0:74-0:82 · S10</div><div class="d">范式跃迁——能力→可信赖</div></div></div>
+    <div class="tl-item"><div class="tl-dot" style="border-color:var(--shield-glow)"></div>
+      <div class="tl-card"><div class="t">0:82-0:88 · S11</div><div class="d">共建基础设施——三方协作</div></div></div>
+    <div class="tl-item"><div class="tl-dot" style="border-color:var(--gold)"></div>
+      <div class="tl-card"><div class="t">0:88-0:90 · S12</div><div class="d">定格召唤——纹章收束</div></div></div>
+  </div>
+</section>
+
+<!-- ============ CTA ============ -->
+<section class="cta">
+  <h2>真空终将被填补<br>盾牌已在铸就</h2>
+  <p>在 Collingridge 窗口关闭之前，嵌入责任追溯机制。这是 AI Agent 技能从"能用"走向"可信"的必经之路。</p>
+  <a class="cta-btn" href="../CONSTITUTION.md">阅读项目宪法 →</a>
+</section>
+
+<footer>
+  Responsibility Shield · 责任盾牌 · AgentSkills Project<br>
+  无代币 · 零启动 · 声望激励 · 全链追溯 · 2026
+</footer>
+
+</div>
+
+<script>
+// ====== Storyboard frame renderer ======
+const C = {
+  void:'#060912', blue:'#3b5cff', glow:'#6d8bff', chain:'#00e0a4',
+  red:'#ff4757', gold:'#ffd60a', dim:'#8893b0', text:'#e8ecf5'
+};
+
+function setup(id){
+  const cv = document.getElementById(id);
+  if(!cv) return null;
+  const ctx = cv.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const r = cv.parentElement.getBoundingClientRect();
+  cv.width = r.width * dpr; cv.height = r.height * dpr;
+  ctx.scale(dpr, dpr);
+  return {cv, ctx, w:r.width, h:r.height};
+}
+
+function node(ctx,x,y,r,c,a){a=a||1;ctx.globalAlpha=a;ctx.fillStyle=c;
+  ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1}
+
+// S01: skill flood
+function f1(s){if(!s)return;const{ctx,w,h}=s;let t=0;
+  function draw(){
+    ctx.fillStyle='rgba(6,9,18,.25)';ctx.fillRect(0,0,w,h);
+    const cx=w/2,cy=h/2;
+    for(let i=0;i<60;i++){
+      const a=i*0.314+t*0.01, d=(50+((i*37)%120))*(1+Math.sin(t*0.02+i)*.3);
+      const x=cx+Math.cos(a)*d,y=cy+Math.sin(a)*d*.5;
+      const r=2+((i*13)%4);
+      node(ctx,x,y,r,i%5===0?C.red:C.blue,0.4+Math.sin(t*0.05+i)*0.3);
+    }
+    // convergence lines
+    ctx.strokeStyle='rgba(59,92,255,.08)';ctx.lineWidth=1;
+    for(let i=0;i<12;i++){const a=i*Math.PI/6;ctx.beginPath();
+      ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(a)*200,cy+Math.sin(a)*100);ctx.stroke()}
+    t++;requestAnimationFrame(draw)}
+  draw()}
+
+// S02: high-risk icons in dark
+function f2(s){if(!s)return;const{ctx,w,h}=s;let t=0;
+  const icons=['✉','▣','✎','⚡'];
+  function draw(){
+    ctx.fillStyle=C.void;ctx.fillRect(0,0,w,h);
+    const cx=w/2,cy=h/2;
+    icons.forEach((ic,i)=>{
+      const x=cx+(i-1.5)*50,y=cy+Math.sin(t*0.03+i)*8;
+      ctx.font='28px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillStyle='rgba(232,236,245,.6)';ctx.fillText(ic,x,y);
+      // red pulse ring
+      const p=Math.sin(t*0.06+i)*0.5+0.5;
+      ctx.strokeStyle=`rgba(255,71,87,${0.2+p*0.4})`;ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.arc(x,y,18+p*6,0,Math.PI*2);ctx.stroke();
+      // no permission marker
+      ctx.strokeStyle='rgba(255,71,87,.5)';ctx.lineWidth=2;
+      ctx.beginPath();ctx.moveTo(x-16,y-16);ctx.lineTo(x+16,y+16);ctx.stroke();
+    });
+    t++;requestAnimationFrame(draw)}
+  draw()}
+
+// S03: audit 100%
+function f3(s){if(!s)return;const{ctx,w,h}=s;let t=0;
+  const plats=['Z.AI','Coze','WorkBuddy','Claude','OpenClaw'];
+  function draw(){
+    ctx.fillStyle=C.void;ctx.fillRect(0,0,w,h);
+    const cx=w/2,cy=h/2;
+    // glitch 100%
+    const gx=(Math.random()-0.5)*4*(t%6<3?1:0);
+    ctx.font='bold 52px monospace';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillStyle=C.red;ctx.fillText('100%',cx+gx,cy-12);
+    ctx.font='12px sans-serif';ctx.fillStyle=C.dim;
+    ctx.fillText('治理缺失率',cx,cy+22);
+    // platform labels
+    plats.forEach((p,i)=>{
+      const x=30+i*(w-60)/4;
+      ctx.font='10px sans-serif';ctx.fillStyle='rgba(232,236,245,.5)';
+      ctx.fillText(p,x,h-20);
+      // bar fully red
+      ctx.fillStyle='rgba(255,71,87,.6)';
+      ctx.fillRect(x-22,h-38,44,4);
+    });
+    t++;requestAnimationFrame(draw)}
+  draw()}
+
+// S04: spec zero governance
+function f4(s){if(!s)return;const{ctx,w,h}=s;let t=0;
+  const fields=['name','description','trigger','metadata','scripts','resources'];
+  function draw(){
+    ctx.fillStyle=C.void;ctx.fillRect(0,0,w,h);
+    const cx=w/2;
+    // functional fields with checkmarks
+    fields.forEach((f,i)=>{
+      const y=24+i*16;
+      ctx.font='9px monospace';ctx.textAlign='left';ctx.textBaseline='middle';
+      ctx.fillStyle='rgba(0,224,164,.6)';ctx.fillText('✓',12,y);
+      ctx.fillStyle='rgba(232,236,245,.4)';ctx.fillText(f,22,y);
+    });
+    // governance zone - blacked out
+    ctx.fillStyle='rgba(255,71,87,.08)';ctx.fillRect(w-90,12,72,h-24);
+    ctx.strokeStyle='rgba(255,71,87,.3)';ctx.lineWidth=1;
+    ctx.setLineDash([3,3]);ctx.strokeRect(w-90,12,72,h-24);ctx.setLineDash([]);
+    // ZERO stamp
+    ctx.save();ctx.translate(w-54,h/2);ctx.rotate(-0.15);
+    ctx.font='bold 28px monospace';ctx.textAlign='center';
+    ctx.fillStyle=`rgba(255,71,87,${0.6+Math.sin(t*0.05)*0.2})`;
+    ctx.fillText('ZERO',0,0);ctx.restore();
+    // alert badge
+    ctx.font='8px sans-serif';ctx.textAlign='center';
+    ctx.fillStyle=C.gold;ctx.fillText('⚠ HKCERT 2026.03',w-54,h-16);
+    t++;requestAnimationFrame(draw)}
+  draw()}
+
+// S05: shield activation
+function f5(s){if(!s)return;const{ctx,w,h}=s;let t=0;
+  function draw(){
+    ctx.fillStyle='rgba(6,9,18,.15)';ctx.fillRect(0,0,w,h);
+    const cx=w/2,cy=h/2;
+    // light crack
+    ctx.strokeStyle='rgba(109,139,255,.4)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(0,cy);ctx.lineTo(w,cy);ctx.stroke();
+    // hex shield
+    const r=40+Math.min(t*0.5,30);
+    ctx.strokeStyle=`rgba(59,92,255,${0.5+Math.sin(t*0.05)*0.2})`;
+    ctx.lineWidth=2;ctx.beginPath();
+    for(let i=0;i<6;i++){const a=i*Math.PI/3-Math.PI/2;
+      const x=cx+Math.cos(a)*r,y=cy+Math.sin(a)*r;
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y)}
+    ctx.closePath();ctx.stroke();
+    // inner hex
+    ctx.strokeStyle='rgba(109,139,255,.3)';ctx.beginPath();
+    for(let i=0;i<6;i++){const a=i*Math.PI/3-Math.PI/2;
+      const x=cx+Math.cos(a)*r*.6,y=cy+Math.sin(a)*r*.6;
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y)}
+    ctx.closePath();ctx.stroke();
+    // captured nodes
+    for(let i=0;i<8;i++){
+      const a=i*Math.PI/4+t*0.02;
+      const d=r*.85+Math.sin(t*0.05+i)*4;
+      node(ctx,cx+Math.cos(a)*d,cy+Math.sin(a)*d*.5,2,C.blue,0.6)}
+    // fingerprint text
+    ctx.font='8px monospace';ctx.textAlign='center';ctx.fillStyle='rgba(0,224,164,.5)';
+    ctx.fillText('keccak256',cx,cy+4);
+    t++;requestAnimationFrame(draw)}
+  draw()}
+
+// S06: three-layer framework
+function f6(s){if(!s)return;const{ctx,w,h}=s;let t=0;
+  function draw(){
+    ctx.fillStyle=C.void;ctx.fillRect(0,0,w,h);
+    const layers=[
+      {y:20,c:C.red,label:'滞后诊断',sub:'Pacing Problem'},
+      {y:52,c:C.gold,label:'风险刻画',sub:'LOW→CRITICAL'},
+      {y:84,c:C.blue,label:'预见性响应',sub:'Anticipatory'}
+    ];
+    layers.forEach((l,i)=>{
+      const prog=Math.min((t-i*15)*0.03,1);
+      if(prog<=0)return;
+      ctx.fillStyle=`${l.c}22`;
+      ctx.fillRect(12,l.y-6,(w-24)*prog,20);
+      ctx.strokeStyle=l.c+'66';ctx.lineWidth=1;
+      ctx.strokeRect(12,l.y-6,(w-24)*prog,20);
+      ctx.font='9px sans-serif';ctx.textAlign='left';ctx.textBaseline='middle';
+      ctx.fillStyle=l.c;ctx.fillText(l.label,18,l.y+4);
+      ctx.font='7px monospace';ctx.fillStyle='rgba(232,236,245,.4)';
+      ctx.fillText(l.sub,70,l.y+4);
+    });
+    t++;requestAnimationFrame(draw)}
+  draw()}
+
+// S07: full-chain traceability
+function f7(s){if(!s)return;const{ctx,w,h}=s;let t=0;
+  const links=['创建','验证','使用','测试','点赞'];
+  function draw(){
+    ctx.fillStyle=C.void;ctx.fillRect(0,0,w,h);
+    const cy=h/2,y2=cy;
+    // chain line
+    ctx.strokeStyle='rgba(0,224,164,.3)';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(20,cy);ctx.lineTo(w-20,cy);ctx.stroke();
+    links.forEach((l,i)=>{
+      const x=24+i*(w-48)/4;
+      const lit=Math.min((t-i*10)*0.04,1);
+      if(lit<=0)return;
+      ctx.fillStyle=`rgba(0,224,164,${lit*0.7})`;
+      ctx.beginPath();ctx.arc(x,cy,8*lit,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle=`rgba(0,224,164,${lit})`;ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.arc(x,cy,10,0,Math.PI*2);ctx.stroke();
+      ctx.font='9px sans-serif';ctx.textAlign='center';ctx.fillStyle=`rgba(232,236,245,${lit*0.8})`;
+      ctx.fillText(l,x,cy+24);
+    });
+    // chain links between
+    ctx.strokeStyle='rgba(0,224,164,.4)';ctx.lineWidth=1;
+    for(let i=0;i<4;i++){const x1=24+i*(w-48)/4+10,x2=24+(i+1)*(w-48)/4-10;
+      ctx.beginPath();ctx.moveTo(x1,cy);ctx.lineTo(x2,cy);ctx.stroke()}
+    t++;requestAnimationFrame(draw)}
+  draw()}
+
+// S08: no token, reputation
+function f8(s){if(!s)return;const{ctx,w,h}=s;let t=0;
+  const levels=['观察员','贡献者','信用者','守护者'];
+  function draw(){
+    ctx.fillStyle=C.void;ctx.fillRect(0,0,w,h);
+    const cx=w/2,cy=h/2;
+    // crossed-out token
+    ctx.save();ctx.translate(cx-50,cy);
+    ctx.font='20px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillStyle='rgba(255,71,87,.3)';ctx.fillText('◈',0,0);
+    ctx.strokeStyle=C.red;ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(-14,-14);ctx.lineTo(14,14);ctx.stroke();
+    ctx.restore();
+    // arrow
+    ctx.strokeStyle=C.dim;ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(cx-28,cy);ctx.lineTo(cx+8,cy);ctx.stroke();
+    // reputation stars
+    levels.forEach((l,i)=>{
+      const x=cx+24+i*22;
+      const lit=Math.min((t-i*12)*0.03,1);
+      if(lit<=0)return;
+      ctx.fillStyle=`rgba(255,214,10,${lit*0.7})`;
+      ctx.font='14px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText('★',x,cy);
+      ctx.font='7px sans-serif';ctx.fillStyle=`rgba(232,236,245,${lit*0.5})`;
+      ctx.fillText(l,x,cy+16);
+    });
+    t++;requestAnimationFrame(draw)}
+  draw()}
+
+// S09: Collingridge clock
+function f9(s){if(!s)return;const{ctx,w,h}=s;let t=0;
+  function draw(){
+    ctx.fillStyle=C.void;ctx.fillRect(0,0,w,h);
+    const cx=w/2,cy=h/2,R=Math.min(w,h)/2-10;
+    // clock ring
+    ctx.lineWidth=4;ctx.strokeStyle='rgba(255,71,87,.3)';
+    ctx.beginPath();ctx.arc(cx,cy,R,Math.PI*0.75,Math.PI*1.25);ctx.stroke();
+    ctx.strokeStyle='rgba(120,120,140,.3)';
+    ctx.beginPath();ctx.arc(cx,cy,R,Math.PI*1.25,Math.PI*0.75);ctx.stroke();
+    // hands
+    const ang=Math.PI*0.75+(t*0.003);
+    ctx.strokeStyle=C.gold;ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(cx,cy);
+    ctx.lineTo(cx+Math.cos(ang)*R*0.7,cy+Math.sin(ang)*R*0.7);ctx.stroke();
+    // window gap
+    const gap=Math.max(0.15-t*0.002,0.02);
+    ctx.strokeStyle=`rgba(255,214,10,${0.5+Math.sin(t*0.08)*0.3})`;ctx.lineWidth=3;
+    ctx.beginPath();ctx.arc(cx,cy,R,Math.PI*0.75-gap,Math.PI*0.75+gap);ctx.stroke();
+    // labels
+    ctx.font='8px sans-serif';ctx.textAlign='center';
+    ctx.fillStyle='rgba(59,92,255,.6)';
+    ctx.fillText('可改变',cx-Math.cos(Math.PI)*R*0.6,cy-Math.sin(Math.PI)*0+0);
+    t++;requestAnimationFrame(draw)}
+  draw()}
+
+// S10: paradigm shift
+function f10(s){if(!s)return;const{ctx,w,h}=s;let t=0;
+  function draw(){
+    const p=Math.min(t*0.01,1);
+    // dark to light gradient
+    const g=ctx.createLinearGradient(0,0,w,0);
+    g.addColorStop(0,'rgba(6,9,18,1)');
+    g.addColorStop(p,'rgba(6,9,18,1)');
+    g.addColorStop(Math.min(p+0.05,1),'rgba(20,40,80,1)');
+    g.addColorStop(1,'rgba(40,80,160,1)');
+    ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+    // sun glow
+    const sx=w*p,cy=h/2;
+    const rg=ctx.createRadialGradient(sx,cy,0,sx,cy,60);
+    rg.addColorStop(0,'rgba(255,214,10,.5)');rg.addColorStop(1,'rgba(255,214,10,0)');
+    ctx.fillStyle=rg;ctx.fillRect(0,0,w,h);
+    // old/new labels
+    ctx.font='10px sans-serif';ctx.textAlign='center';
+    ctx.fillStyle='rgba(136,147,176,.5)';ctx.fillText('能力竞争',30,h-16);
+    ctx.fillStyle=`rgba(0,224,164,${p})`;ctx.fillText('可信赖竞争',w-30,h-16);
+    t++;requestAnimationFrame(draw)}
+  draw()}
+
+// S11: co-build
+function f11(s){if(!s)return;const{ctx,w,h}=s;let t=0;
+  function draw(){
+    ctx.fillStyle=C.void;ctx.fillRect(0,0,w,h);
+    const cx=w/2,cy=h/2;
+    // shield emblem forming
+    const p=Math.min(t*0.02,1);
+    ctx.strokeStyle=`rgba(59,92,255,${p})`;ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.moveTo(cx,cy-24);ctx.lineTo(cx+20,cy-12);ctx.lineTo(cx+20,cy+12);
+    ctx.lineTo(cx,cy+24);ctx.lineTo(cx-20,cy+12);ctx.lineTo(cx-20,cy-12);
+    ctx.closePath();ctx.stroke();
+    // rays
+    for(let i=0;i<8;i++){const a=i*Math.PI/4+t*0.01;
+      ctx.strokeStyle=`rgba(109,139,255,${p*0.3})`;ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(cx+Math.cos(a)*26,cy+Math.sin(a)*26);
+      ctx.lineTo(cx+Math.cos(a)*36,cy+Math.sin(a)*36);ctx.stroke()}
+    // three roles
+    ctx.font='8px sans-serif';ctx.textAlign='center';ctx.fillStyle='rgba(232,236,245,.5)';
+    ctx.fillText('开发者',cx-40,cy+34);
+    ctx.fillText('审计者',cx,cy+34);
+    ctx.fillText('使用者',cx+40,cy+34);
+    t++;requestAnimationFrame(draw)}
+  draw()}
+
+// S12: final logo hold
+function f12(s){if(!s)return;const{ctx,w,h}=s;let t=0;
+  function draw(){
+    ctx.fillStyle='rgba(6,9,18,.1)';ctx.fillRect(0,0,w,h);
+    const cx=w/2,cy=h/2;
+    // stars drift
+    for(let i=0;i<30;i++){const x=(i*47+t*0.3)%w,y=(i*31)%h;
+      ctx.fillStyle='rgba(232,236,245,.15)';ctx.fillRect(x,y,1,1)}
+    // emblem
+    ctx.strokeStyle=C.blue;ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.moveTo(cx,cy-22);ctx.lineTo(cx+18,cy-10);ctx.lineTo(cx+18,cy+10);
+    ctx.lineTo(cx,cy+22);ctx.lineTo(cx-18,cy+10);ctx.lineTo(cx-18,cy-10);
+    ctx.closePath();ctx.stroke();
+    // text
+    ctx.font='bold 10px sans-serif';ctx.textAlign='center';
+    ctx.fillStyle=C.glow;ctx.fillText('Responsibility Shield',cx,cy+38);
+    ctx.font='8px sans-serif';ctx.fillStyle=C.dim;ctx.fillText('责任盾牌',cx,cy+50);
+    t++;requestAnimationFrame(draw)}
+  draw()}
+
+// init all
+window.addEventListener('load',()=>{
+  f1(setup('f1'));f2(setup('f2'));f3(setup('f3'));f4(setup('f4'));
+  f5(setup('f5'));f6(setup('f6'));f7(setup('f7'));f8(setup('f8'));
+  f9(setup('f9'));f10(setup('f10'));f11(setup('f11'));f12(setup('f12'));
+});
+</script>
+</body>
+</html>

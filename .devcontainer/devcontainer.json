@@ -1,0 +1,44 @@
+{
+  "name": "AgentSkills Development Container",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
+
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "lts"
+    },
+    "ghcr.io/devcontainers/features/git:1": {}
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "juanblanco.solidity",
+        "NomicFoundation.hardhat-solidity"
+      ],
+      "settings": {
+        "solidity.compileUsingRemoteVersion": "v0.8.20",
+        "solidity.packageDefaultDependenciesContractsDirectory": "contracts",
+        "solidity.packageDefaultDependenciesDirectory": "node_modules"
+      }
+    }
+  },
+
+  "postCreateCommand": "npm install",
+
+  "forwardPorts": [8545],
+
+  "portsAttributes": {
+    "8545": {
+      "label": "Hardhat Local Node",
+      "onAutoForward": "notify"
+    }
+  },
+
+  "remoteUser": "node",
+
+  "mounts": [
+    "source=${localWorkspaceFolder}/.env,target=${containerWorkspaceFolder}/.env,type=bind,consistency=cached"
+  ]
+}
