@@ -1,6 +1,6 @@
 /**
  * AgentSkills i18n (Internationalization)
- * 支持: 中文, English, 日本語, 한국어
+ * Supports: 中文, English, 日本語, 한국어
  */
 
 export const translations = {

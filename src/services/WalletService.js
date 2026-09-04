@@ -1,7 +1,7 @@
 /**
  * WalletService - Wallet connection with contract access
  * Phase 18: Contract Integration
- *宪法第二条：低摩擦参与，嵌入式钱包（无感知注册）
+ * Constitution §2: low-friction participation, embedded wallet (seamless registration)
  */
 
 import { ethers } from 'ethers'
@@ -16,14 +16,14 @@ class WalletService {
   }
 
   async init() {
-    // 简化版：邮箱注册 → 自动生成钱包（宪法第二条）
+    // Simplified: email registration → auto-generated wallet (Constitution §2)
     const savedUser = localStorage.getItem('agentskills_user')
     if (savedUser) {
       this.user = JSON.parse(savedUser)
       return this.user
     }
 
-    // 新用户注册（嵌入式，无感知）
+    // New user registration (embedded, seamless)
     const newUser = {
       address: '0x' + Math.random().toString(16).substr(2, 40),
       reputation: 0,
@@ -146,7 +146,7 @@ class WalletService {
   }
 
   /**
-   * Sign a transaction (后台签名，宪法第二条)
+   * Sign a transaction (backend signing, Constitution §2)
    */
   async signTransaction(tx) {
     if (!this.signer) {

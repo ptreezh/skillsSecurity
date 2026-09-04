@@ -3,10 +3,10 @@
  * Phase 17: Frontend UI Design (Optimized)
  * Version: 1.1.0
  *
- * 设计原则：
- * - 单一主色（Primary Blue），避免多色系冲突
- * - 清晰的信息层级与充足的留白
- * - 所有可见颜色均来自 CSS 变量，禁止硬编码
+ * Design Principles:
+ * - Single primary color (Primary Blue), avoiding multi-color conflicts
+ * - Clear information hierarchy and generous whitespace
+ * - All visible colors come from CSS variables; no hard-coded values
  */
 
 :root {

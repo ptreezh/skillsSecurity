@@ -11,8 +11,8 @@ import {
 } from '../services/ContractService.jsx';
 
 /**
- * ProtocolDemo - 协议演示页
- * 展示 AgentSkills 协议的核心机制
+ * ProtocolDemo - Protocol demonstration page
+ * Showcases the core mechanisms of the AgentSkills protocol
  */
 export default function ProtocolDemo({ initialTab = 'standard' }) {
   const { t } = useTranslation();

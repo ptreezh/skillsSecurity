@@ -21,7 +21,7 @@ function App() {
   const [demoTab, setDemoTab] = useState('standard')
 
   useEffect(() => {
-    // 初始化钱包（宪法第二条：低摩擦参与）
+    // Initialize wallet (Constitution §2: low-friction participation)
     WalletService.init().then(setUser)
   }, [])
 
@@ -50,7 +50,7 @@ function App() {
             <div className="app-brand-logo">A</div>
             <h1 className="app-brand-title">AgentSkills</h1>
           </div>
-          <nav className="app-nav" aria-label="主导航">
+          <nav className="app-nav" aria-label="Main navigation">
             {navItems.map(item => (
               <button
                 key={item.id}
