@@ -211,7 +211,13 @@
       "extensionFieldsCode": "freeskill (fingerprint, ipfsHash...),\nresponsibility (liability...),\nantiSlash (enabled, slashRate...),\nhumanAuth (required...)",
       "exampleCode": "---\nname: skill-name                              # AgentSkills 基础\ndescription: 功能描述\ntrigger: \"触发条件 {param}\"\nmetadata:\n  version: \"1.0.0\"\n  author: \"0x...\"\n  riskLevel: \"LOW\"\nscripts:\n  - name: \"main\"\n    language: \"python\"\n    code: |\n      def main(param):\n          return {\"status\": \"ok\"}\nresources: []\n\n# === FreeSkill 治理扩展 ===\nfreeskill:\n  fingerprint: \"0x...\"\n  creator: \"0x...\"\n  ipfsHash: \"Qm...\"\n  stakeRequired: 10\n  standard: \"freeskill\"\nresponsibility:\n  liabilityDeclaration: \"我对此技能行为负全部责任\"\n  scopeDeclaration: \"此技能仅访问声明的资源\"\nantiSlash:\n  enabled: true\n  slashRate: 0.5\nhumanAuth:\n  required: [\"stake\", \"submit\"]\n---",
       "workflowTitle": "上传后流程",
-      "workflowSteps": ["上传", "自动解析", "风险评估", "安全审核", "上链"],
+      "workflowSteps": [
+        "上传",
+        "自动解析",
+        "风险评估",
+        "安全审核",
+        "上链"
+      ],
       "altEntries": {
         "title": "需要更严格的治理标准？",
         "desc": "使用 FreeSkill 扩展或技能模板，快速生成带责任声明、反噬机制和验证流程的技能包。",
@@ -233,31 +239,79 @@
       "tagline": "Free by default. Trusted by design.",
       "taglineDesc": "让 Skill 免于混乱的自由 — 让 AI 技能可追溯、可归因、可验证、可惩罚",
       "responsibilityChain": "责任链（Responsibility Chain）",
-      "chainSteps": ["创建者签署责任声明", "验证者背书", "指纹锚定 IPFS", "使用记录", "审计追踪上链", "反噬惩罚"],
+      "chainSteps": [
+        "创建者签署责任声明",
+        "验证者背书",
+        "指纹锚定 IPFS",
+        "使用记录",
+        "审计追踪上链",
+        "反噬惩罚"
+      ],
       "comparisonTitle": "可信技能 vs 普通技能",
-      "comparisonDimensions": ["追溯", "归因", "验证", "授权", "反噬"],
+      "comparisonDimensions": [
+        "追溯",
+        "归因",
+        "验证",
+        "授权",
+        "反噬"
+      ],
       "comparisonRegular": "普通技能",
       "comparisonFreeskill": "FreeSkill",
       "requiredFieldsTitle": "FreeSkill 必需字段",
       "requiredFieldsCode": "{\n  \"freeskill\": {\n    \"fingerprint\": \"0x...\",\n    \"creator\": \"0x...\",\n    \"ipfsHash\": \"QmXxx...\",\n    \"riskLevel\": \"LOW/MEDIUM/HIGH/CRITICAL\",\n    \"stakeRequired\": 100,\n    \"auditTrail\": []\n  },\n  \"responsibility\": {\n    \"liabilityDeclaration\": \"责任声明\"\n  },\n  \"antiSlash\": {\n    \"enabled\": true,\n    \"appealsPeriod\": 7\n  }\n}",
       "collaborationTitle": "多 Agent 协作标准",
       "collaborationSkills": [
-        { "name": "freeskill-orchestrate", "desc": "编排协调" },
-        { "name": "freeskill-upgrade", "desc": "补充责任链" },
-        { "name": "freeskill-audit", "desc": "安全审核" },
-        { "name": "freeskill-evaluate", "desc": "风险评估" },
-        { "name": "freeskill-chain", "desc": "链上提交" }
+        {
+          "name": "freeskill-orchestrate",
+          "desc": "编排协调"
+        },
+        {
+          "name": "freeskill-upgrade",
+          "desc": "补充责任链"
+        },
+        {
+          "name": "freeskill-audit",
+          "desc": "安全审核"
+        },
+        {
+          "name": "freeskill-evaluate",
+          "desc": "风险评估"
+        },
+        {
+          "name": "freeskill-chain",
+          "desc": "链上提交"
+        }
       ],
       "authCheckpointsTitle": "人类授权检查点",
       "authStepHeader": "步骤",
       "authContentHeader": "授权内容",
       "authTriggerHeader": "触发条件",
       "authRows": [
-        { "step": "PRE_UPGRADE", "auth": "确认开始升级", "trigger": "所有技能" },
-        { "step": "POST_AUDIT", "auth": "确认审核结果", "trigger": "HIGH/CRITICAL" },
-        { "step": "RISK_CONFIRM", "auth": "确认风险等级", "trigger": "所有技能" },
-        { "step": "STAKE_CONFIRM", "auth": "确认质押", "trigger": "需要质押" },
-        { "step": "CHAIN_SUBMIT", "auth": "确认链上提交", "trigger": "所有提交" }
+        {
+          "step": "PRE_UPGRADE",
+          "auth": "确认开始升级",
+          "trigger": "所有技能"
+        },
+        {
+          "step": "POST_AUDIT",
+          "auth": "确认审核结果",
+          "trigger": "HIGH/CRITICAL"
+        },
+        {
+          "step": "RISK_CONFIRM",
+          "auth": "确认风险等级",
+          "trigger": "所有技能"
+        },
+        {
+          "step": "STAKE_CONFIRM",
+          "auth": "确认质押",
+          "trigger": "需要质押"
+        },
+        {
+          "step": "CHAIN_SUBMIT",
+          "auth": "确认链上提交",
+          "trigger": "所有提交"
+        }
       ]
     },
     "templates": {
@@ -272,8 +326,18 @@
       "uploadSkill": "上传技能",
       "download": "下载",
       "templateList": [
-        { "name": "freeskill-create", "desc": "创建符合 FreeSkill 规范的新技能", "color": "var(--color-primary)", "file": "freeskill-create.FREESKILL.md" },
-        { "name": "freeskill-upgrade", "desc": "将现有 AgentSkills 技能升级为 FreeSkill 规范", "color": "var(--color-purple-600)", "file": "freeskill-upgrade.FREESKILL.md" }
+        {
+          "name": "freeskill-create",
+          "desc": "创建符合 FreeSkill 规范的新技能",
+          "color": "var(--color-primary)",
+          "file": "freeskill-create.FREESKILL.md"
+        },
+        {
+          "name": "freeskill-upgrade",
+          "desc": "将现有 AgentSkills 技能升级为 FreeSkill 规范",
+          "color": "var(--color-purple-600)",
+          "file": "freeskill-upgrade.FREESKILL.md"
+        }
       ],
       "stats": {
         "riskLevel": "风险等级",
@@ -284,14 +348,38 @@
       "fieldHeader": "字段",
       "descHeader": "说明",
       "governanceFields": [
-        { "field": "freeskill.fingerprint", "desc": "keccak256 指纹，用于追溯" },
-        { "field": "freeskill.stakeRequired", "desc": "质押要求 (10/50/100/200 ether)" },
-        { "field": "freeskill.attestationCount", "desc": "验证者数量要求" },
-        { "field": "responsibility.liabilityDeclaration", "desc": "创建者责任声明" },
-        { "field": "responsibility.scopeDeclaration", "desc": "权限边界声明" },
-        { "field": "antiSlash.enabled", "desc": "启用反噬机制" },
-        { "field": "antiSlash.slashRate", "desc": "惩罚比例 (默认 50%)" },
-        { "field": "humanAuth.required", "desc": "人类授权检查点" }
+        {
+          "field": "freeskill.fingerprint",
+          "desc": "keccak256 指纹，用于追溯"
+        },
+        {
+          "field": "freeskill.stakeRequired",
+          "desc": "质押要求 (10/50/100/200 ether)"
+        },
+        {
+          "field": "freeskill.attestationCount",
+          "desc": "验证者数量要求"
+        },
+        {
+          "field": "responsibility.liabilityDeclaration",
+          "desc": "创建者责任声明"
+        },
+        {
+          "field": "responsibility.scopeDeclaration",
+          "desc": "权限边界声明"
+        },
+        {
+          "field": "antiSlash.enabled",
+          "desc": "启用反噬机制"
+        },
+        {
+          "field": "antiSlash.slashRate",
+          "desc": "惩罚比例 (默认 50%)"
+        },
+        {
+          "field": "humanAuth.required",
+          "desc": "人类授权检查点"
+        }
       ]
     },
     "audit": {
@@ -317,16 +405,48 @@
       "coreComponents": "核心组件",
       "protocolFeatures": "协议特性",
       "components": [
-        { "name": "SkillRegistry", "desc": "技能注册与状态管理", "status": "已部署", "variant": "success" },
-        { "name": "Attribution", "desc": "贡献归因与声望系统", "status": "已部署", "variant": "success" },
-        { "name": "StakingManager", "desc": "质押与反噬机制", "status": "已部署", "variant": "success" },
-        { "name": "ASKToken", "desc": "积分代币（延迟发行）", "status": "规划中", "variant": "warning" }
+        {
+          "name": "SkillRegistry",
+          "desc": "技能注册与状态管理",
+          "status": "已部署",
+          "variant": "success"
+        },
+        {
+          "name": "Attribution",
+          "desc": "贡献归因与声望系统",
+          "status": "已部署",
+          "variant": "success"
+        },
+        {
+          "name": "StakingManager",
+          "desc": "质押与反噬机制",
+          "status": "已部署",
+          "variant": "success"
+        },
+        {
+          "name": "ASKToken",
+          "desc": "积分代币（延迟发行）",
+          "status": "规划中",
+          "variant": "warning"
+        }
       ],
       "features": [
-        { "title": "标准化接口", "desc": "统一的 Skill 注册、验证、调用接口" },
-        { "title": "指纹追溯", "desc": "keccak256 指纹确保技能可追溯" },
-        { "title": "风险分级", "desc": "LOW/MEDIUM/HIGH/CRITICAL 四级风险评估" },
-        { "title": "反噬机制", "desc": "恶意行为触发惩罚，保护社区" }
+        {
+          "title": "标准化接口",
+          "desc": "统一的 Skill 注册、验证、调用接口"
+        },
+        {
+          "title": "指纹追溯",
+          "desc": "keccak256 指纹确保技能可追溯"
+        },
+        {
+          "title": "风险分级",
+          "desc": "LOW/MEDIUM/HIGH/CRITICAL 四级风险评估"
+        },
+        {
+          "title": "反噬机制",
+          "desc": "恶意行为触发惩罚，保护社区"
+        }
       ]
     },
     "risk": {
@@ -336,10 +456,30 @@
       "decisionTreeTitle": "风险分类决策树",
       "decisionTree": "只读查询 → LOW\n用户可控文件 → MEDIUM\n他人数据/资金 → HIGH\n系统权限/智能合约 → CRITICAL",
       "levels": [
-        { "level": "LOW", "icon": "+", "desc": "只读操作，无风险", "stake": 10 },
-        { "level": "MEDIUM", "icon": "!", "desc": "有限写入操作", "stake": 50 },
-        { "level": "HIGH", "icon": "!!", "desc": "涉及资金或重要数据", "stake": 100 },
-        { "level": "CRITICAL", "icon": "!!!", "desc": "不可逆关键操作", "stake": 200 }
+        {
+          "level": "LOW",
+          "icon": "+",
+          "desc": "只读操作，无风险",
+          "stake": 10
+        },
+        {
+          "level": "MEDIUM",
+          "icon": "!",
+          "desc": "有限写入操作",
+          "stake": 50
+        },
+        {
+          "level": "HIGH",
+          "icon": "!!",
+          "desc": "涉及资金或重要数据",
+          "stake": 100
+        },
+        {
+          "level": "CRITICAL",
+          "icon": "!!!",
+          "desc": "不可逆关键操作",
+          "stake": 200
+        }
       ]
     },
     "fingerprint": {
@@ -348,12 +488,30 @@
       "desc": "每个技能创建时生成唯一指纹（fingerprint），用于追溯整个生命周期。指纹基于 IPFS 哈希、创建者地址和时间戳计算。",
       "formula": "fingerprint = keccak256(ipfsHash + creator + timestamp)",
       "inputs": [
-        { "label": "IPFS 哈希", "value": "QmXxx...", "desc": "代码存储地址" },
-        { "label": "创建者", "value": "0x1234...", "desc": "钱包地址" },
-        { "label": "时间戳", "value": "1714896000", "desc": "Unix 时间" }
+        {
+          "label": "IPFS 哈希",
+          "value": "QmXxx...",
+          "desc": "代码存储地址"
+        },
+        {
+          "label": "创建者",
+          "value": "0x1234...",
+          "desc": "钱包地址"
+        },
+        {
+          "label": "时间戳",
+          "value": "1714896000",
+          "desc": "Unix 时间"
+        }
       ],
       "generated": "指纹已生成",
-      "steps": ["提交验证池", "分配验证者", "代码审查", "投票共识", "上链完成"],
+      "steps": [
+        "提交验证池",
+        "分配验证者",
+        "代码审查",
+        "投票共识",
+        "上链完成"
+      ],
       "emptyState": "指纹在上链技能流程中通过验证后生成，用于追溯整个生命周期"
     },
     "antislas": {
@@ -362,13 +520,38 @@
       "reputation": "声望",
       "confiscate": "没收 {{penalty}}",
       "penalties": [
-        { "type": "恶意技能（已损害）", "penalty": "100%", "rep": "-500", "variant": "danger" },
-        { "type": "恶意技能（未损害）", "penalty": "50%", "rep": "-200", "variant": "warning" },
-        { "type": "验证者失职", "penalty": "100%", "rep": "-300", "variant": "warning" },
-        { "type": "虚假举报", "penalty": "全额", "rep": "-300", "variant": "info" }
+        {
+          "type": "恶意技能（已损害）",
+          "penalty": "100%",
+          "rep": "-500",
+          "variant": "danger"
+        },
+        {
+          "type": "恶意技能（未损害）",
+          "penalty": "50%",
+          "rep": "-200",
+          "variant": "warning"
+        },
+        {
+          "type": "验证者失职",
+          "penalty": "100%",
+          "rep": "-300",
+          "variant": "warning"
+        },
+        {
+          "type": "虚假举报",
+          "penalty": "全额",
+          "rep": "-300",
+          "variant": "info"
+        }
       ],
       "appealTitle": "申诉流程",
-      "appealSteps": ["收到通知", "7天内申诉", "长老团审核", "结果通知"]
+      "appealSteps": [
+        "收到通知",
+        "7天内申诉",
+        "长老团审核",
+        "结果通知"
+      ]
     }
   },
   "profile": {
@@ -384,6 +567,42 @@
       "trusted": "信用者",
       "guardian": "守护者",
       "elder": "长者"
+    },
+    "notSignedIn": "请先注册（宪法第二条：低摩擦）",
+    "loading": "加载用户资料中...",
+    "connectedToContract": "已连接到合约",
+    "reputationPoints": "声誉积分",
+    "nonTransferable": "不可转让",
+    "globalRank": "全球排名",
+    "constitutionArticle3": "宪法第三条",
+    "freeQuota": "免费限额",
+    "walletBalance": "钱包余额",
+    "vesting": {
+      "title": "变现进度",
+      "remaining": "距离解锁变现还需 {{count}} 声誉",
+      "unlocked": "已解锁 30% 变现权限（月度上限 500 ASK）",
+      "apply": "申请变现",
+      "locked": "需 {{count}} 声誉解锁",
+      "rule": "宪法第二条：达到 1000 声誉后才可变现",
+      "requirement": "需声誉 >= 1000 才可变现（当前：{{current}}）\n宪法第二条：渐进变现",
+      "applied": "变现申请已提交！\n可提取：30%（月度上限 500 ASK）\n宪法第二条：防早期 rush"
+    },
+    "levelSystem": "等级体系",
+    "current": "当前",
+    "error": "错误: ",
+    "levelReq": {
+      "observer": "邮箱验证",
+      "contributor": "完成3次行为",
+      "trusted": "声誉>=500",
+      "guardian": "声誉>=2000",
+      "elder": "声誉>=5000"
+    },
+    "levelPerms": {
+      "observer": "只积累声誉",
+      "contributor": "创建/改进/测试",
+      "trusted": "全功能+30%变现",
+      "guardian": "审计/仲裁+70%变现",
+      "elder": "治理投票+90%变现"
     }
   },
   "leaderboard": {
@@ -393,7 +612,30 @@
     "address": "地址",
     "reputation": "声誉",
     "skills": "技能数",
-    "reviews": "审核数"
+    "reviews": "审核数",
+    "loading": "加载排行榜中...",
+    "connectedToContract": "已连接到合约",
+    "sortByReputation": "按声誉排序",
+    "sortByLikes": "按点赞数排序",
+    "filterAll": "全部",
+    "filterVerified": "守护者/信用者（L3+）",
+    "filterNormal": "观察员/贡献者（L1-2）",
+    "empty": "暂无排行榜数据。部署合约后可查看。",
+    "tableHeaders": {
+      "rank": "排名",
+      "address": "地址",
+      "level": "等级",
+      "reputation": "声誉积分",
+      "skillsCreated": "创建技能",
+      "likes": "获赞数",
+      "status": "状态"
+    },
+    "noViolations": "无违规",
+    "flagged": "被标记 {{count}} 次",
+    "ruleConstitution3": "宪法第三条：前 3 名获得特殊标记 G/S/B，前 50 名获得\"推荐位\"，平台首页展示",
+    "ruleConstitution2": "宪法第二条：声誉积分不可转让，只积累不交易（类似 GitHub 星标）",
+    "showingCount": "当前展示：{{count}} 名用户",
+    "error": "错误: "
   },
   "wallet": {
     "connect": "连接钱包",
@@ -403,5 +645,68 @@
     "status": "钱包状态",
     "address": "地址",
     "balance": "余额"
+  },
+  "deployerDashboard": {
+    "notConnectedTitle": "连接钱包查看你的激励数据",
+    "notConnectedDesc": "成为部署者，享受推荐奖励和等级特权",
+    "connectWallet": "连接钱包",
+    "loading": "加载激励数据中...",
+    "notRegisteredTitle": "注册成为部署者获取推荐奖励",
+    "notRegisteredDesc": "推荐用户使用 AgentSkills，获得 10% 的 staking 奖励",
+    "registerNow": "立即注册",
+    "tierPrivileges": "等级特权",
+    "panelTitle": "部署者激励面板",
+    "stats": {
+      "totalUsers": "总用户",
+      "activeUsers": "活跃用户",
+      "totalRewards": "累计奖励",
+      "pendingRewards": "待领取"
+    },
+    "referralLink": "推荐链接",
+    "copy": "复制",
+    "copied": "已复制",
+    "tierProgress": "等级进度",
+    "users": "用户",
+    "toNextTier": "距离{{tier}}还差 {{count}} 用户",
+    "maxTier": "已达最高等级",
+    "partialError": "数据加载部分失败，使用演示数据",
+    "registerUnavailable": "注册功能将在合约部署后启用\n\n请使用: node scripts/deploy-with-rewards.js --register --domain your-site.com",
+    "tiers": {
+      "bronze": {
+        "name": "青铜",
+        "benefit": "基础奖励"
+      },
+      "silver": {
+        "name": "白银",
+        "benefit": "额外 5%"
+      },
+      "gold": {
+        "name": "黄金",
+        "benefit": "VIP 支持"
+      }
+    }
+  },
+  "selfOps": {
+    "title": "四自运营面板",
+    "features": {
+      "revenue": "收益",
+      "promotion": "推广",
+      "governance": "治理",
+      "health": "健康"
+    },
+    "revenueOverview": "收益概览",
+    "promotionLeaderboard": "推广排行榜",
+    "myVotingPower": "我的投票权",
+    "noActiveProposals": "暂无活跃提案",
+    "votesFor": "支持 {{count}}",
+    "votesAgainst": "反对 {{count}}",
+    "voteFor": "支持",
+    "voteAgainst": "反对",
+    "healthReports": {
+      "bug": "漏洞报告",
+      "status": "状态报告",
+      "stress": "压力测试"
+    },
+    "monthlyRemaining": "本月剩余提交次数："
   }
 }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import ContractService from '../services/ContractService.jsx'
 
 const demoUsers = [
@@ -10,6 +11,7 @@ const demoUsers = [
 ]
 
 export default function Leaderboard() {
+  const { t } = useTranslation()
   const [users, setUsers] = useState([])
   const [filter, setFilter] = useState('all')
   const [sortBy, setSortBy] = useState('reputation')
@@ -71,7 +73,7 @@ export default function Leaderboard() {
       <div className="container">
         <div className="loading-state">
           <div className="loading-spinner" />
-          <span>加载排行榜中...</span>
+          <span>{t('leaderboard.loading')}</span>
         </div>
       </div>
     )
@@ -80,13 +82,13 @@ export default function Leaderboard() {
   return (
     <div className="container animate-fade-in">
       <div className="page-header">
-        <h2 className="page-title">全球声誉排行榜</h2>
-        <p className="page-subtitle">按声誉积分排序，前 3 名获得特殊标记（宪法第三条）</p>
+        <h2 className="page-title">{t('leaderboard.title')}</h2>
+        <p className="page-subtitle">{t('leaderboard.subtitle')}</p>
       </div>
 
       {ContractService.isInitialized() && (
         <div className="badge badge-success" style={{ marginBottom: 'var(--space-4)' }}>
-          已连接到合约
+          {t('leaderboard.connectedToContract')}
         </div>
       )}
 
@@ -96,13 +98,13 @@ export default function Leaderboard() {
             className={sortBy === 'reputation' ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm'}
             onClick={() => setSortBy('reputation')}
           >
-            按声誉排序
+            {t('leaderboard.sortByReputation')}
           </button>
           <button
             className={sortBy === 'likes' ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm'}
             onClick={() => setSortBy('likes')}
           >
-            按点赞数排序
+            {t('leaderboard.sortByLikes')}
           </button>
         </div>
         <div className="toolbar-spacer" />
@@ -112,27 +114,27 @@ export default function Leaderboard() {
           onChange={e => setFilter(e.target.value)}
           style={{ minWidth: '180px' }}
         >
-          <option value="all">全部</option>
-          <option value="verified">守护者/信用者（L3+）</option>
-          <option value="normal">观察员/贡献者（L1-2）</option>
+          <option value="all">{t('leaderboard.filterAll')}</option>
+          <option value="verified">{t('leaderboard.filterVerified')}</option>
+          <option value="normal">{t('leaderboard.filterNormal')}</option>
         </select>
       </div>
 
       {filteredUsers.length === 0 && !loading ? (
         <div className="card empty-state">
-          暂无排行榜数据。部署合约后可查看。
+          {t('leaderboard.empty')}
         </div>
       ) : (
         <>
           <div className="card" style={{ padding: 'var(--space-4)' }}>
             <div className="table-header">
-              <span>排名</span>
-              <span>地址</span>
-              <span>等级</span>
-              <span style={{ textAlign: 'right' }}>声誉积分</span>
-              <span style={{ textAlign: 'right' }}>创建技能</span>
-              <span style={{ textAlign: 'right' }}>获赞数</span>
-              <span>状态</span>
+              <span>{t('leaderboard.tableHeaders.rank')}</span>
+              <span>{t('leaderboard.tableHeaders.address')}</span>
+              <span>{t('leaderboard.tableHeaders.level')}</span>
+              <span style={{ textAlign: 'right' }}>{t('leaderboard.tableHeaders.reputation')}</span>
+              <span style={{ textAlign: 'right' }}>{t('leaderboard.tableHeaders.skillsCreated')}</span>
+              <span style={{ textAlign: 'right' }}>{t('leaderboard.tableHeaders.likes')}</span>
+              <span>{t('leaderboard.tableHeaders.status')}</span>
             </div>
 
             {filteredUsers.map((user, index) => (
@@ -158,7 +160,7 @@ export default function Leaderboard() {
                   {user.totalLikes}
                 </span>
                 <span style={{ color: user.flagged > 0 ? 'var(--color-danger)' : 'var(--color-success)', fontSize: 'var(--text-sm)' }}>
-                  {user.flagged > 0 ? `被标记 ${user.flagged} 次` : '无违规'}
+                  {user.flagged > 0 ? t('leaderboard.flagged', { count: user.flagged }) : t('leaderboard.noViolations')}
                 </span>
               </div>
             ))}
@@ -166,13 +168,13 @@ export default function Leaderboard() {
 
           <div className="card" style={{ marginTop: 'var(--space-4)', padding: 'var(--space-4)' }}>
             <p style={{ margin: '0 0 var(--space-2) 0', color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)' }}>
-              宪法第三条：前 3 名获得特殊标记 G/S/B，前 50 名获得"推荐位"，平台首页展示
+              {t('leaderboard.ruleConstitution3')}
             </p>
             <p style={{ margin: '0 0 var(--space-2) 0', color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)' }}>
-              宪法第二条：声誉积分不可转让，只积累不交易（类似 GitHub 星标）
+              {t('leaderboard.ruleConstitution2')}
             </p>
             <p style={{ margin: 0, color: 'var(--color-text-tertiary)', fontSize: 'var(--text-sm)' }}>
-              当前展示：{filteredUsers.length} 名用户
+              {t('leaderboard.showingCount', { count: filteredUsers.length })}
             </p>
           </div>
         </>
@@ -180,7 +182,7 @@ export default function Leaderboard() {
 
       {error && (
         <div className="alert alert-danger" style={{ marginTop: 'var(--space-4)' }}>
-          错误: {error}
+          {t('leaderboard.error')}{error}
         </div>
       )}
     </div>

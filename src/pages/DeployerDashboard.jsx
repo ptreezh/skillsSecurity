@@ -6,17 +6,9 @@
  */
 
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import './DeployerDashboard.css'
 import ContractService from '../services/ContractService.jsx'
-
-// Tier configuration
-const TIER_KEY = { 0: 'bronze', 1: 'silver', 2: 'gold' }
-
-const TIER_CONFIG = {
-  0: { name: '青铜', key: 'bronze' },
-  1: { name: '白银', key: 'silver' },
-  2: { name: '黄金', key: 'gold' }
-}
 
 // Tier thresholds (number of users)
 const TIER_THRESHOLDS = {
@@ -25,13 +17,22 @@ const TIER_THRESHOLDS = {
   2: 100   // Gold: 100+ users
 }
 
+const TIER_KEY = { 0: 'bronze', 1: 'silver', 2: 'gold' }
+
 export default function DeployerDashboard({ user }) {
+  const { t } = useTranslation()
   const [stats, setStats] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [isRegistered, setIsRegistered] = useState(false)
   const [referralLink, setReferralLink] = useState('')
   const [copied, setCopied] = useState(false)
+
+  const tierConfig = {
+    0: { name: t('deployerDashboard.tiers.bronze.name'), key: 'bronze', benefit: t('deployerDashboard.tiers.bronze.benefit') },
+    1: { name: t('deployerDashboard.tiers.silver.name'), key: 'silver', benefit: t('deployerDashboard.tiers.silver.benefit') },
+    2: { name: t('deployerDashboard.tiers.gold.name'), key: 'gold', benefit: t('deployerDashboard.tiers.gold.benefit') }
+  }
 
   // Fetch deployer stats
   useEffect(() => {
@@ -114,7 +115,7 @@ export default function DeployerDashboard({ user }) {
 
   // Handle register (placeholder)
   const handleRegister = () => {
-    alert('注册功能将在合约部署后启用\n\n请使用: node scripts/deploy-with-rewards.js --register --domain your-site.com')
+    alert(t('deployerDashboard.registerUnavailable'))
   }
 
   // Get progress to next tier
@@ -134,7 +135,7 @@ export default function DeployerDashboard({ user }) {
       current: stats.totalUsers,
       next: nextThreshold,
       progress: Math.min(Math.max(progress, 0), 100),
-      nextTier: TIER_CONFIG[currentTier + 1]
+      nextTier: tierConfig[currentTier + 1]
     }
   }
 
@@ -145,10 +146,10 @@ export default function DeployerDashboard({ user }) {
         <div className="deployer-card">
           <div className="not-connected">
             <div className="not-connected-icon">🔗</div>
-            <h2>连接钱包查看你的激励数据</h2>
-            <p>成为部署者，享受推荐奖励和等级特权</p>
+            <h2>{t('deployerDashboard.notConnectedTitle')}</h2>
+            <p>{t('deployerDashboard.notConnectedDesc')}</p>
             <button className="btn btn-primary" onClick={() => window.location.reload()}>
-              连接钱包
+              {t('wallet.connect')}
             </button>
           </div>
         </div>
@@ -163,7 +164,7 @@ export default function DeployerDashboard({ user }) {
         <div className="deployer-card">
           <div className="loading">
             <div className="spinner"></div>
-            <p>加载激励数据中...</p>
+            <p>{t('deployerDashboard.loading')}</p>
           </div>
         </div>
       </div>
@@ -177,20 +178,20 @@ export default function DeployerDashboard({ user }) {
         <div className="deployer-card">
           <div className="not-registered">
             <div className="not-registered-icon">🎯</div>
-            <h2>注册成为部署者获取推荐奖励</h2>
-            <p>推荐用户使用 AgentSkills，获得 10% 的 staking 奖励</p>
+            <h2>{t('deployerDashboard.notRegisteredTitle')}</h2>
+            <p>{t('deployerDashboard.notRegisteredDesc')}</p>
             <button className="btn btn-primary" onClick={handleRegister}>
-              立即注册
+              {t('deployerDashboard.registerNow')}
             </button>
             <div className="tier-preview">
-              <h3>等级特权</h3>
+              <h3>{t('deployerDashboard.tierPrivileges')}</h3>
               <div className="tier-list">
-                {Object.entries(TIER_CONFIG).map(([tier, config]) => (
+                {Object.entries(tierConfig).map(([tier, config]) => (
                   <div key={tier} className={`tier-item tier-item-${config.key}`}>
                     <span className={`tier-name tier-name-${config.key}`}>{config.name}</span>
                     <span>
-                      {TIER_THRESHOLDS[tier]}+ 用户 |{' '}
-                      {tier === '0' ? '基础奖励' : tier === '1' ? '额外 5%' : 'VIP 支持'}
+                      {TIER_THRESHOLDS[tier]}+ {t('deployerDashboard.users')} |{' '}
+                      {config.benefit}
                     </span>
                   </div>
                 ))}
@@ -203,7 +204,7 @@ export default function DeployerDashboard({ user }) {
   }
 
   // REGISTERED STATE - SHOW FULL DASHBOARD
-  const tierInfo = TIER_CONFIG[stats.tier] || TIER_CONFIG[0]
+  const tierInfo = tierConfig[stats.tier] || tierConfig[0]
   const tierKey = TIER_KEY[stats.tier] || 'bronze'
   const progress = getProgressToNextTier()
 
@@ -213,7 +214,7 @@ export default function DeployerDashboard({ user }) {
         {/* Panel Header */}
         <div className="panel-header">
           <div className="panel-title">
-            <h2>部署者激励面板</h2>
+            <h2>{t('deployerDashboard.panelTitle')}</h2>
             <span className="domain-label">{stats.domain}</span>
           </div>
           <span className={`tier-badge tier-badge-${tierKey}`}>
@@ -224,27 +225,27 @@ export default function DeployerDashboard({ user }) {
         {/* Stats Grid */}
         <div className="stats-grid">
           <div className="stat-card">
-            <div className="stat-label">总用户</div>
+            <div className="stat-label">{t('deployerDashboard.stats.totalUsers')}</div>
             <div className="stat-value">{stats.totalUsers}</div>
           </div>
           <div className="stat-card">
-            <div className="stat-label">活跃用户</div>
+            <div className="stat-label">{t('deployerDashboard.stats.activeUsers')}</div>
             <div className="stat-value">{stats.activeUsers}</div>
           </div>
           <div className="stat-card stat-highlight">
-            <div className="stat-label">累计奖励</div>
+            <div className="stat-label">{t('deployerDashboard.stats.totalRewards')}</div>
             <div className="stat-value">{stats.totalRewards.toLocaleString()}</div>
             <div className="stat-unit">ASK</div>
           </div>
           <div className="stat-card">
-            <div className="stat-label">待领取</div>
+            <div className="stat-label">{t('deployerDashboard.stats.pendingRewards')}</div>
             <div className="stat-value pending">{stats.pendingRewards.toLocaleString()}</div>
           </div>
         </div>
 
         {/* Referral Section */}
         <div className="referral-section">
-          <h3>推荐链接</h3>
+          <h3>{t('deployerDashboard.referralLink')}</h3>
           <div className="referral-link-container">
             <input
               type="text"
@@ -256,24 +257,24 @@ export default function DeployerDashboard({ user }) {
               className={`btn btn-primary ${copied ? 'copied' : ''}`}
               onClick={handleCopyLink}
             >
-              {copied ? '已复制' : '复制'}
+              {copied ? t('common.copied') : t('deployerDashboard.copy')}
             </button>
           </div>
         </div>
 
         {/* Tier Progress */}
         <div className="tier-progress">
-          <h3>等级进度</h3>
+          <h3>{t('deployerDashboard.tierProgress')}</h3>
           <div className="progress-info">
             <span className={`current-tier tier-text-${tierKey}`}>
-              {tierInfo.name} · {stats.totalUsers} 用户
+              {tierInfo.name} · {stats.totalUsers} {t('deployerDashboard.users')}
             </span>
             {progress.nextTier ? (
               <span className="next-tier">
-                距离{progress.nextTier.name}还差 {progress.next - progress.current} 用户
+                {t('deployerDashboard.toNextTier', { tier: progress.nextTier.name, count: progress.next - progress.current })}
               </span>
             ) : (
-              <span className="max-tier">已达最高等级</span>
+              <span className="max-tier">{t('deployerDashboard.maxTier')}</span>
             )}
           </div>
           <div className="progress-bar-container">
@@ -285,7 +286,7 @@ export default function DeployerDashboard({ user }) {
             </div>
           </div>
           <div className="tier-markers">
-            {Object.entries(TIER_CONFIG).map(([tier, config]) => (
+            {Object.entries(tierConfig).map(([tier, config]) => (
               <span key={tier} className={`marker tier-marker-${config.key}`}>
                 {config.name} {TIER_THRESHOLDS[tier]}
               </span>
@@ -296,7 +297,7 @@ export default function DeployerDashboard({ user }) {
         {/* Error display */}
         {error && (
           <div className="alert alert-warning" style={{ marginTop: 'var(--space-4)' }}>
-            数据加载部分失败，使用演示数据
+            {t('deployerDashboard.partialError')}
           </div>
         )}
       </div>

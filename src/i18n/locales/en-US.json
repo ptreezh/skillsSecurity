@@ -211,7 +211,13 @@
       "extensionFieldsCode": "freeskill (fingerprint, ipfsHash...),\nresponsibility (liability...),\nantiSlash (enabled, slashRate...),\nhumanAuth (required...)",
       "exampleCode": "---\nname: skill-name                              # AgentSkills base\ndescription: Feature description\ntrigger: \"trigger condition {param}\"\nmetadata:\n  version: \"1.0.0\"\n  author: \"0x...\"\n  riskLevel: \"LOW\"\nscripts:\n  - name: \"main\"\n    language: \"python\"\n    code: |\n      def main(param):\n          return {\"status\": \"ok\"}\nresources: []\n\n# === FreeSkill governance extension ===\nfreeskill:\n  fingerprint: \"0x...\"\n  creator: \"0x...\"\n  ipfsHash: \"Qm...\"\n  stakeRequired: 10\n  standard: \"freeskill\"\nresponsibility:\n  liabilityDeclaration: \"I take full responsibility for this skill's behavior\"\n  scopeDeclaration: \"This skill only accesses declared resources\"\nantiSlash:\n  enabled: true\n  slashRate: 0.5\nhumanAuth:\n  required: [\"stake\", \"submit\"]\n---",
       "workflowTitle": "Upload Workflow",
-      "workflowSteps": ["Upload", "Auto Parse", "Risk Assessment", "Security Audit", "On-Chain"],
+      "workflowSteps": [
+        "Upload",
+        "Auto Parse",
+        "Risk Assessment",
+        "Security Audit",
+        "On-Chain"
+      ],
       "altEntries": {
         "title": "Need stricter governance standards?",
         "desc": "Use FreeSkill extensions or skill templates to quickly generate packages with liability declarations, anti-slash mechanisms, and verification workflows.",
@@ -233,31 +239,79 @@
       "tagline": "Free by default. Trusted by design.",
       "taglineDesc": "Freedom from chaos for Skills — making AI skills traceable, attributable, verifiable, and punishable.",
       "responsibilityChain": "Responsibility Chain",
-      "chainSteps": ["Creator signs liability declaration", "Verifier attests", "Fingerprint anchored to IPFS", "Usage records", "Audit trail on-chain", "Anti-slash penalty"],
+      "chainSteps": [
+        "Creator signs liability declaration",
+        "Verifier attests",
+        "Fingerprint anchored to IPFS",
+        "Usage records",
+        "Audit trail on-chain",
+        "Anti-slash penalty"
+      ],
       "comparisonTitle": "Trusted Skill vs Regular Skill",
-      "comparisonDimensions": ["Traceability", "Attribution", "Verification", "Authorization", "Anti-Slash"],
+      "comparisonDimensions": [
+        "Traceability",
+        "Attribution",
+        "Verification",
+        "Authorization",
+        "Anti-Slash"
+      ],
       "comparisonRegular": "Regular Skill",
       "comparisonFreeskill": "FreeSkill",
       "requiredFieldsTitle": "FreeSkill Required Fields",
       "requiredFieldsCode": "{\n  \"freeskill\": {\n    \"fingerprint\": \"0x...\",\n    \"creator\": \"0x...\",\n    \"ipfsHash\": \"QmXxx...\",\n    \"riskLevel\": \"LOW/MEDIUM/HIGH/CRITICAL\",\n    \"stakeRequired\": 100,\n    \"auditTrail\": []\n  },\n  \"responsibility\": {\n    \"liabilityDeclaration\": \"Liability declaration\"\n  },\n  \"antiSlash\": {\n    \"enabled\": true,\n    \"appealsPeriod\": 7\n  }\n}",
       "collaborationTitle": "Multi-Agent Collaboration Standards",
       "collaborationSkills": [
-        { "name": "freeskill-orchestrate", "desc": "Orchestration" },
-        { "name": "freeskill-upgrade", "desc": "Responsibility chain extension" },
-        { "name": "freeskill-audit", "desc": "Security audit" },
-        { "name": "freeskill-evaluate", "desc": "Risk assessment" },
-        { "name": "freeskill-chain", "desc": "On-chain submission" }
+        {
+          "name": "freeskill-orchestrate",
+          "desc": "Orchestration"
+        },
+        {
+          "name": "freeskill-upgrade",
+          "desc": "Responsibility chain extension"
+        },
+        {
+          "name": "freeskill-audit",
+          "desc": "Security audit"
+        },
+        {
+          "name": "freeskill-evaluate",
+          "desc": "Risk assessment"
+        },
+        {
+          "name": "freeskill-chain",
+          "desc": "On-chain submission"
+        }
       ],
       "authCheckpointsTitle": "Human Authorization Checkpoints",
       "authStepHeader": "Step",
       "authContentHeader": "Authorization",
       "authTriggerHeader": "Trigger",
       "authRows": [
-        { "step": "PRE_UPGRADE", "auth": "Confirm upgrade start", "trigger": "All skills" },
-        { "step": "POST_AUDIT", "auth": "Confirm audit result", "trigger": "HIGH/CRITICAL" },
-        { "step": "RISK_CONFIRM", "auth": "Confirm risk level", "trigger": "All skills" },
-        { "step": "STAKE_CONFIRM", "auth": "Confirm stake", "trigger": "Stake required" },
-        { "step": "CHAIN_SUBMIT", "auth": "Confirm on-chain submission", "trigger": "All submissions" }
+        {
+          "step": "PRE_UPGRADE",
+          "auth": "Confirm upgrade start",
+          "trigger": "All skills"
+        },
+        {
+          "step": "POST_AUDIT",
+          "auth": "Confirm audit result",
+          "trigger": "HIGH/CRITICAL"
+        },
+        {
+          "step": "RISK_CONFIRM",
+          "auth": "Confirm risk level",
+          "trigger": "All skills"
+        },
+        {
+          "step": "STAKE_CONFIRM",
+          "auth": "Confirm stake",
+          "trigger": "Stake required"
+        },
+        {
+          "step": "CHAIN_SUBMIT",
+          "auth": "Confirm on-chain submission",
+          "trigger": "All submissions"
+        }
       ]
     },
     "templates": {
@@ -272,8 +326,18 @@
       "uploadSkill": "Upload Skill",
       "download": "Download",
       "templateList": [
-        { "name": "freeskill-create", "desc": "Create a new skill that complies with the FreeSkill standard", "color": "var(--color-primary)", "file": "freeskill-create.FREESKILL.md" },
-        { "name": "freeskill-upgrade", "desc": "Upgrade an existing AgentSkills skill to the FreeSkill standard", "color": "var(--color-purple-600)", "file": "freeskill-upgrade.FREESKILL.md" }
+        {
+          "name": "freeskill-create",
+          "desc": "Create a new skill that complies with the FreeSkill standard",
+          "color": "var(--color-primary)",
+          "file": "freeskill-create.FREESKILL.md"
+        },
+        {
+          "name": "freeskill-upgrade",
+          "desc": "Upgrade an existing AgentSkills skill to the FreeSkill standard",
+          "color": "var(--color-purple-600)",
+          "file": "freeskill-upgrade.FREESKILL.md"
+        }
       ],
       "stats": {
         "riskLevel": "Risk Level",
@@ -284,14 +348,38 @@
       "fieldHeader": "Field",
       "descHeader": "Description",
       "governanceFields": [
-        { "field": "freeskill.fingerprint", "desc": "keccak256 fingerprint for traceability" },
-        { "field": "freeskill.stakeRequired", "desc": "Stake requirement (10/50/100/200 ether)" },
-        { "field": "freeskill.attestationCount", "desc": "Required number of verifiers" },
-        { "field": "responsibility.liabilityDeclaration", "desc": "Creator liability declaration" },
-        { "field": "responsibility.scopeDeclaration", "desc": "Permission boundary declaration" },
-        { "field": "antiSlash.enabled", "desc": "Enable anti-slash mechanism" },
-        { "field": "antiSlash.slashRate", "desc": "Penalty rate (default 50%)" },
-        { "field": "humanAuth.required", "desc": "Human authorization checkpoints" }
+        {
+          "field": "freeskill.fingerprint",
+          "desc": "keccak256 fingerprint for traceability"
+        },
+        {
+          "field": "freeskill.stakeRequired",
+          "desc": "Stake requirement (10/50/100/200 ether)"
+        },
+        {
+          "field": "freeskill.attestationCount",
+          "desc": "Required number of verifiers"
+        },
+        {
+          "field": "responsibility.liabilityDeclaration",
+          "desc": "Creator liability declaration"
+        },
+        {
+          "field": "responsibility.scopeDeclaration",
+          "desc": "Permission boundary declaration"
+        },
+        {
+          "field": "antiSlash.enabled",
+          "desc": "Enable anti-slash mechanism"
+        },
+        {
+          "field": "antiSlash.slashRate",
+          "desc": "Penalty rate (default 50%)"
+        },
+        {
+          "field": "humanAuth.required",
+          "desc": "Human authorization checkpoints"
+        }
       ]
     },
     "audit": {
@@ -317,16 +405,48 @@
       "coreComponents": "Core Components",
       "protocolFeatures": "Protocol Features",
       "components": [
-        { "name": "SkillRegistry", "desc": "Skill registration and state management", "status": "Deployed", "variant": "success" },
-        { "name": "Attribution", "desc": "Contribution attribution and reputation system", "status": "Deployed", "variant": "success" },
-        { "name": "StakingManager", "desc": "Staking and anti-slash mechanism", "status": "Deployed", "variant": "success" },
-        { "name": "ASKToken", "desc": "Point token (delayed issuance)", "status": "Planned", "variant": "warning" }
+        {
+          "name": "SkillRegistry",
+          "desc": "Skill registration and state management",
+          "status": "Deployed",
+          "variant": "success"
+        },
+        {
+          "name": "Attribution",
+          "desc": "Contribution attribution and reputation system",
+          "status": "Deployed",
+          "variant": "success"
+        },
+        {
+          "name": "StakingManager",
+          "desc": "Staking and anti-slash mechanism",
+          "status": "Deployed",
+          "variant": "success"
+        },
+        {
+          "name": "ASKToken",
+          "desc": "Point token (delayed issuance)",
+          "status": "Planned",
+          "variant": "warning"
+        }
       ],
       "features": [
-        { "title": "Standardized Interface", "desc": "Unified Skill registration, verification, and invocation interface" },
-        { "title": "Fingerprint Traceability", "desc": "keccak256 fingerprints ensure skills are traceable" },
-        { "title": "Risk Tiers", "desc": "LOW/MEDIUM/HIGH/CRITICAL four-level risk assessment" },
-        { "title": "Anti-Slash Mechanism", "desc": "Malicious behavior triggers penalties to protect the community" }
+        {
+          "title": "Standardized Interface",
+          "desc": "Unified Skill registration, verification, and invocation interface"
+        },
+        {
+          "title": "Fingerprint Traceability",
+          "desc": "keccak256 fingerprints ensure skills are traceable"
+        },
+        {
+          "title": "Risk Tiers",
+          "desc": "LOW/MEDIUM/HIGH/CRITICAL four-level risk assessment"
+        },
+        {
+          "title": "Anti-Slash Mechanism",
+          "desc": "Malicious behavior triggers penalties to protect the community"
+        }
       ]
     },
     "risk": {
@@ -336,10 +456,30 @@
       "decisionTreeTitle": "Risk Decision Tree",
       "decisionTree": "Read-only query → LOW\nUser-controllable files → MEDIUM\nOthers' data/funds → HIGH\nSystem privileges / smart contracts → CRITICAL",
       "levels": [
-        { "level": "LOW", "icon": "+", "desc": "Read-only operations, no risk", "stake": 10 },
-        { "level": "MEDIUM", "icon": "!", "desc": "Limited write operations", "stake": 50 },
-        { "level": "HIGH", "icon": "!!", "desc": "Involves funds or important data", "stake": 100 },
-        { "level": "CRITICAL", "icon": "!!!", "desc": "Irreversible critical operations", "stake": 200 }
+        {
+          "level": "LOW",
+          "icon": "+",
+          "desc": "Read-only operations, no risk",
+          "stake": 10
+        },
+        {
+          "level": "MEDIUM",
+          "icon": "!",
+          "desc": "Limited write operations",
+          "stake": 50
+        },
+        {
+          "level": "HIGH",
+          "icon": "!!",
+          "desc": "Involves funds or important data",
+          "stake": 100
+        },
+        {
+          "level": "CRITICAL",
+          "icon": "!!!",
+          "desc": "Irreversible critical operations",
+          "stake": 200
+        }
       ]
     },
     "fingerprint": {
@@ -348,12 +488,30 @@
       "desc": "Each skill generates a unique fingerprint upon creation, used to trace its entire lifecycle. The fingerprint is computed from the IPFS hash, creator address, and timestamp.",
       "formula": "fingerprint = keccak256(ipfsHash + creator + timestamp)",
       "inputs": [
-        { "label": "IPFS Hash", "value": "QmXxx...", "desc": "Code storage address" },
-        { "label": "Creator", "value": "0x1234...", "desc": "Wallet address" },
-        { "label": "Timestamp", "value": "1714896000", "desc": "Unix time" }
+        {
+          "label": "IPFS Hash",
+          "value": "QmXxx...",
+          "desc": "Code storage address"
+        },
+        {
+          "label": "Creator",
+          "value": "0x1234...",
+          "desc": "Wallet address"
+        },
+        {
+          "label": "Timestamp",
+          "value": "1714896000",
+          "desc": "Unix time"
+        }
       ],
       "generated": "Fingerprint Generated",
-      "steps": ["Submit to verification pool", "Assign verifiers", "Code review", "Vote consensus", "On-chain finish"],
+      "steps": [
+        "Submit to verification pool",
+        "Assign verifiers",
+        "Code review",
+        "Vote consensus",
+        "On-chain finish"
+      ],
       "emptyState": "The fingerprint is generated after the skill passes verification in the on-chain flow and is used to trace its entire lifecycle."
     },
     "antislas": {
@@ -362,13 +520,38 @@
       "reputation": "Reputation",
       "confiscate": "Confiscate {{penalty}}",
       "penalties": [
-        { "type": "Malicious skill (damaged)", "penalty": "100%", "rep": "-500", "variant": "danger" },
-        { "type": "Malicious skill (no damage)", "penalty": "50%", "rep": "-200", "variant": "warning" },
-        { "type": "Validator negligence", "penalty": "100%", "rep": "-300", "variant": "warning" },
-        { "type": "False report", "penalty": "Full", "rep": "-300", "variant": "info" }
+        {
+          "type": "Malicious skill (damaged)",
+          "penalty": "100%",
+          "rep": "-500",
+          "variant": "danger"
+        },
+        {
+          "type": "Malicious skill (no damage)",
+          "penalty": "50%",
+          "rep": "-200",
+          "variant": "warning"
+        },
+        {
+          "type": "Validator negligence",
+          "penalty": "100%",
+          "rep": "-300",
+          "variant": "warning"
+        },
+        {
+          "type": "False report",
+          "penalty": "Full",
+          "rep": "-300",
+          "variant": "info"
+        }
       ],
       "appealTitle": "Appeal Process",
-      "appealSteps": ["Receive notice", "Appeal within 7 days", "Elder review", "Result notification"]
+      "appealSteps": [
+        "Receive notice",
+        "Appeal within 7 days",
+        "Elder review",
+        "Result notification"
+      ]
     }
   },
   "profile": {
@@ -384,6 +567,42 @@
       "trusted": "Trusted",
       "guardian": "Guardian",
       "elder": "Elder"
+    },
+    "notSignedIn": "Please register first (Constitution §2: low-friction participation)",
+    "loading": "Loading profile...",
+    "connectedToContract": "Connected to contract",
+    "reputationPoints": "Reputation Points",
+    "nonTransferable": "Non-transferable",
+    "globalRank": "Global Rank",
+    "constitutionArticle3": "Constitution Article 3",
+    "freeQuota": "Free quota",
+    "walletBalance": "Wallet Balance",
+    "vesting": {
+      "title": "Vesting Progress",
+      "remaining": "{{count}} reputation to unlock vesting",
+      "unlocked": "30% vesting unlocked (monthly cap 500 ASK)",
+      "apply": "Apply for Vesting",
+      "locked": "{{count}} reputation required",
+      "rule": "Constitution §2: Vesting unlocks at 1,000 reputation",
+      "requirement": "Reputation >= 1,000 required to vest (current: {{current}})\nConstitution §2: Gradual vesting",
+      "applied": "Vesting application submitted!\nWithdrawable: 30% (monthly cap 500 ASK)\nConstitution §2: Anti early rush"
+    },
+    "levelSystem": "Level System",
+    "current": "Current",
+    "error": "Error: ",
+    "levelReq": {
+      "observer": "Email verified",
+      "contributor": "3 actions completed",
+      "trusted": "Reputation >= 500",
+      "guardian": "Reputation >= 2000",
+      "elder": "Reputation >= 5000"
+    },
+    "levelPerms": {
+      "observer": "Reputation only",
+      "contributor": "Create/Improve/Test",
+      "trusted": "Full features + 30% vesting",
+      "guardian": "Audit/Arbitrate + 70% vesting",
+      "elder": "Governance vote + 90% vesting"
     }
   },
   "leaderboard": {
@@ -393,7 +612,30 @@
     "address": "Address",
     "reputation": "Reputation",
     "skills": "Skills",
-    "reviews": "Reviews"
+    "reviews": "Reviews",
+    "loading": "Loading leaderboard...",
+    "connectedToContract": "Connected to contract",
+    "sortByReputation": "Sort by Reputation",
+    "sortByLikes": "Sort by Likes",
+    "filterAll": "All",
+    "filterVerified": "Guardian/Trusted (L3+)",
+    "filterNormal": "Observer/Contributor (L1-2)",
+    "empty": "No leaderboard data yet. Deploy contracts to view.",
+    "tableHeaders": {
+      "rank": "Rank",
+      "address": "Address",
+      "level": "Level",
+      "reputation": "Reputation",
+      "skillsCreated": "Skills Created",
+      "likes": "Likes",
+      "status": "Status"
+    },
+    "noViolations": "No violations",
+    "flagged": "Flagged {{count}} times",
+    "ruleConstitution3": "Constitution §3: Top 3 get special G/S/B marks; top 50 get featured spots on the platform homepage",
+    "ruleConstitution2": "Constitution §2: Reputation points are non-transferable and only accumulate (like GitHub stars)",
+    "showingCount": "Showing {{count}} users",
+    "error": "Error: "
   },
   "wallet": {
     "connect": "Connect Wallet",
@@ -403,5 +645,68 @@
     "status": "Wallet Status",
     "address": "Address",
     "balance": "Balance"
+  },
+  "deployerDashboard": {
+    "notConnectedTitle": "Connect wallet to view your rewards",
+    "notConnectedDesc": "Become a deployer and enjoy referral rewards and tier privileges",
+    "connectWallet": "Connect Wallet",
+    "loading": "Loading rewards data...",
+    "notRegisteredTitle": "Register as a deployer to earn referral rewards",
+    "notRegisteredDesc": "Refer users to AgentSkills and earn 10% of staking rewards",
+    "registerNow": "Register Now",
+    "tierPrivileges": "Tier Privileges",
+    "panelTitle": "Deployer Rewards Panel",
+    "stats": {
+      "totalUsers": "Total Users",
+      "activeUsers": "Active Users",
+      "totalRewards": "Total Rewards",
+      "pendingRewards": "Pending Rewards"
+    },
+    "referralLink": "Referral Link",
+    "copy": "Copy",
+    "copied": "Copied",
+    "tierProgress": "Tier Progress",
+    "users": "users",
+    "toNextTier": "{{count}} users to {{tier}}",
+    "maxTier": "Max tier reached",
+    "partialError": "Partial data load failed, using demo data",
+    "registerUnavailable": "Registration will be enabled after contract deployment\n\nPlease use: node scripts/deploy-with-rewards.js --register --domain your-site.com",
+    "tiers": {
+      "bronze": {
+        "name": "Bronze",
+        "benefit": "Base reward"
+      },
+      "silver": {
+        "name": "Silver",
+        "benefit": "Extra 5%"
+      },
+      "gold": {
+        "name": "Gold",
+        "benefit": "VIP support"
+      }
+    }
+  },
+  "selfOps": {
+    "title": "Self-Ops Panel",
+    "features": {
+      "revenue": "Revenue",
+      "promotion": "Promotion",
+      "governance": "Governance",
+      "health": "Health"
+    },
+    "revenueOverview": "Revenue Overview",
+    "promotionLeaderboard": "Promotion Leaderboard",
+    "myVotingPower": "My Voting Power",
+    "noActiveProposals": "No active proposals",
+    "votesFor": "For {{count}}",
+    "votesAgainst": "Against {{count}}",
+    "voteFor": "Support",
+    "voteAgainst": "Oppose",
+    "healthReports": {
+      "bug": "Bug Report",
+      "status": "Status Report",
+      "stress": "Stress Test"
+    },
+    "monthlyRemaining": "Submissions remaining this month:"
   }
 }

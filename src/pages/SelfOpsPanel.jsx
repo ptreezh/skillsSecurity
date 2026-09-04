@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from 'react-i18next'
 import "./SelfOpsPanel.css";
 import DividendCalculator from "../components/DividendCalculator";
 import DistributionHistory from "../components/DistributionHistory";
@@ -19,18 +20,8 @@ import {
   submitHealthReport
 } from "../services/ContractService";
 
-const SELF_OPS_CONFIG = {
-  features: [
-    { id: "revenue", label: "收益", icon: "💰" },
-    { id: "promotion", label: "推广", icon: "📣" },
-    { id: "governance", label: "治理", icon: "🏛️" },
-    { id: "health", label: "健康", icon: "🧬" }
-  ]
-};
-
-const TIER_LABEL = { 0: "青铜", 1: "白银", 2: "黄金" };
-
 export default function SelfOpsPanel({ user, deployerStats }) {
+  const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState("revenue");
   const [selectedProposal, setSelectedProposal] = useState(null);
   const [votingPower, setVotingPower] = useState(0);
@@ -38,6 +29,15 @@ export default function SelfOpsPanel({ user, deployerStats }) {
   const [promotionData, setPromotionData] = useState({ leaderboard: [] });
   const [governanceData, setGovernanceData] = useState({ proposals: [], activeProposal: null });
   const [healthData, setHealthData] = useState({ stats: null });
+
+  const features = [
+    { id: "revenue", label: t('selfOps.features.revenue'), icon: "💰" },
+    { id: "promotion", label: t('selfOps.features.promotion'), icon: "📣" },
+    { id: "governance", label: t('selfOps.features.governance'), icon: "🏛️" },
+    { id: "health", label: t('selfOps.features.health'), icon: "🧬" }
+  ]
+
+  const tierLabel = t(`deployerDashboard.tiers.${['bronze', 'silver', 'gold'][deployerStats?.tier ?? 0]}.name`)
 
   const { data: revenueResult, loading: revenueLoading } = usePolling(
     async () => {
@@ -99,17 +99,24 @@ export default function SelfOpsPanel({ user, deployerStats }) {
     if (healthResult) setHealthData(p => ({ ...p, stats: healthResult }));
   }, [healthResult]);
 
-  const tierLabel = TIER_LABEL[deployerStats?.tier] ?? TIER_LABEL[0];
+  const handleHealthReport = (type) => {
+    const descriptions = {
+      0: t('selfOps.healthReports.bug'),
+      1: t('selfOps.healthReports.status'),
+      2: t('selfOps.healthReports.stress')
+    }
+    submitHealthReport(type, `${descriptions[type]} description`)
+  }
 
   return (
     <div className="self-ops-panel animate-fade-in">
       <div className="self-ops-header">
-        <h2 className="self-ops-title">四自运营面板</h2>
+        <h2 className="self-ops-title">{t('selfOps.title')}</h2>
         <span className="self-ops-badge">{tierLabel}</span>
       </div>
 
       <div className="self-ops-tabs" role="tablist">
-        {SELF_OPS_CONFIG.features.map(f => (
+        {features.map(f => (
           <button
             key={f.id}
             role="tab"
@@ -126,14 +133,14 @@ export default function SelfOpsPanel({ user, deployerStats }) {
       <div className="self-ops-content">
         {activeTab === "revenue" && (
           <section className="animate-fade-in">
-            <h3 className="self-ops-section-title">收益概览</h3>
+            <h3 className="self-ops-section-title">{t('selfOps.revenueOverview')}</h3>
             <RevenueChart history={[]} loading={revenueLoading} error={null} />
           </section>
         )}
 
         {activeTab === "promotion" && (
           <section className="animate-fade-in">
-            <h3 className="self-ops-section-title">推广排行榜</h3>
+            <h3 className="self-ops-section-title">{t('selfOps.promotionLeaderboard')}</h3>
             <PromotionBarChart
               data={promotionData.leaderboard}
               loading={promotionLoading}
@@ -152,7 +159,7 @@ export default function SelfOpsPanel({ user, deployerStats }) {
         {activeTab === "governance" && (
           <section className="animate-fade-in">
             <div className="voting-power">
-              <span className="label">我的投票权</span>
+              <span className="label">{t('selfOps.myVotingPower')}</span>
               <span className="value">{votingPower}</span>
             </div>
             <GovernancePieChart
@@ -162,7 +169,7 @@ export default function SelfOpsPanel({ user, deployerStats }) {
             />
             <ul className="proposal-list">
               {governanceData.proposals.length === 0 ? (
-                <li className="proposal-empty">暂无活跃提案</li>
+                <li className="proposal-empty">{t('selfOps.noActiveProposals')}</li>
               ) : (
                 governanceData.proposals.map(proposal => (
                   <li
@@ -172,14 +179,14 @@ export default function SelfOpsPanel({ user, deployerStats }) {
                   >
                     <span className="proposal-id">#{proposal.id}</span>
                     <span className="proposal-votes">
-                      支持 {Number(proposal.forVotes || 0)} / 反对 {Number(proposal.againstVotes || 0)}
+                      {t('selfOps.votesFor', { count: Number(proposal.forVotes || 0) })} / {t('selfOps.votesAgainst', { count: Number(proposal.againstVotes || 0) })}
                     </span>
                     <div className="proposal-actions">
                       <button className="btn btn-sm btn-secondary" disabled={!user}>
-                        支持
+                        {t('selfOps.voteFor')}
                       </button>
                       <button className="btn btn-sm btn-danger" disabled={!user}>
-                        反对
+                        {t('selfOps.voteAgainst')}
                       </button>
                     </div>
                   </li>
@@ -194,34 +201,34 @@ export default function SelfOpsPanel({ user, deployerStats }) {
             <div className="health-actions">
               <button
                 className="health-action-card health-action-bug"
-                onClick={() => submitHealthReport(0, "漏洞报告描述")}
+                onClick={() => handleHealthReport(0)}
                 disabled={!user}
               >
                 <span className="health-action-icon">🐛</span>
-                <span className="health-action-name">漏洞报告</span>
+                <span className="health-action-name">{t('selfOps.healthReports.bug')}</span>
                 <span className="health-action-reward">+50 ASK</span>
               </button>
               <button
                 className="health-action-card health-action-status"
-                onClick={() => submitHealthReport(1, "状态报告描述")}
+                onClick={() => handleHealthReport(1)}
                 disabled={!user}
               >
                 <span className="health-action-icon">📊</span>
-                <span className="health-action-name">状态报告</span>
+                <span className="health-action-name">{t('selfOps.healthReports.status')}</span>
                 <span className="health-action-reward">+10 ASK</span>
               </button>
               <button
                 className="health-action-card health-action-stress"
-                onClick={() => submitHealthReport(2, "压力测试描述")}
+                onClick={() => handleHealthReport(2)}
                 disabled={!user}
               >
                 <span className="health-action-icon">⚡</span>
-                <span className="health-action-name">压力测试</span>
+                <span className="health-action-name">{t('selfOps.healthReports.stress')}</span>
                 <span className="health-action-reward">+100 ASK</span>
               </button>
             </div>
             <div className="health-stats">
-              <span className="health-stats-label">本月剩余提交次数：</span>
+              <span className="health-stats-label">{t('selfOps.monthlyRemaining')}</span>
               <span className="health-stats-value">
                 {Math.max(0, (healthData.stats?.maxMonthly || 10) - (healthData.stats?.monthlyCount || 0))} / {healthData.stats?.maxMonthly || 10}
               </span>
