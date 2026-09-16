@@ -11,7 +11,7 @@ const { jobs, addJob, updateJob, getJob } = require('./jobs');
 const { localeMiddleware } = require('./locale-middleware');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 10001;
 
 // Ensure directories exist
 const UPLOADS_DIR = process.env.UPLOADS_DIR || path.join(__dirname, '..', 'uploads');

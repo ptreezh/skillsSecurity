@@ -65,7 +65,7 @@ async function runE2ETest() {
   const result = await new Promise((resolve, reject) => {
     const options = {
       hostname: 'localhost',
-      port: 3001,
+      port: 10001,
       path: '/api/upload',
       method: 'POST',
       headers: {
@@ -118,7 +118,7 @@ async function runE2ETest() {
       await new Promise(r => setTimeout(r, 5000));
 
       const statusResult = await new Promise((resolve) => {
-        http.get(`http://localhost:3001/api/status/${result.jobId}`, (res) => {
+        http.get(`http://localhost:10001/api/status/${result.jobId}`, (res) => {
           let data = '';
           res.on('data', chunk => data += chunk);
           res.on('end', () => {
