@@ -1,460 +1,101 @@
 # Roadmap: AgentSkills
 
-## Milestones
+## v1 Milestones（已归档）
 
-- [x] **v1.1 标准文档完善** - Phases 1-7 (shipped 2026-05-15)
-- [x] **v1.2 技术债补齐** - Phases 8-10 (shipped 2026-05-16)
-- [x] **v1.3 测试与部署** - Phases 11-19 (shipped 2026-05-18)
-- [x] **v1.4 自主运营** - Phases 20-23 (completed 2026-05-21)
-- [x] **v1.5 安全加固** - Phases 24 (completed 2026-05-23)
-- [x] **v1.6 产品完善** - Phases 25 (completed 2026-05-23)
-- [x] **v1.7 测试对齐** - No-token architecture test alignment (completed 2026-05-25)
+- [x] v1.1 标准文档完善 — Phases 1-7（2026-05-15）
+- [x] v1.2 技术债补齐 — Phases 8-10（2026-05-16）
+- [x] v1.3 测试与部署 — Phases 11-19（2026-05-18）
+- [x] v1.4 自主运营 — Phases 20-23（2026-05-21）
+- [x] v1.5 安全加固 — Phase 24（2026-05-23）
+- [x] v1.6 产品完善 — Phase 25（2026-05-23）
+- [x] v1.7 测试对齐 — Phase 26（2026-05-25）
 
----
-
-## Milestones Summary
-
-### v1.1 标准文档完善 (Phases 1-7)
-
-**Shipped:** 2026-05-15
-**Requirements:** 32/32 complete
+> v1 完整需求与阶段细节归档于 `milestones/v1.1-*` 至 `v1.7-*`。
 
 ---
 
-### v1.2 技术债补齐 (Phases 8-10)
+## Current Milestone: v2.0 端到端上线收官
 
-**Shipped:** 2026-05-16
-**Requirements:** 11/11 complete
+**Goal:** 公网前端 → 后端读/写 API → ChainMaker chain1 全链路打通，生产可用、可演示、有验收证据。
 
-**Resolved:**
-- Recovery functions implemented
-- Reputation lock mechanism complete
+**背景:** 合约层已真实上链（v2 六合约，区块 28-53，13/13 验证全绿，见 `REPORTS/launch-readiness-report.md`）；断点在前端仍指向已废弃的 v1 合约 + Polygon Amoy RPC，后端无读端点，服务未持久化。
 
 ---
 
-### v1.3 测试与部署 (Phases 11-19)
+### Phase 27: 后端链上读路径 API
 
-**Shipped:** 2026-05-18
-**Requirements:** 28/28 complete
+**Requirements:** API-01, API-02, API-03, API-04, API-05
+**Depends on:** 无（cmc 容器已恢复运行）
 
----
+**Plans:**
+- 27-01 chainmaker-client 读封装 — cmc 查询 AS_SkillRegistry / AS_Staking / AgentEcosystem（技能列表、声誉、排行、统计），含缓存与容错
+- 27-02 REST 读端点 — /api/skills, /api/skills/:id, /api/reputation/:address, /api/leaderboard, /api/stats + 单元测试
 
-### v1.4 自主运营 (Phases 20-23)
-
-**Shipped:** 2026-05-21
-**Goal:** 完善已部署的四自系统组件，移除代币依赖，完成无 token 架构
-
-**Resolved:**
-- DeployerRewards + RevenueDistributor frontend panels
-- SelfOpsPanel with 4 tabs (revenue, promotion, governance, health)
-- No-token architecture: RevenueSplit, ReputationBadges, SelfSustainingEcosystem
-- Core contracts refactored (StakingManager, SkillRegistry) to remove ASKToken dependency
+**Success criteria:**
+1. curl GET /api/skills 返回 chain1 真实技能数据（非空或明确的空态）
+2. curl GET /api/reputation/0x3737f0d872f386f170c20e2ae73b81cfe6b7ecf3 返回部署者真实声誉
+3. 读端点单元测试通过
 
 ---
 
-### v1.5 安全加固 (Phase 24)
+### Phase 28: 前端接线重构
 
-**Shipped:** 2026-05-23
-**Goal:** 修复高风险漏洞，添加多签机制，委托第三方审计
+**Requirements:** FE-01, FE-02, FE-03, E2E-02, E2E-03, E2E-04
+**Depends on:** Phase 27
 
-**Resolved:**
-- ReentrancyGuard applied to StakingManager
-- CEI pattern (Checks-Effects-Interactions) on all state changes
-- GovernanceTimelock: 3-of-N multisig with 24-hour timelock delay
-- AgentPausable: emergency pause mechanism for critical functions
-- Audit package: executive summary, contract descriptions, bug bounty program
-- 27 tests passing
+**Plans:**
+- 28-01 ChainDataService — 新 API 数据层替换 ContractService 直连（读写均经后端；写路径复用 /api/upload → /api/chain 管线）
+- 28-02 页面改造 — SkillBrowser / UserProfile / Leaderboard / ProtocolDemo 接新数据层；DeployerDashboard / DividendCalculator / DistributionHistory 改接 v2（AgentEcosystem / ReputationBadges）或降级标注
+- 28-03 去 Amoy 化清零 — 全 src/ 无 80002 / rpc-amoy 引用；网络标识统一 ChainMaker chain1
 
----
-
-### v1.7 测试对齐 (2026-05-25)
-
-**Goal:** 对齐测试套件与无 token 架构
-
-**Resolved:**
-- Playwright/Mocha 冲突修复 (E2E 测试移至 e2e/ 目录)
-- ASKToken 测试归档 (contracts/test/archive/)
-- Smoke fixture 更新为无 token 架构
-- SelfSustainingEcosystem 测试 (25 tests)
-- RevenueSplit 测试 (28 tests)
-- ReputationBadges 测试 (30 tests)
-- 115 tests passing
+**Success criteria:**
+1. `grep -r "80002\|rpc-amoy" src/` 零匹配
+2. 技能浏览 / 排行榜 / 用户档案页展示链上真实数据（浏览器实测）
+3. npm run build 通过，零构建错误
 
 ---
 
-## Phases
+### Phase 29: 生产部署固化 ⚠️ GATE
 
-- [x] **Phase 11: 测试基础设施** - Hardhat 环境配置、测试框架、fixtures (completed 2026-05-17)
-- [x] **Phase 12: ASKToken 单元测试** - 代币功能完整测试 (completed 2026-05-17) [已归档]
-- [x] **Phase 13: StakingManager 单元测试** - 质押/惩罚/恢复测试 (completed 2026-05-17)
-- [x] **Phase 14: SkillRegistry + Attribution 单元测试** - 声望/归因功能测试 (completed 2026-05-18)
-- [x] **Phase 15: 集成测试** - 跨合约流程端到端验证 (completed 2026-05-17)
-- [x] **Phase 16: Polygon Amoy 部署** - 配置、部署、验证 (completed 2026-05-24)
-- [x] **Phase 17: 前端 UI 设计** - 设计系统、组件库 (completed 2026-05-18)
-- [x] **Phase 18: 合约连接** - 接入真实合约 (completed 2026-05-18)
-- [x] **Phase 19: 四自系统集成** - DeployerRewards x 自运营/自推广/自进化/自运维 (completed 2026-05-18)
-- [x] **Phase 20: DeployerRewards 完善** - 前端面板 + 测试覆盖 (completed 2026-05-18)
-- [x] **Phase 21: 四自系统 UI 完善** - 数据可视化 + 交互优化 (completed 2026-05-20)
-- [x] **Phase 22: 无代币核心基础设施** - RevenueSplit, ReputationBadges, 合约禁用 (completed 2026-05-20)
-- [x] **Phase 23: 无 Token 核心重构** - 移除核心合约对 ASKToken 的依赖，完成无 token 架构 (completed 2026-05-21)
-- [x] **Phase 24: 安全加固** - 修复高风险漏洞，添加多签机制，委托第三方审计 (completed 2026-05-23)
-- [x] **Phase 25: 产品完善** - 完善前端功能，搭建监控系统，实现 Timelock 治理 (completed 2026-05-23)
-- [x] **Phase 26: 测试对齐** - 对齐测试套件与无 token 架构 (completed 2026-05-25)
+**Requirements:** OPS-01, OPS-02, OPS-03
+**Depends on:** Phase 28
+**⚠️ 决策门:** 公网后端托管方案需用户拍板（选项：A 本机持久运行+内网穿透；B 云服务器部署 docker-compose；C 仅局域网演示+文档化公网方案）
+
+**Plans:**
+- 29-01 服务持久化 — chainmaker-solo / cmc-debug 容器 restart 策略；后端 compose 生产化（restart: unless-stopped）
+- 29-02 前端生产接线 — VITE_API_URL 指向生产后端；GitHub Pages 重新部署（deploy-frontend.yml）
+
+**Success criteria:**
+1. docker ps 三服务 Up 且 restart 策略生效
+2. 公网前端可请求到 /api/health（HTTP 200）
+3. 重启宿主机后服务自动恢复（或记录等效持久化证明）
 
 ---
 
-## Phase Details
+### Phase 30: 安全扫描与端到端验收
 
-### Phase 11: 测试基础设施
+**Requirements:** SEC-14, SEC-15, QA-01, QA-02, QA-03, QA-04, E2E-01
+**Depends on:** Phase 29
 
-**Goal**: 测试环境就绪，测试框架和 fixtures 可用
+**Plans:**
+- 30-01 安全扫描实跑 — Slither + Mythril 本地运行，报告归档 REPORTS/，高危清零或豁免记录
+- 30-02 端到端验收 — npm test / test:chain 全绿；E2E 全流程实测（上传→审计→上链→浏览→声誉）留证；上线就绪报告 v2
 
-**Depends on**: Nothing
-
-**Requirements**: TEST-01, TEST-02, TEST-03
-
-**Success Criteria** (what must be TRUE):
-  1. Hardhat chai-matchers, network-helpers, verify 插件安装并正常工作
-  2. Test fixtures 按正确顺序部署: StakingManager -> SkillRegistry -> Attribution
-  3. Mocha 测试运行器配置覆盖报告功能
-  4. 覆盖率报告可以为所有合约生成
-
-**Plans**: 3 plans in 1 wave
-
-Plan list:
-- [x] 11-01-PLAN.md - Install plugins and update network config
-- [x] 11-02-PLAN.md - Create test fixtures with deployment order
+**Success criteria:**
+1. REPORTS/ 含 Slither 与 Mythril 报告，无未豁免高危发现
+2. npm test 与 npm run test:chain 全部通过（实测输出留证）
+3. E2E 证据链归档，上线就绪报告总体 100%
 
 ---
 
-### Phase 12: ASKToken 单元测试
-
-**Goal**: ASKToken 代币合约功能完整覆盖
-
-**Depends on**: Phase 11
-
-**Requirements**: ASKT-01, ASKT-02, ASKT-03, ASKT-04
-
-**Success Criteria** (what must be TRUE):
-  1. Only owner/minter can mint tokens (access control verified)
-  2. Burning tokens correctly reduces user balance
-  3. Delegation updates vote weight tracking
-  4. Mint, Burn, Delegate events emit with correct parameters
-
-**Plans**: 1 plan in 1 wave
-
-Plan list:
-- [x] 12-01-PLAN.md - ASKToken unit tests (Mint, Burn, Delegate, Events)
-
----
-
-### Phase 13: StakingManager 单元测试
-
-**Goal**: StakingManager 质押合约功能完整覆盖
-
-**Depends on**: Phase 12
-
-**Requirements**: STAK-01, STAK-02, STAK-03, STAK-04, STAK-05
-
-**Success Criteria** (what must be TRUE):
-  1. Stake locks tokens for configured period
-  2. Unstake releases tokens after lock expires
-  3. Slash mechanism validates evidence before penalizing
-  4. Reputation lock excludes locked amount from voting power
-  5. Time-based unlock (90-day period) works with evm_increaseTime + evm_mine
-
-**Plans**: 3 plans in 1 wave
-
-Plan list:
-- [x] 13-01-PLAN.md - StakingManager stake/unstake tests (STAK-01, STAK-05)
-- [x] 13-02-PLAN.md - Slash/reputation lock/recovery tests (STAK-02, STAK-03, STAK-04)
-
----
-
-### Phase 14: SkillRegistry + Attribution 单元测试
-
-**Goal**: SkillRegistry 和 Attribution 合约功能完整覆盖
-
-**Depends on**: Phase 13
-
-**Requirements**: SKIL-01, SKIL-02, SKIL-03, SKIL-04, ATTR-01, ATTR-02, ATTR-03, ATTR-04
-
-**Success Criteria** (what must be TRUE):
-  1. Reputation tier gates (L1-L5) enforce correctly based on thresholds
-  2. Fingerprint generation produces consistent hashes for verification
-  3. Skill verification request -> approval flow completes end-to-end
-  4. Attribution creation tracks contributor and contribution value
-  5. Like mechanism prevents double-liking same contribution
-  6. Cross-contract notification triggers StakingManager correctly
-  7. setPositiveContribution() marks contribution and triggers recovery
-
-**Plans**: 3 plans in 1 wave
-
-Plan list:
-- [x] 14-01-PLAN.md - SkillRegistry unit tests (SKIL-01 to SKIL-04)
-- [x] 14-02-PLAN.md - Attribution unit tests (ATTR-01 to ATTR-04)
-
----
-
-### Phase 15: 集成测试
-
-**Goal**: 跨合约流程端到端验证完成
-
-**Depends on**: Phase 14
-
-**Requirements**: INTG-01, INTG-02, INTG-03, INTG-04
-
-**Success Criteria** (what must be TRUE):
-  1. Full deployment with correct dependency wiring verifies all contracts
-  2. Reputation flow: register -> verify -> positive contribution -> recovery works end-to-end
-  3. Anti-slash flow: like -> slash -> lock -> recover completes successfully
-  4. Cross-contract state synchronization maintains consistency
-
-**Plans**: 3 plans in 1 wave
-
-Plan list:
-- [x] 15-01-PLAN.md - Integration test fixtures
-- [x] 15-02-PLAN.md - End-to-end integration tests
-
----
-
-### Phase 16: Polygon Amoy 部署
-
-**Goal**: 合约部署到 Polygon Amoy 测试网并验证
-
-**Depends on**: Phase 15
-
-**Status**: COMPLETE (2026-05-24)
-
-**Resolved:**
-- Polygon Amoy network configured (chainId 80002)
-- deployCore.js script created with full deployment flow
-- All contracts deployed and wired correctly
-- Deployment addresses saved to deployments/core-latest.json
-
-**Requirements**: DEPL-01, DEPL-02, DEPL-03, DEPL-04
-
-**Success Criteria** (what must be TRUE):
-  1. hardhat.config.js configured for Polygon Amoy (chainId 80002, Mumbai removed)
-  2. deployCore.js script deploys all contracts with correct order and wiring
-  3. Contracts deployed and accessible on Polygon Amoy testnet
-  4. Deployment addresses saved for frontend integration
-
-**Plans**: 1 plan complete
-
-Plan list:
-- [x] 16-01-SUMMARY.md - Configure and deploy core contracts
-
----
-
-### Phase 17: 前端 UI 设计
-
-**Goal**: 设计系统、组件库
-
-**Depends on**: Phase 16
-
-**Success Criteria**: Design system complete, components built
-
-**Plans**: Complete (6/6)
-
----
-
-### Phase 18: 合约连接
-
-**Goal**: 接入真实合约
-
-**Depends on**: Phase 17
-
-**Success Criteria**: Frontend connects to real contracts on Polygon Amoy
-
-**Plans**: Complete (1/1)
-
----
-
-### Phase 19: 四自系统集成
-
-**Goal**: DeployerRewards x 自运营/自推广/自进化/自运维
-
-**Depends on**: Phase 18
-
-**Success Criteria**: Four-self system components implemented
-
-**Plans**: Complete (5/5)
-
----
-
-### Phase 20: DeployerRewards + RevenueDistributor 完善
-
-**Goal**: 完善已部署的激励合约，添加前端面板和测试
-
-**Depends on**: Phase 19
-
-**Requirements**: OPS-01, OPS-02, OPS-03
-
-**Success Criteria** (what must be TRUE):
-  1. RevenueDistributor 前端面板（显示分红历史、待领取金额）
-  2. DeployerRewards 完整测试（覆盖率 > 80%）
-  3. 分红计算器（预估月收入）
-
-**Plans**: 3 plans in 1 wave
-- [x] 20-01-PLAN.md - DeployerRewards governance tests + ContractService extension
-- [x] 20-02-PLAN.md - SelfOpsPanel integration + dividend calculator
-
----
-
-### Phase 21: 四自系统 UI 完善
-
-**Goal**: 完善 SelfOpsPanel 前端组件，添加数据可视化
-
-**Depends on**: Phase 20
-
-**Requirements**: OPS-04, OPS-05, OPS-06
-
-**Success Criteria** (what must be TRUE):
-  1. 自运营面板（收益图表、分红历史）
-  2. 自推广面板（推广效果追踪、排名）
-  3. 自进化面板（提案列表、投票历史）
-  4. 自运维面板（报告记录、奖励统计）
-
-**Plans**: 3 plans in 1 wave
-- [x] 21-01-PLAN.md - Create foundation (ABIs, hooks, common components)
-- [x] 21-02-PLAN.md - Implement chart components for all four tabs
-- [x] 21-03-PLAN.md - Gap closure (governance list, health buttons, tab switching)
-
----
-
-### Phase 22: 无代币核心基础设施
-
-**Goal**: 重构为无代币架构 - 区块链 + 声誉系统 + 服务分账
-
-**Depends on**: Phase 21
-
-**Requirements**: OPS-07, OPS-08, OPS-09
-
-**Success Criteria** (what must be TRUE):
-  1. RevenueSplit 合约完成（服务费分账，无代币）
-  2. ReputationBadges 合约完成（链上声誉徽章，不可转让）
-  3. 移除/禁用代币相关合约（ASKToken, DeployerRewards, RevenueDistributor）
-  4. 合规性确认（无代币 = 全球可服务）
-
-**Plans**: 2 plans in 2 waves
-
-**Plan list:**
-- [x] 22-01-PLAN.md - Core contracts (RevenueSplit, ReputationBadges, SelfSustainingEcosystem)
-- [x] 22-02-PLAN.md - Deprecate token contracts and update existing contracts
-
----
-
-### Phase 23: 无 Token 核心重构
-
-**Goal**: 移除核心合约对 ASKToken 的依赖，完成无 token 架构
-
-**Depends on**: Phase 22
-
-**Requirements**: NO-TOKEN-01, NO-TOKEN-02, NO-TOKEN-03, NO-TOKEN-04, NO-TOKEN-05, NO-TOKEN-06, NO-TOKEN-07
-
-**Success Criteria** (what must be TRUE):
-  1. StakingManager 不再依赖 ASKToken（移除 token 字段和所有 token 调用）
-  2. SkillRegistry 不再依赖 ASKToken（移除 token 字段）
-  3. 核心合约使用纯声誉系统替代代币质押
-  4. 所有测试通过
-
-**Plans**: 3 plans in 2 waves
-
-**Plan list:**
-- [x] 23-01-PLAN.md - Refactor StakingManager to remove ASKToken dependency
-- [x] 23-02-PLAN.md - Refactor SkillRegistry to remove ASKToken dependency
-- [x] 23-03-PLAN.md - Update tests and verify contracts work without token
-
----
-
-## Progress
-
-| Phase | Milestone | Plans Complete | Status | Completed |
-|-------|-----------|----------------|--------|-----------|
-| 1-7 | v1.1 | 100% | Complete | 2026-05-15 |
-| 8-10 | v1.2 | 100% | Complete | 2026-05-16 |
-| 11 | v1.3 | 2/2 | Complete | 2026-05-17 |
-| 12 | v1.3 | 1/1 | Complete | 2026-05-17 |
-| 13 | v1.3 | 2/2 | Complete | 2026-05-17 |
-| 14 | v1.3 | 2/2 | Complete | 2026-05-18 |
-| 15 | v1.3 | 2/2 | Complete | 2026-05-17 |
-| 16 | v1.3 | 0/2 | Not started | - |
-| 17-19 | v1.3 | 6/6 | Complete | 2026-05-18 |
-| 20 | v1.4 | 2/2 | Complete | 2026-05-18 |
-| 21 | v1.4 | 3/3 | Complete | 2026-05-20 |
-| 22 | v1.4 | 2/2 | Complete | 2026-05-20 |
-| 23 | v1.4 | 3/3 | Complete    | 2026-05-21 |
-| 24 | v1.5 | 4/4 | Complete | 2026-05-23 |
-| 25 | v1.6 | 4/4 | Complete | 2026-05-23 |
-
----
-
-### Phase 24: 安全加固
-
-**Goal**: 修复高风险漏洞，添加多签机制，委托第三方审计
-
-**Depends on**: Phase 23
-
-**Status**: COMPLETE (2026-05-23)
-
-**Resolved:**
-- ReentrancyGuard added to StakingManager
-- CEI pattern applied to all state-changing functions
-- GovernanceTimelock (3-of-N multisig, 24h delay)
-- AgentPausable for emergency pause
-- Audit package created
-- Bug bounty program defined
-
-**Success Criteria** (what must be TRUE):
-  1. `setEffectiveReputation()` 漏洞已修复
-  2. 多签机制已实现（至少 3-of-5）
-  3. 紧急暂停机制已添加
-  4. 所有合约编译通过，测试通过
-  5. 第三方安全审计报告完成 (待执行)
-
-**Plans**: 4 plans in 2 waves
-
-**Plan list:**
-- [x] 24-01-PLAN.md - Fix critical vulnerabilities (setEffectiveReputation, reentrancy)
-- [x] 24-02-PLAN.md - Implement multi-signature governance
-- [x] 24-03-PLAN.md - Add emergency pause mechanism
-- [x] 24-04-PLAN.md - Complete security audit preparation
-
----
-
-### Phase 25: 产品完善
-
-**Goal**: 完善前端功能，搭建监控系统，实现 Timelock 治理
-
-**Depends on**: Phase 24
-
-**Status**: COMPLETE (2026-05-23)
-
-**Resolved:**
-- GasMonitor for Polygon gas price monitoring
-- EventWatcher for contract events
-- AlertService with Telegram/Email/Slack support
-- OpsDashboard for real-time monitoring
-- AgentTimelock (48h delay), ReputationVotes, AgentGovernor
-- API documentation, user onboarding guide, FAQ
-
-**Success Criteria** (what must be TRUE):
-  1. 前端 SelfOpsPanel 功能完整
-  2. 监控系统部署（Gas 监控、异常告警）
-  3. Timelock 治理合约实现
-  4. API 文档完成
-  5. 用户指南完成
-
-**Plans**: 4 plans in 3 waves
-
-**Plan list:**
-- [x] 25-01-PLAN.md - Complete frontend core features
-- [x] 25-02-PLAN.md - Build monitoring and alerting system
-- [x] 25-03-PLAN.md - Implement Timelock governance
-- [x] 25-04-PLAN.md - Create API documentation and user guide
-
----
-
-*Roadmap created: 2026-05-16*
-*Last updated: 2026-05-23 after Phase 24 & 25 completion*
+## Coverage 验证
+
+| 分类 | 需求数 | 映射 Phase |
+|------|--------|-----------|
+| E2E | 4 | 28 (02-04), 30 (01) |
+| API | 5 | 27 |
+| FE | 3 | 28 |
+| OPS | 3 | 29 |
+| SEC | 2 | 30 |
+| QA | 4 | 30 |
+| **合计** | **21** | **100% 覆盖** |
