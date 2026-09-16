@@ -306,6 +306,9 @@ const abiCache = new Map();
 async function loadAbi(contractKey) {
   if (abiCache.has(contractKey)) return abiCache.get(contractKey);
   const contract = CONTRACTS[contractKey];
+  if (!contract) {
+    throw new Error(`未注册的合约 key: ${contractKey}`);
+  }
   const abiPath = `${ABI_DIR}/${contract.abiFile}`;
   let raw = '';
   if (ABI_LOCAL_DIR) {
