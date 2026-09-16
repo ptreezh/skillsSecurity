@@ -1,15 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.7
-milestone_name: 测试对齐
-status: complete
-last_updated: "2026-05-27T12:00:00.000Z"
+milestone: v2.0
+milestone_name: 端到端上线收官
+status: in_progress
+last_updated: "2026-09-16T00:00:00.000Z"
 progress:
-  total_phases: 26
-  completed_phases: 26
-  total_plans: 50
-  completed_plans: 50
-  percent: 100
+  total_phases: 4
+  completed_phases: 0
+  phase_numbering: 27-30
+  total_plans: 9
+  completed_plans: 0
+  percent: 0
 ---
 
 # AgentSkills - Current State
@@ -19,15 +20,24 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-18)
 
 **Core value:** Skills with accountability — every action is traceable, every contributor is credited, every violation has consequences.
-**Current focus:** All 7 milestones complete. Ready for v2.0 planning.
+**Current focus:** v2.0 端到端上线收官 — 打通公网前端 → 后端 API → ChainMaker chain1 全链路。
 
 ## Current Position
 
-Milestone: v1.7 (测试对齐) - COMPLETE
-Phase: 26
-Status: All phases complete — next milestone not yet defined
+Milestone: v2.0 (端到端上线收官) - IN PROGRESS
+Phase: 27 (后端链上读路径 API) - NEXT
+Status: v2.0 已定义（REQUIREMENTS 21 项 / ROADMAP 4 phases），待执行 Phase 27
 
-Progress: [████████████████████] 100%
+Progress: [░░░░░░░░░░░░░░░░░░░░] 0%
+
+## v2.0 Active Phases
+
+| Phase | Name | Plans | Status |
+|-------|------|-------|--------|
+| 27 | 后端链上读路径 API | 0/2 | Pending |
+| 28 | 前端接线重构 | 0/3 | Pending |
+| 29 | 生产部署固化 ⚠️GATE | 0/2 | Pending |
+| 30 | 安全扫描与端到端验收 | 0/2 | Pending |
 
 ## Milestone Summary
 

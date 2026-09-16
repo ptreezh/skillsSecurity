@@ -38,11 +38,7 @@ Skills with accountability — every action is traceable, every contributor is c
 
 ## Context
 
-**Current state:** v1.3 milestone in progress (2026-05-17)
-- SKILLS_STANDARD.md v1.1-1.2 finalized with 32+ requirements addressed
-- Smart contracts: ASKToken, SkillRegistry, Attribution, StakingManager
-- Full test suite: 20 integration tests covering deployment, reputation flow, anti-slash, and cross-contract sync
-- Testnet deployment pending (Polygon Amoy)
+**Current state:** v1.1–v1.7 全部完成（26 phases，2026-05-25）；v2 六合约已真实部署 ChainMaker chain1（solo，区块 28-53，13/13 验证全绿，`deployments.json`）；断点：前端仍指向废弃 v1 合约 + Polygon Amoy RPC，后端无链上读端点，服务未持久化。v2.0 目标：端到端收官（2026-09-16 启动）。
 
 **Technical environment:**
 - Solidity smart contracts (Hardhat framework)
@@ -68,16 +64,15 @@ Skills with accountability — every action is traceable, every contributor is c
 
 ---
 
-## Current Milestone: v1.3 测试与部署
+## Current Milestone: v2.0 端到端上线收官
 
-**Goal:** 建立测试环境、编写合约测试、部署到 Polygon 测试网
+**Goal:** 打通公网前端 → 后端 API → ChainMaker chain1 完整生产链路，端到端可演示、可持续运行、有验收证据
 
 **Target features:**
-- 创建 hardhat.config.js 和测试环境
-- 编写合约单元测试（ASKToken、SkillRegistry、Attribution、StakingManager）
-- 编写跨合约集成测试
-- 部署到 Polygon Amoy 测试网
-- 验证合约交互和功能
+- 后端链上读 API（skills / reputation / leaderboard / stats）
+- 前端去 Amoy 化，全部数据经后端 ChainMaker 网关
+- 服务持久化运行 + 公网前端重新部署
+- Slither/Mythril 实跑 + 端到端验收留证
 
 ---
 
@@ -92,4 +87,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-17 after phase 15 complete*
+*Last updated: 2026-09-16 — v2.0 milestone started*
