@@ -4,7 +4,7 @@
 
 import i18n from '../i18n'
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:10001';
 
 function getHeaders() {
   return {
