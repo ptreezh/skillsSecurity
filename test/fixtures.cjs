@@ -37,6 +37,11 @@ async function deployContracts() {
   // CRITICAL: Wire Attribution to StakingManager (per D-03 and PITFALL #1)
   await attribution.setStakingManager(staking);
 
+  // Authorize SkillRegistry and Attribution as callers for setPositiveContribution
+  // (W1.7b: onlyGovernance → onlyGovernanceOrAuthorized)
+  await staking.addAuthorizedCaller(registry.target);
+  await staking.addAuthorizedCaller(attribution.target);
+
   return { staking, registry, attribution, owner, user1, user2, accounts };
 }
 

@@ -2,39 +2,27 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "../interfaces/IReputationIncentives.sol";
 
 /**
  * @title Governance
- * @notice On-chain voting with reputation-weighted power + deployer governance
- * @dev Voting power: L4+ (1 per 1000 rep) + Token holders (1 per 10000 ASK) + Deployer weight
- * @dev Security fixes: timelock initialization, onlyOwner access, whitelist actions, pause mechanism
+ * @notice On-chain reputation-weighted voting (pure reputation, no tokens, no deployer black-box)
+ * @dev v3 (grill-down #8–#15): removed askToken/deployerRewards/timelock/veto dependencies
+ * @dev execute() is publicly callable after internal timelock end time (OZ Governor pattern)
  */
 interface IStakingManager {
     function getUserReputation(address account) external view returns (int256);
-}
-
-interface IERC20 {
-    function balanceOf(address account) external view returns (uint256);
-    function transfer(address to, uint256 amount) external returns (bool);
-    function transferFrom(address from, address to, uint256 amount) external returns (bool);
-}
-
-interface IDeployerRewards {
-    function getGovernanceWeight(address deployer) external view returns (uint256);
-    function isGoldTier(address deployer) external view returns (bool);
+    function getTotalReputation() external view returns (int256);
 }
 
 /**
- * @notice Allowed proposal action types (whitelist pattern)
- * @dev Prevents arbitrary function calls through execute()
+ * @notice Allowed proposal action types (whitelist pattern, all real & executable)
+ * @dev 3 actions only: reward config (real param write) + pause/unpause (real switch)
  */
 enum ProposalAction {
-    UPDATE_TIER_CONFIG,      // Update tier configuration
-    UPDATE_REWARD_CONFIG,    // Update reward configuration
-    UPDATE_DISTRIBUTION,     // Update distribution ratios
-    TRANSFER_TOKENS,         // Transfer tokens to address
-    PAUSE_CONTRACT,          // Pause contract
-    UNPAUSE_CONTRACT          // Unpause contract
+    UPDATE_REWARD_CONFIG,    // Write reward base into ReputationIncentives (real)
+    PAUSE_CONTRACT,          // Pause governance (real)
+    UNPAUSE_CONTRACT         // Unpause governance (real)
 }
 
 contract Governance is Ownable {
@@ -52,21 +40,14 @@ contract Governance is Ownable {
     }
 
     uint256 public constant VOTING_PERIOD = 7 days;
-    uint256 public constant QUORUM = 6000; // 60% of total votes
+    uint256 public constant QUORUM = 6000; // 60% of total voting power
     uint256 public constant TIMELOCK_DELAY = 48 hours;
     uint256 public constant MAJORITY = 5001; // 50.01%
-    uint256 public constant MIN_VOTING_POWER = 100;
-    uint256 public constant GOLD_VETO_THRESHOLD = 3000; // 30% gold opposition can pause proposal
+    uint256 public constant MIN_VOTING_POWER = 100; // >= 100 voting units (rep >= 100,000)
+    uint256 public constant MAX_VOTE_CAP = 1000; // 10% of total (1000 bps)
 
     Proposal[] public proposals;
-    address public timelock;
     address public stakingManager;
-    address public askToken;
-    address public deployerRewards; // DeployerRewards contract for governance integration
-
-    mapping(address => uint256) public votingPowerCache;
-    uint256 public lastTotalPowerRecalculation;
-    uint256 public cachedTotalVotingPower;
 
     // Pausable state for emergency actions
     bool public paused;
@@ -77,23 +58,14 @@ contract Governance is Ownable {
     event VoteCast(uint256 id, address voter, bool support, uint256 weight);
     event ProposalExecuted(uint256 id, ProposalAction action);
     event ProposalCanceled(uint256 id);
-    event VotingPowerRecalculated(uint256 totalPower);
-    event GoldVeto(uint256 indexed proposalId, address deployer, uint256 vetoPower);
-    event DeployerRewardsSet(address deployerRewards);
     event Paused();
     event Unpaused();
 
     // Errors
     error PausedError();
-    error NotTimelock();
     error NotPassed();
     error QuorumNotReached();
     error TimelockNotElapsed();
-
-    modifier onlyTimelock() {
-        if (msg.sender != timelock) revert NotTimelock();
-        _;
-    }
 
     modifier whenNotPaused() {
         if (paused) revert PausedError();
@@ -101,37 +73,22 @@ contract Governance is Ownable {
     }
 
     /**
-     * @notice Constructor with timelock initialization (CRITICAL FIX)
-     * @param _stakingManager StakingManager contract address
-     * @param _askToken ASKToken contract address
-     * @param _timelock Timelock address (usually a Gnosis Safe)
+     * @notice Constructor (v3: token/timelock/deployer dependencies removed)
+     * @param _stakingManager StakingManager contract address (reputation authority)
      */
-    constructor(address _stakingManager, address _askToken, address _timelock) {
-        require(_timelock != address(0), "Zero timelock");
+    constructor(address _stakingManager) Ownable() {
+        require(_stakingManager != address(0), "Zero staking manager");
         stakingManager = _stakingManager;
-        askToken = _askToken;
-        timelock = _timelock;
         paused = false;
-    }
-
-    /**
-     * @notice Set deployer rewards contract (SECURITY FIX: added onlyOwner)
-     * @param _deployerRewards DeployerRewards contract address
-     */
-    function setDeployerRewards(address _deployerRewards) external onlyOwner {
-        require(_deployerRewards != address(0), "Zero address");
-        require(deployerRewards == address(0), "Already set");
-        deployerRewards = _deployerRewards;
-        emit DeployerRewardsSet(_deployerRewards);
     }
 
     /**
      * @notice Create a new proposal with structured action (whitelist pattern)
      * @param description Proposal description
      * @param action The type of action being proposed
-     * @param target Target address (for transfers)
-     * @param value Value/amount
-     * @param data Additional encoded data
+     * @param target Target address (for UPDATE_REWARD_CONFIG: ReputationIncentives)
+     * @param value Value/amount (for UPDATE_REWARD_CONFIG: new base reward)
+     * @param data Additional encoded data (for UPDATE_REWARD_CONFIG: abi.encode(uint8 role))
      */
     function createProposal(
         string memory description,
@@ -154,8 +111,10 @@ contract Governance is Ownable {
         // Store structured action data
         proposal.callData = abi.encode(action, target, value, data);
 
-        // Set timelock end time (48h delay)
-        proposalTimelockEndTime[proposalId] = block.timestamp + TIMELOCK_DELAY;
+        // Set timelock end time: measured from VOTING END, not creation (fix W1.7b)
+        // Otherwise 7d voting > 48h timelock → timelock would already be expired
+        // when voting ends, making TimelockNotElapsed dead code and the delay meaningless.
+        proposalTimelockEndTime[proposalId] = block.timestamp + VOTING_PERIOD + TIMELOCK_DELAY;
 
         emit ProposalCreated(proposalId, msg.sender, description, action);
     }
@@ -184,10 +143,11 @@ contract Governance is Ownable {
     }
 
     /**
-     * @notice Execute a passed proposal (SECURITY FIX: whitelist pattern, no arbitrary calls)
+     * @notice Execute a passed proposal (publicly callable after timelock end)
+     * @dev v3 (grill-down #8): onlyTimelock removed — internal timelockEndTime check is the sole gate
      * @param proposalId Proposal ID to execute
      */
-    function execute(uint256 proposalId) external onlyTimelock whenNotPaused {
+    function execute(uint256 proposalId) external whenNotPaused {
         require(proposalId < proposals.length, "Invalid proposal");
         Proposal storage proposal = proposals[proposalId];
         require(block.timestamp > proposal.endTime, "Voting not ended");
@@ -212,24 +172,25 @@ contract Governance is Ownable {
 
         proposal.executed = true;
 
-        // Decode and execute whitelist action (SECURITY FIX: no arbitrary calls)
+        // Decode and execute whitelist action (whitelist pattern, no arbitrary calls)
         _executeWhitelistAction(proposal.callData);
 
         emit ProposalExecuted(proposalId, abi.decode(proposal.callData, (ProposalAction)));
     }
 
     /**
-     * @notice Internal: Execute whitelist action (SECURITY FIX)
+     * @notice Internal: Execute whitelist action (3 real actions only)
      * @param callData Encoded (action, target, value, data)
      */
     function _executeWhitelistAction(bytes memory callData) internal {
         (ProposalAction action, address target, uint256 value, bytes memory data) =
             abi.decode(callData, (ProposalAction, address, uint256, bytes));
 
-        if (action == ProposalAction.TRANSFER_TOKENS) {
-            // Transfer tokens to target address
+        if (action == ProposalAction.UPDATE_REWARD_CONFIG) {
+            // Real config write into ReputationIncentives (grill-down #15)
             require(target != address(0), "Zero target");
-            require(IERC20(askToken).transfer(target, value), "Transfer failed");
+            ReputationRole role = abi.decode(data, (ReputationRole));
+            IReputationIncentives(target).setRoleBaseReward(role, value);
         } else if (action == ProposalAction.PAUSE_CONTRACT) {
             paused = true;
             emit Paused();
@@ -237,9 +198,7 @@ contract Governance is Ownable {
             paused = false;
             emit Unpaused();
         }
-        // UPDATE_TIER_CONFIG, UPDATE_REWARD_CONFIG, UPDATE_DISTRIBUTION
-        // would be implemented here with external contract calls
-        // For now, these are placeholder for future integrations
+        // No other actions exist (enum has exactly 3 members)
     }
 
     function cancelProposal(uint256 proposalId) external {
@@ -271,41 +230,29 @@ contract Governance is Ownable {
         emit Unpaused();
     }
 
+    /**
+     * @notice Voting power = pure reputation weight (grill-down #9: no token/deployer terms)
+     * @dev 1 voting unit per 1000 reputation; capped at 10% of total (anti-dominance)
+     * @param account Voter address
+     */
     function getVotingPower(address account) public view returns (uint256) {
-        // 1. Reputation votes (L4+: 1 vote per 1000 reputation)
         int256 reputation = IStakingManager(stakingManager).getUserReputation(account);
-        uint256 repVotes = reputation > 0 ? uint256(reputation / 1000) * 1e18 : 0;
+        if (reputation <= 0) return 0;
+        uint256 repVotes = (uint256(reputation) / 1000) * 1e18;
 
-        // 2. Token votes (1 vote per 10000 ASK)
-        uint256 tokenBalance = IERC20(askToken).balanceOf(account);
-        uint256 tokenVotes = (tokenBalance / 10000) * 1e18;
-
-        // 3. Deployer weight (new: from DeployerRewards)
-        uint256 deployerVotes;
-        if (deployerRewards != address(0)) {
-            deployerVotes = IDeployerRewards(deployerRewards).getGovernanceWeight(account);
-        }
-
-        // Calculate total weight
-        uint256 total = repVotes + tokenVotes + deployerVotes;
-
-        // Apply cap at 10% of total
-        uint256 cap = getTotalVotingPower() / 10;
-        return total > cap ? cap : total;
+        // Apply cap at 10% of total voting power
+        uint256 cap = getTotalVotingPower() / (10000 / MAX_VOTE_CAP);
+        return repVotes > cap ? cap : repVotes;
     }
 
+    /**
+     * @notice Total voting power from StakingManager's incremental aggregate (grill-down #2)
+     * @dev No iteration, no hardcoded cache: reads reputation authority's maintained total
+     */
     function getTotalVotingPower() public view returns (uint256) {
-        // For simplicity, return cached value
-        // In production, this would iterate through all stakers
-        return cachedTotalVotingPower > 0 ? cachedTotalVotingPower : 1000000e18;
-    }
-
-    function recalculateTotalPower() external {
-        // Called periodically to update total voting power cache
-        // In production: iterate all stakers from StakingManager
-        cachedTotalVotingPower = 1000000e18;
-        lastTotalPowerRecalculation = block.timestamp;
-        emit VotingPowerRecalculated(cachedTotalVotingPower);
+        int256 totalRep = IStakingManager(stakingManager).getTotalReputation();
+        if (totalRep <= 0) return 0;
+        return (uint256(totalRep) / 1000) * 1e18;
     }
 
     function getProposal(uint256 proposalId) external view returns (
@@ -339,25 +286,5 @@ contract Governance is Ownable {
 
     function getProposalCount() external view returns (uint256) {
         return proposals.length;
-    }
-
-    /// @notice Gold tier deployers can cast veto (自进化治理)
-    /// @param proposalId Proposal ID to veto
-    function castGoldVeto(uint256 proposalId) external whenNotPaused {
-        require(proposalId < proposals.length, "Invalid proposal");
-        require(deployerRewards != address(0), "DeployerRewards not set");
-
-        bool isGold = IDeployerRewards(deployerRewards).isGoldTier(msg.sender);
-        require(isGold, "Not a Gold deployer");
-
-        Proposal storage proposal = proposals[proposalId];
-        require(!proposal.hasVoted[msg.sender], "Already voted");
-        require(!proposal.executed, "Already executed");
-
-        uint256 weight = getVotingPower(msg.sender);
-        proposal.hasVoted[msg.sender] = true;
-        proposal.againstVotes += weight; // Count as against
-
-        emit GoldVeto(proposalId, msg.sender, weight);
     }
 }

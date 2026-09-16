@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/governance/utils/IVotes.sol";
-import "./StakingManager.sol";
+import "../StakingManager.sol";
 
 /**
  * @title ReputationVotes

@@ -43,6 +43,7 @@ contract Attribution is Ownable {
     mapping(uint256 => Contribution[]) public skillContributions;
     mapping(uint256 => uint256) public contributionCount;
     mapping(address => uint256[]) public contributorSkills;
+    uint256 public totalContributions;
     
     // 新增：测试报告
     mapping(uint256 => TestReport[]) public skillTestReports;
@@ -92,6 +93,7 @@ contract Attribution is Ownable {
         skillContributions[_skillId].push(c);
         contributorSkills[_contributor].push(_skillId);
         contributionCount[_skillId]++;
+        totalContributions++;
     }
     
     // 新增：添加测试报告（宪法第三条：全链条追溯）

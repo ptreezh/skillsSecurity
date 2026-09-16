@@ -1,31 +1,32 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./interfaces/IReputationBadges.sol";
 
 /// @title ReputationBadges
-/// @notice Non-transferable reputation badges (ERC-721)
-/// @dev Badges cannot be transferred once issued
-contract ReputationBadges is ERC721, Ownable, IReputationBadges {
+/// @notice Non-transferable reputation badges（纯声誉事件记账，零 token 标准）
+/// @dev W1.4 改造：移除 ERC721，徽章为不可转移的纯链上声誉凭证
+///      接口 IReputationBadges 保持不变（SelfSustainingEcosystem._issueTierBadge 依赖）
+contract ReputationBadges is Ownable, IReputationBadges {
     // State
     address public issuer;
 
-    // Token data
+    // Badge data（按自增 badgeId 索引，非 ERC721 token）
     mapping(uint256 => BadgeType) public badgeTypes;
     mapping(uint256 => string) public badgeEvidence;
     mapping(uint256 => uint256) public badgeIssuedAt;
+    uint256 private _badgeIdCounter;
 
     // User badge tracking
-    mapping(address => mapping(uint256 => uint256)) public userBadgeCount;
-    uint256 private _tokenIdCounter;
+    mapping(address => mapping(uint256 => uint256)) public userBadgeCount; // user → badgeType(uint) → count
+    mapping(address => uint256[]) public userBadgeIds;                     // user → badgeId 列表（前端读取路径）
 
-    constructor() ERC721("AgentSkills Badges", "ASKB") Ownable() {
+    constructor() Ownable() {
         issuer = _msgSender();
     }
 
-    /// @notice Issue a badge to a recipient
+    /// @notice Issue a badge to a recipient（纯记账：无 token 铸造，仅记录 + 事件）
     /// @param recipient The badge recipient
     /// @param badgeType The type of badge
     /// @param evidence The evidence/metadata for the badge
@@ -37,26 +38,25 @@ contract ReputationBadges is ERC721, Ownable, IReputationBadges {
         require(recipient != address(0), "Invalid recipient");
         require(bytes(evidence).length > 0, "Evidence required");
 
-        uint256 tokenId = _tokenIdCounter++;
-        _safeMint(recipient, tokenId);
-        
-        badgeTypes[tokenId] = badgeType;
-        badgeEvidence[tokenId] = evidence;
-        badgeIssuedAt[tokenId] = block.timestamp;
+        uint256 badgeId = _badgeIdCounter++;
+        badgeTypes[badgeId] = badgeType;
+        badgeEvidence[badgeId] = evidence;
+        badgeIssuedAt[badgeId] = block.timestamp;
         userBadgeCount[recipient][uint256(badgeType)]++;
+        userBadgeIds[recipient].push(badgeId);
 
-        emit BadgeIssued(recipient, badgeType, tokenId, evidence);
+        emit BadgeIssued(recipient, badgeType, badgeId, evidence);
     }
 
-    /// @notice Get badge info by token ID
-    /// @param tokenId The token ID
-    /// @return BadgeInfo for the token
-    function getBadgeInfo(uint256 tokenId) external view override returns (BadgeInfo memory) {
-        require(_exists(tokenId), "Token does not exist");
+    /// @notice Get badge info by badge ID
+    /// @param badgeId The badge ID
+    /// @return BadgeInfo for the badge
+    function getBadgeInfo(uint256 badgeId) external view override returns (BadgeInfo memory) {
+        require(badgeId < _badgeIdCounter, "Badge does not exist");
         return BadgeInfo({
-            badgeType: badgeTypes[tokenId],
-            evidence: badgeEvidence[tokenId],
-            issuedAt: badgeIssuedAt[tokenId]
+            badgeType: badgeTypes[badgeId],
+            evidence: badgeEvidence[badgeId],
+            issuedAt: badgeIssuedAt[badgeId]
         });
     }
 
@@ -71,67 +71,19 @@ contract ReputationBadges is ERC721, Ownable, IReputationBadges {
         return userBadgeCount[user][uint256(badgeType)];
     }
 
+    /// @notice Get all badge IDs held by a user（前端读取路径，W1.4 新增）
+    /// @param user The user address
+    /// @return Array of badge IDs
+    function getUserBadges(address user) external view returns (uint256[] memory) {
+        return userBadgeIds[user];
+    }
+
     /// @notice Set the issuer address
     /// @param newIssuer The new issuer address
     function setIssuer(address newIssuer) external override onlyOwner {
         require(newIssuer != address(0), "Invalid issuer");
         issuer = newIssuer;
         emit IssuerChanged(newIssuer);
-    }
-
-    /// @dev CRITICAL: Override transferFrom to prevent transfers
-    function transferFrom(
-        address,
-        address,
-        uint256
-    ) public pure override {
-        revert("Badges are non-transferable");
-    }
-
-    /// @dev CRITICAL: Override safeTransferFrom to prevent transfers
-    function safeTransferFrom(
-        address,
-        address,
-        uint256
-    ) public pure override {
-        revert("Badges are non-transferable");
-    }
-
-    /// @dev CRITICAL: Override safeTransferFrom with data to prevent transfers
-    function safeTransferFrom(
-        address,
-        address,
-        uint256,
-        bytes memory
-    ) public pure override {
-        revert("Badges are non-transferable");
-    }
-
-    /// @dev Override tokenURI to provide badge metadata
-    function tokenURI(uint256 tokenId) public view override returns (string memory) {
-        require(_exists(tokenId), "Token does not exist");
-        BadgeType bt = badgeTypes[tokenId];
-        return string(abi.encodePacked(
-            "data:application/json,",
-            '{"name":"',
-            _badgeTypeToString(bt),
-            '","description":"AgentSkills Reputation Badge","attributes":[{"trait_type":"Type","value":"',
-            _badgeTypeToString(bt),
-            '"},{"trait_type":"IssuedAt","value":',
-            Strings.toString(badgeIssuedAt[tokenId]),
-            '}]}'
-        ));
-    }
-
-    /// @dev Helper to convert badge type to string
-    function _badgeTypeToString(BadgeType bt) internal pure returns (string memory) {
-        if (bt == BadgeType.SKILLSHARP_100) return "SKILLSHARP_100";
-        if (bt == BadgeType.VERIFIED_DEVELOPER) return "VERIFIED_DEVELOPER";
-        if (bt == BadgeType.TOP_RATED) return "TOP_RATED";
-        if (bt == BadgeType.EARLY_ADOPTER) return "EARLY_ADOPTER";
-        if (bt == BadgeType.SECURITY_AUDITOR) return "SECURITY_AUDITOR";
-        if (bt == BadgeType.CODE_REVIEWER) return "CODE_REVIEWER";
-        return "UNKNOWN";
     }
 
     /// @dev Modifier to restrict to issuer only
