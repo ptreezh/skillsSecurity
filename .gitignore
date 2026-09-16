@@ -17,3 +17,6 @@ progress.log
 
 # Claude worktrees and local settings
 .claude/
+
+# Runtime upload artifacts (API tests / temp skill files)
+uploads/temp/

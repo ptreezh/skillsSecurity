@@ -1,5 +1,9 @@
 # AgentSkills 生产部署检查清单
 
+> **当前运行架构（2026-09-16 更新）**: 后端链提交走 **ChainMaker 私有链（chain1）**。
+> 本清单中的钱包/私钥步骤仅适用于**可选公开链部署**（Polygon，手动 workflow_dispatch）。
+> 运行后端链提交只需 `CHAINMAKER_*` + `SKILL_REGISTRY_ADDRESS`，无需私钥。
+
 ## 📋 部署前准备
 
 ### 环境检查
@@ -7,8 +11,9 @@
 - [ ] npm 依赖已安装 (`npm install`)
 - [ ] Hardhat 已配置 (`hardhat.config.js`)
 - [ ] .env 文件已创建并配置
+- [ ] 后端链提交：`CHAINMAKER_*` + `SKILL_REGISTRY_ADDRESS`（chain1）已配置
 
-### 钱包准备
+### 钱包准备（仅公开链部署需要）
 - [ ] 部署者钱包地址已确认
 - [ ] 私钥已安全配置 (`PRIVATE_KEY` in .env)
 - [ ] 钱包余额充足 (>= 0.1 MATIC for testnet, >= 1 MATIC for mainnet)

@@ -1,6 +1,10 @@
 # AgentSkills 部署指南
 
-## Polygon Amoy 测试网部署
+> **当前运行架构（2026-09-16 更新）**: 后端链提交已切换到 **ChainMaker 私有链（chain1）**（cmc 网关），
+> 运行后端**不需要** `PRIVATE_KEY` / `POLYGON_AMOY_RPC`。本指南保留的 Polygon 部署流程仅用于
+> **可选公开链部署**（`deploy.yml` 手动触发），不影响日常运行。
+
+## Polygon Amoy 测试网部署（可选公开链）
 
 ### 前置条件
 

@@ -329,14 +329,17 @@ vercel --prod
 
 ## 10. Polygon Amoy 测试网 + 后端部署实操
 
+> **注（2026-09-16 更新）**: 后端链提交路径已切换到 **ChainMaker 私有链（chain1）**，通过 cmc 网关真实提交，不再需要 RPC 钱包。
+> 本节的 Polygon 合约部署（10.1）仅用于**公开链合约部署**（可选），后端运行（10.2）请使用 ChainMaker 配置。
+
 GitHub Pages 只能托管静态前端，上传技能、AI 审计、上链提交需要单独运行后端服务。
 
-### 10.1 部署合约到 Polygon Amoy
+### 10.1 部署合约到 Polygon Amoy（可选，公开链）
 
 ```bash
 # 1. 配置环境变量
 cp .env.example .env
-# 编辑 .env：填入 PRIVATE_KEY、POLYGON_AMOY_RPC
+# 编辑 .env：填入 PRIVATE_KEY、POLYGON_AMOY_RPC（仅公开链部署需要）
 
 # 2. 部署核心合约
 npm run deploy:amoy
@@ -350,18 +353,25 @@ npm run deploy:hardhat
 - `deployments.json`：根目录配置
 - `public/deployments.json`：前端读取的合约地址
 
-### 10.2 运行后端服务
+### 10.2 运行后端服务（ChainMaker 提交）
 
 #### 方式 A：Docker（推荐）
 
 ```bash
 # 创建 .env 文件，至少包含：
-#   PRIVATE_KEY=0x...
-#   SKILL_REGISTRY_ADDRESS=0x...
+#   CHAINMAKER_CONTAINER_CMD=docker exec cmc-debug
+#   CHAINMAKER_SDK_CONF=/work/sdk_config.yml
+#   CHAINMAKER_CERT_DIR=/work
+#   CHAINMAKER_ABI_DIR=/work
+#   CHAINMAKER_CHAIN_ID=chain1
+#   CHAINMAKER_ORG_ID=wx-org.chainmaker.org
+#   SKILL_REGISTRY_ADDRESS=cf089d4bebcdabd13cd6a27ba6c168acac6bc042
 #   CORS_ORIGIN=https://你的域名
 
 docker compose up -d
 ```
+
+> API 容器通过挂载的 docker.sock 调用 cmc-debug 容器访问 chain1。
 
 #### 方式 B：直接运行
 
@@ -390,9 +400,10 @@ curl https://api.yourdomain.com/api/health
 
 ### 10.5 安全提示
 
-- `PRIVATE_KEY` 仅用于后端支付 Gas，**不要提交到 GitHub**。
-- 生产环境建议使用专用低权限钱包，而非部署者主钱包。
-- 后端服务器需通过 HTTPS 暴露，避免私钥和上传流量被中间人窃取。
+- `PRIVATE_KEY` 仅用于**公开链合约部署**（Hardhat），**不要提交到 GitHub**。
+- 后端链提交使用 ChainMaker，无需私钥；cmc-debug 容器需为仅内部可访问的受信环境。
+- 生产环境建议使用专用低权限钱包（公开链部署时），而非部署者主钱包。
+- 后端服务器需通过 HTTPS 暴露，避免上传流量被中间人窃取。
 
 ---
 

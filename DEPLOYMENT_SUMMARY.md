@@ -1,5 +1,8 @@
 # AgentSkills 部署执行状态
 
+> **现状更新（2026-09-16）**: 本报告的 Polygon Amoy RPC 阻塞已被 **ChainMaker 私有链（chain1）** 方案解决。
+> 后端链提交真实上链（cmc 网关），本文件保留为历史记录。
+
 **更新时间**: 2026-08-10 08:15 UTC
 **执行模式**: GoSkill 持续自动化 (Solo Mode)
 

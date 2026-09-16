@@ -35,7 +35,9 @@ npx playwright test  # E2E tests (separate from npm test)
 - **Port conflict**: both default to 3001. Set `PORT` to run one without collision.
 
 ## ENVIRONMENT
-- Copy `.env.example` → `.env`. Deployment requires `PRIVATE_KEY`, `POLYGON_RPC` / `POLYGON_AMOY_RPC`.
+- Copy `.env.example` → `.env`.
+- **Backend chain submission uses ChainMaker** (private chain `chain1` via cmc gateway): `CHAINMAKER_*`, `SKILL_REGISTRY_ADDRESS`. No token/RPC wallet needed for the server submit path.
+- `PRIVATE_KEY` / `POLYGON_RPC` / `POLYGON_AMOY_RPC` are **only** for optional public-chain contract deployment via Hardhat (`deploy.yml` → `polygonAmoy`/`polygon`), not for the running backend.
 - Monitoring optional: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `GAS_*_THRESHOLD`.
 
 ## CI

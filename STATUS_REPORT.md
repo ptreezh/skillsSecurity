@@ -1,5 +1,9 @@
 # AgentSkills 生产部署状态报告
 
+> **现状更新（2026-09-16）**: 本报告的 Polygon Amoy 网络阻塞已解决——方案是切换到 **ChainMaker 私有链（chain1）**。
+> 后端链提交现已真实上链（`AS_SkillRegistry` @ `cf089d4bebcdabd13cd6a27ba6c168acac6bc042`，经 cmc 网关），
+> 不再需要 `PRIVATE_KEY` / PolyGON RPC。ChainMaker 仅用于可选公开链部署（Hardhat）。
+
 **报告时间**: 2026-08-10 07:05
 **执行模式**: GoSkill 持续运行
 **总体进度**: 65% 完成

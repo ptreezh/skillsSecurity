@@ -1,5 +1,8 @@
 # AgentSkills 部署就绪状态报告
 
+> **现状更新（2026-09-16）**: 本报告的 Polygon Amoy RPC 阻塞已被 **ChainMaker 私有链（chain1）** 方案解决。
+> 后端链提交真实上链（cmc 网关），本次 W2 E2E 已验证 skill 0–4（最高 block 60）。本文件保留为历史记录。
+
 **生成时间**: 2026-08-10 08:00 UTC
 **版本**: v1.5
 **目标网络**: Polygon Amoy Testnet (Chain ID: 80002)
