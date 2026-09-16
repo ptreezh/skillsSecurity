@@ -30,9 +30,9 @@ npx playwright test  # E2E tests (separate from npm test)
 - **No governance fields** in skill browsing UI (paper core finding).
 
 ## SERVERS
-- `server/index.js` — Express API on `:3001` (skill upload, audit, chain submit).
-- `src/server.js` — Express monitoring on `:3001` (gas, alerts, events).
-- **Port conflict**: both default to 3001. Set `PORT` to run one without collision.
+- `server/index.js` — Express API on `:10001` (skill upload, audit, chain submit).
+- `src/server.js` — Express monitoring on `:10001` (gas, alerts, events).
+- **Port conflict**: both default to 10001. Set `PORT` to run one without collision.
 
 ## ENVIRONMENT
 - Copy `.env.example` → `.env`.
