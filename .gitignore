@@ -21,6 +21,9 @@ progress.log
 # Runtime upload artifacts (API tests / temp skill files)
 uploads/temp/
 
+# Audit agent temp scripts
+temp_audit_*.py
+
 # Timestamped local deployment snapshots (canonical: deployments/core-latest.json)
 deployments/core-hardhat-*.json
 deployments/core-localhost-*.json
