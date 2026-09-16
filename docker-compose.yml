@@ -5,10 +5,10 @@ services:
     build: .
     container_name: agentskills-api
     ports:
-      - "3001:3001"
+      - "10001:10001"
     environment:
       - NODE_ENV=production
-      - PORT=3001
+      - PORT=10001
       # 允许的前端域名，多个用逗号分隔
       - CORS_ORIGIN=${CORS_ORIGIN:-https://ptreezh.github.io}
       # ChainMaker 网关：API 容器通过 docker.sock 调用 cmc-debug 容器
@@ -28,7 +28,7 @@ services:
       - ${CHAINMAKER_ABI_HOST_DIR:-./.chainmaker-work}:/chainmaker-work:ro
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/api/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:10001/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
