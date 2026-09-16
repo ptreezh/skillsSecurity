@@ -45,7 +45,7 @@ jobs:
       - name: Deploy contracts
         if: github.event_name == 'workflow_dispatch'
         run: |
-          npx hardhat run scripts/deployCore.js --network ${{ inputs.network || 'polygonAmoy' }}
+          npx hardhat run scripts/deploy-core-v2.js --network ${{ inputs.network || 'polygonAmoy' }}
         env:
           PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
           POLYGON_RPC: ${{ secrets.POLYGON_RPC }}
@@ -66,10 +66,10 @@ jobs:
           retention-days: 30
 
   verify:
-    name: Verify on Polygonscan
+    name: Validate deployment artifacts
     runs-on: ubuntu-latest
     needs: deploy
-    if: github.event_name == 'workflow_dispatch' && inputs.network == 'polygon'
+    if: github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Checkout repository
@@ -90,8 +90,18 @@ jobs:
           name: deployment-artifacts-${{ inputs.network }}
           path: deployments/
 
-      - name: Verify contracts
+      - name: Validate deployment artifacts
         run: |
-          echo "Verifying contracts on Polygonscan..."
-          # Contract verification would go here
-          echo "Verification setup complete"
+          node -e "
+            const fs = require('fs');
+            const d = JSON.parse(fs.readFileSync('deployments/core-latest.json', 'utf8'));
+            const required = ['StakingManager', 'SkillRegistry', 'Attribution', 'Governance', 'SelfSustainingEcosystem', 'ReputationBadges'];
+            const missing = required.filter(k => !/^0x[0-9a-fA-F]{40}$/.test(d.contracts?.[k] ?? ''));
+            if (missing.length > 0) {
+              console.error('Missing or invalid contract addresses:', missing);
+              process.exit(1);
+            }
+            console.log('Deployment artifact OK');
+            console.log('Network:', d.network, '(chainId', d.chainId + ')');
+            for (const k of required) console.log(' ', k + ':', d.contracts[k]);
+          "
