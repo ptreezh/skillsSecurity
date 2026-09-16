@@ -13,8 +13,8 @@
     "jobIdRequired": "jobId required",
     "submitting": "Submitting to chain...",
     "onChain": "On chain",
-    "notConfigured": "Real chain not configured, falling back to mock submission",
-    "configHint": "Set PRIVATE_KEY and SKILL_REGISTRY_ADDRESS to enable real submission",
+    "notConfigured": "ChainMaker gateway unavailable, cannot submit",
+    "configHint": "Ensure cmc-debug container is running and CHAINMAKER_* config is correct to enable real submission",
     "balanceTooLow": "Submit wallet balance too low: {{balance}} MATIC"
   },
   "audit": {

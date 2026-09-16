@@ -1,0 +1,28 @@
+{
+  "3": {
+    "skillId": 3,
+    "name": "e2e-chain-submit-test",
+    "description": "End-to-end chain submit verification with spaces",
+    "trigger": "when user asks for chain submit test",
+    "metadataIPFS": "0xb2a03fd081a28561d0598ec6ac5808a0e921f5ed",
+    "riskLevel": 0,
+    "version": "1.0.0",
+    "txId": "18d5a420cf26a3edcae7f96ebff0375fce10706eac17448f85b956412cb527fc",
+    "blockHeight": 58,
+    "submitter": "0x3737f0d872f386f170c20e2ae73b81cfe6b7ecf3",
+    "submittedAt": "2026-09-16T00:01:27.996Z"
+  },
+  "4": {
+    "skillId": 4,
+    "name": "api-e2e-skill",
+    "description": "API end-to-end submit test",
+    "trigger": "user asks api-e2e",
+    "metadataIPFS": "0x1e1c79b3e3f9755f21cc8b0e658415ccd46d7766",
+    "riskLevel": 0,
+    "version": "2.0.0",
+    "txId": "18d5a46f120c0e85ca02a36fc83d04a84bdb06d0dbb14f3c8b31d19f9bd7b6b5",
+    "blockHeight": 60,
+    "submitter": "0x3737f0d872f386f170c20e2ae73b81cfe6b7ecf3",
+    "submittedAt": "2026-09-16T00:07:03.968Z"
+  }
+}

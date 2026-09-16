@@ -1,25 +1,26 @@
 /**
- * Chain submission - submit approved skill to SkillRegistry on Polygon Amoy
+ * Chain submission - submit approved skill to AS_SkillRegistry on ChainMaker (chain1)
  *
- * 环境变量：
- *   POLYGON_AMOY_RPC    - Polygon Amoy RPC 端点（默认使用官方节点）
- *   PRIVATE_KEY         - 提交者钱包私钥（0x 开头）
- *   SKILL_REGISTRY_ADDRESS - SkillRegistry 合约地址
+ * 完全基于真实长安链 cmc 网关（server/chainmaker-client.js），无 mock / 无 ethers。
  *
- * 安全提示：
- *   该私钥用于后端代用户支付 Gas 并提交技能注册交易。
- *   生产环境请使用专用低权限钱包，并通过 KMS/密钥管理服务保管。
+ * 环境变量（见 chainmaker-client.js）：
+ *   CHAINMAKER_CONTAINER_CMD - 容器命令前缀（默认 docker exec cmc-debug）
+ *   CHAINMAKER_CMC_CMD       - cmc 完整命令（默认 <CONTAINER_CMD> cmc）
+ *   CHAINMAKER_SDK_CONF      - sdk 配置路径（容器内，默认 /work/sdk_config.yml）
+ *   CHAINMAKER_CERT_DIR      - 证书目录（容器内，默认 /work）
+ *   CHAINMAKER_ABI_DIR       - ABI 目录（容器内，默认 /work）
+ *   CHAINMAKER_ABI_LOCAL_DIR - 宿主机 ABI 目录（可选，跳过容器内 cat）
+ *   CHAINMAKER_CHAIN_ID      - 链 ID（默认 chain1）
+ *   CHAINMAKER_ORG_ID        - 组织 ID（默认 wx-org.chainmaker.org）
  */
 
-require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const yaml = require('js-yaml');
-const { ethers } = require('ethers');
+const chainmaker = require('./chainmaker-client');
 const { getJob } = require('./jobs');
 const { t } = require('./i18n');
-
-const SkillRegistryAbi = require('../src/abi/SkillRegistry.json').abi;
 
 const RISK_LEVEL_MAP = {
   LOW: 0,
@@ -28,12 +29,30 @@ const RISK_LEVEL_MAP = {
   CRITICAL: 3
 };
 
+// 提交侧技能镜像：skills(id) 的字符串字段（name/description/trigger/metadataIPFS）
+// 无法从 cmc struct 输出中可靠切分（字段含空格），故提交成功后归档真实参数到
+// server/data/skills-mirror.json；链上存在性与 verified 仍以真实查询为准。
+const MIRROR_FILE = path.join(__dirname, 'data', 'skills-mirror.json');
+
+function loadMirror() {
+  try {
+    if (fs.existsSync(MIRROR_FILE)) {
+      return JSON.parse(fs.readFileSync(MIRROR_FILE, 'utf-8'));
+    }
+  } catch (err) {
+    console.warn('[Chain] 镜像读取失败（将重建）:', err.message);
+  }
+  return {};
+}
+
+function saveMirror(mirror) {
+  fs.mkdirSync(path.dirname(MIRROR_FILE), { recursive: true });
+  fs.writeFileSync(MIRROR_FILE, JSON.stringify(mirror, null, 2), 'utf-8');
+}
+
 function isConfigured() {
-  return !!(
-    process.env.PRIVATE_KEY &&
-    process.env.SKILL_REGISTRY_ADDRESS &&
-    process.env.SKILL_REGISTRY_ADDRESS.startsWith('0x')
-  );
+  // ChainMaker 网关始终可用（真实环境依赖）；无降级 mock。
+  return true;
 }
 
 /**
@@ -61,9 +80,10 @@ function parseSkillFromJob(job, locale = 'zh-CN') {
   const riskLevelText = String(metadata.riskLevel || skillData.riskLevel || 'LOW').toUpperCase();
   const riskLevel = RISK_LEVEL_MAP[riskLevelText] ?? 0;
 
-  // 用文件内容哈希作为 metadataIPFS 占位符；接入真实 IPFS 后可替换为 CID
-  const metadataIPFS = skillData.freeskill?.ipfsHash ||
-    '0x' + ethers.keccak256(ethers.toUtf8Bytes(content)).slice(2, 42);
+  // 文件内容哈希作为 metadataIPFS 内容指纹；接入真实 IPFS 后可替换为 CID
+  const metadataIPFS =
+    skillData.freeskill?.ipfsHash ||
+    '0x' + crypto.createHash('sha256').update(content, 'utf-8').digest('hex').slice(0, 40);
 
   return {
     name: String(skillData.name || path.basename(job.originalName, path.extname(job.originalName))),
@@ -76,150 +96,121 @@ function parseSkillFromJob(job, locale = 'zh-CN') {
 }
 
 /**
- * 真实链上提交
+ * 真实链上提交（ChainMaker invoke registerSkill）
+ * 返回 { skillId, txId, blockHeight, submitter, events }
+ * skillId 来自 registerSkill 的 uint256 返回值（精确，无需 nextSkillId-1）。
  */
-async function submitToChainReal(job, locale = 'zh-CN') {
-  const rpcUrl = process.env.POLYGON_AMOY_RPC || 'https://rpc-amoy.polygon.technology';
-  const privateKey = process.env.PRIVATE_KEY;
-  const skillRegistryAddress = process.env.SKILL_REGISTRY_ADDRESS;
-
-  const provider = new ethers.JsonRpcProvider(rpcUrl);
-  const wallet = new ethers.Wallet(privateKey, provider);
-
-  const balance = await provider.getBalance(wallet.address);
-  if (balance < ethers.parseEther('0.001')) {
-    throw new Error(t(locale, 'chain.balanceTooLow', { balance: ethers.formatEther(balance) }));
+async function submitToChain(job, locale = 'zh-CN') {
+  if (!isConfigured()) {
+    throw new Error(t(locale, 'chain.notConfigured'));
   }
-
-  const skillRegistry = new ethers.Contract(skillRegistryAddress, SkillRegistryAbi, wallet);
 
   const skill = parseSkillFromJob(job, locale);
   console.log(`[Chain] Submitting skill: ${skill.name} (risk=${skill.riskLevel})`);
 
-  const tx = await skillRegistry.registerSkill(
-    skill.name,
-    skill.description,
-    skill.trigger,
-    skill.metadataIPFS,
-    skill.riskLevel,
-    skill.version
+  const inv = await chainmaker.invoke(
+    'AS_SkillRegistry',
+    'registerSkill',
+    [
+      skill.name,
+      skill.description,
+      skill.trigger,
+      skill.metadataIPFS,
+      skill.riskLevel,
+      skill.version
+    ],
+    { sync: true }
   );
 
-  console.log(`[Chain] Transaction submitted: ${tx.hash}`);
-  const receipt = await tx.wait();
+  const skillId = Number(inv.result);
 
-  // 从事件中解析 skillId
-  let skillId = null;
-  for (const log of receipt.logs) {
-    try {
-      const parsed = skillRegistry.interface.parseLog(log);
-      if (parsed && parsed.name === 'SkillRegistered') {
-        skillId = parsed.args.skillId.toString();
-      }
-    } catch {
-      // 忽略无法解析的日志
-    }
+  // 从 SkillRegistered 事件中解析 submitter（event_data[0] = 32 字节地址）
+  let submitter = null;
+  const skillRegistered = (inv.events || []).find(
+    e => e.topic === '51e29d85e5eeb0bb608bb025117296259dabb2c5105f2368988e6e19db57b17c'
+  );
+  if (skillRegistered && skillRegistered.event_data && skillRegistered.event_data[0]) {
+    submitter = '0x' + skillRegistered.event_data[0].slice(24);
   }
 
-  if (!skillId) {
-    // 若事件解析失败，使用 nextSkillId - 1 作为备选
-    const nextId = await skillRegistry.nextSkillId();
-    skillId = (Number(nextId) - 1).toString();
-  }
+  // 归档镜像（真实提交参数；字符串字段供 getSkillFromChain 读取）
+  const mirror = loadMirror();
+  mirror[skillId] = {
+    skillId,
+    name: skill.name,
+    description: skill.description,
+    trigger: skill.trigger,
+    metadataIPFS: skill.metadataIPFS,
+    riskLevel: skill.riskLevel,
+    version: skill.version,
+    txId: inv.txId,
+    blockHeight: inv.blockHeight,
+    submitter,
+    submittedAt: new Date().toISOString()
+  };
+  saveMirror(mirror);
 
+  console.log(`[Chain] Skill registered: id=${skillId} tx=${inv.txId} block=${inv.blockHeight}`);
   return {
     skillId,
-    txHash: tx.hash,
-    blockNumber: receipt.blockNumber,
-    submitter: wallet.address
+    txId: inv.txId,
+    txHash: inv.txId,
+    blockHeight: inv.blockHeight,
+    blockNumber: inv.blockHeight,
+    submitter,
+    events: inv.events
   };
 }
 
 /**
- * Mock 提交（未配置真实链时降级使用）
+ * 按 txId 查询链上回执（cmc query tx）
  */
-async function submitToChainMock(job, locale = 'zh-CN') {
-  console.log(`[Chain] Mock submit for job ${job?.id}`);
-  await new Promise(resolve => setTimeout(resolve, 1000));
+async function getTransactionReceipt(txId) {
+  if (!txId) return null;
+  const receipt = await chainmaker.queryTx(txId);
   return {
-    skillId: `skill_${Date.now()}`,
-    txHash: `0x${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`,
-    mock: true
+    txHash: txId,
+    blockNumber: receipt.blockHeight,
+    status: 'confirmed',
+    gasUsed: receipt.gasUsed,
+    method: receipt.method,
+    events: receipt.events
   };
 }
 
 /**
- * 提交已审核通过的技能到链上
+ * 从链上读取技能详情
+ * - 链上精确字段：owner / verified / createdAt / updatedAt / version / fingerprint
+ * - 字符串字段：来自提交侧镜像（真实提交参数）
+ * - raw：cmc 原始 struct 输出（供审计核对）
  */
-async function submitToChain(job, locale = 'zh-CN') {
-  if (!isConfigured()) {
-    console.warn(t(locale, 'chain.notConfigured'));
-    console.warn(t(locale, 'chain.configHint'));
-    return submitToChainMock(job, locale);
-  }
-
-  return submitToChainReal(job, locale);
-}
-
-async function getTransactionReceipt(txHash) {
-  if (!isConfigured()) {
-    return {
-      txHash,
-      blockNumber: 12345678,
-      status: 'confirmed',
-      gasUsed: 200000
-    };
-  }
-
-  const rpcUrl = process.env.POLYGON_AMOY_RPC || 'https://rpc-amoy.polygon.technology';
-  const provider = new ethers.JsonRpcProvider(rpcUrl);
-  const receipt = await provider.getTransactionReceipt(txHash);
-  if (!receipt) return null;
-
-  return {
-    txHash: receipt.hash,
-    blockNumber: receipt.blockNumber,
-    status: receipt.status === 1 ? 'confirmed' : 'failed',
-    gasUsed: Number(receipt.gasUsed)
-  };
-}
-
 async function getSkillFromChain(skillId) {
-  if (!isConfigured()) {
-    return {
-      skillId,
-      owner: '0x0000000000000000000000000000000000000000',
-      name: 'Unknown',
-      verified: false,
-      fingerprint: '0x0'
-    };
-  }
+  const onChain = await chainmaker.getSkill(Number(skillId));
+  const mirror = loadMirror();
+  const local = mirror[skillId] || {};
 
-  const rpcUrl = process.env.POLYGON_AMOY_RPC || 'https://rpc-amoy.polygon.technology';
-  const provider = new ethers.JsonRpcProvider(rpcUrl);
-  const skillRegistryAddress = process.env.SKILL_REGISTRY_ADDRESS;
-  const skillRegistry = new ethers.Contract(skillRegistryAddress, SkillRegistryAbi, provider);
-
-  const skill = await skillRegistry.skills(skillId);
   return {
-    skillId,
-    owner: skill[0],
-    name: skill[1],
-    description: skill[2],
-    trigger: skill[3],
-    metadataIPFS: skill[4],
-    riskLevel: Number(skill[5]),
-    stakeAmount: skill[6].toString(),
-    verified: skill[7],
-    createdAt: Number(skill[8]),
-    updatedAt: Number(skill[9]),
-    version: skill[10],
-    fingerprint: skill[11]
+    skillId: Number(skillId),
+    owner: onChain.owner,
+    name: local.name || null,
+    description: local.description || null,
+    trigger: local.trigger || null,
+    metadataIPFS: local.metadataIPFS || null,
+    riskLevel: local.riskLevel ?? null,
+    version: onChain.version || local.version || null,
+    verified: onChain.verified,
+    createdAt: onChain.createdAt,
+    updatedAt: onChain.updatedAt,
+    fingerprint: onChain.fingerprint,
+    txId: local.txId || null,
+    raw: onChain.raw
   };
 }
 
 module.exports = {
   submitToChain,
   getTransactionReceipt,
-  getSkillFromChain
+  getSkillFromChain,
+  parseSkillFromJob,
+  loadMirror
 };

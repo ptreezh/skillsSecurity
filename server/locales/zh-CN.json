@@ -13,8 +13,8 @@
     "jobIdRequired": "缺少 jobId",
     "submitting": "正在提交到链上...",
     "onChain": "已上链",
-    "notConfigured": "未配置真实链，降级为模拟提交",
-    "configHint": "设置 PRIVATE_KEY 和 SKILL_REGISTRY_ADDRESS 以启用真实提交",
+    "notConfigured": "ChainMaker 网关不可用，无法提交",
+    "configHint": "确保 cmc-debug 容器运行且 CHAINMAKER_* 配置正确以启用真实提交",
     "balanceTooLow": "提交钱包余额过低：{{balance}} MATIC"
   },
   "audit": {

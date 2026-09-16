@@ -11,15 +11,21 @@ services:
       - PORT=3001
       # 允许的前端域名，多个用逗号分隔
       - CORS_ORIGIN=${CORS_ORIGIN:-https://ptreezh.github.io}
-      - POLYGON_AMOY_RPC=${POLYGON_AMOY_RPC:-https://rpc-amoy.polygon.technology}
-      # 提交链上交易的钱包私钥（必填）
-      - PRIVATE_KEY=${PRIVATE_KEY}
-      # 已部署的 SkillRegistry 地址（必填）
-      - SKILL_REGISTRY_ADDRESS=${SKILL_REGISTRY_ADDRESS}
+      # ChainMaker 网关：API 容器通过 docker.sock 调用 cmc-debug 容器
+      - CHAINMAKER_CONTAINER_CMD=${CHAINMAKER_CONTAINER_CMD:-docker exec cmc-debug}
+      - CHAINMAKER_SDK_CONF=${CHAINMAKER_SDK_CONF:-/work/sdk_config.yml}
+      - CHAINMAKER_CERT_DIR=${CHAINMAKER_CERT_DIR:-/work}
+      - CHAINMAKER_ABI_DIR=${CHAINMAKER_ABI_DIR:-/work}
+      - CHAINMAKER_CHAIN_ID=${CHAINMAKER_CHAIN_ID:-chain1}
+      - CHAINMAKER_ORG_ID=${CHAINMAKER_ORG_ID:-wx-org.chainmaker.org}
       # 上传文件持久化目录
       - UPLOADS_DIR=/app/uploads
     volumes:
       - uploads:/app/uploads
+      # 允许调用宿主机 docker 以访问 cmc-debug 链容器
+      - /var/run/docker.sock:/var/run/docker.sock
+      # 宿主 ABI 备选（CHAINMAKER_ABI_LOCAL_DIR 指向宿主路径时挂载）
+      - ${CHAINMAKER_ABI_HOST_DIR:-./.chainmaker-work}:/chainmaker-work:ro
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/api/health"]

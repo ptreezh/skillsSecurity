@@ -75,12 +75,10 @@ app.get('/api/health', (req, res) => {
     status: 'ok',
     timestamp: new Date().toISOString(),
     chain: {
-      configured: !!(
-        process.env.PRIVATE_KEY &&
-        process.env.SKILL_REGISTRY_ADDRESS
-      ),
-      network: 'Polygon Amoy',
-      skillRegistry: process.env.SKILL_REGISTRY_ADDRESS || null
+      configured: true, // ChainMaker 网关为真实依赖（docker exec cmc 可用即可）
+      network: process.env.CHAINMAKER_CHAIN_ID || 'chain1',
+      skillRegistry: 'AS_SkillRegistry',
+      cmcCommand: process.env.CHAINMAKER_CMC_CMD || 'docker exec cmc-debug cmc'
     }
   });
 });
