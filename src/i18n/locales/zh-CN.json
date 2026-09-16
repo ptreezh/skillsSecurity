@@ -398,7 +398,8 @@
       "viewTx": "查看交易",
       "success": "上链成功!",
       "skillId": "Skill ID",
-      "txHash": "Tx Hash"
+      "txHash": "Tx Hash",
+      "reputationRequired": "有效声誉不足：中风险（MEDIUM）及以上技能上链需要足够的有效声誉。请先通过质押或贡献提升有效声誉后再试。"
     },
     "standard": {
       "title": "Skills 标准规范 v1.1",

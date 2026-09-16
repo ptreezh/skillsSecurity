@@ -398,7 +398,8 @@
       "viewTx": "View Transaction",
       "success": "On-chain success!",
       "skillId": "Skill ID",
-      "txHash": "Tx Hash"
+      "txHash": "Tx Hash",
+      "reputationRequired": "Insufficient effective reputation: MEDIUM or higher risk skills require sufficient effective reputation for on-chain registration. Raise your effective reputation via staking or contributions and try again."
     },
     "standard": {
       "title": "Skills Standard v1.1",

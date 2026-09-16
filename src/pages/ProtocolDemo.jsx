@@ -10,6 +10,9 @@ import {
   isInitialized
 } from '../services/ContractService.jsx';
 
+// Matches real chain revert messages about insufficient reputation (MEDIUM+ gate)
+const REPUTATION_ERROR_RE = /reputation|insufficient|有效声誉|声誉不足/i;
+
 /**
  * ProtocolDemo - Protocol demonstration page
  * Showcases the core mechanisms of the AgentSkills protocol
@@ -644,8 +647,12 @@ export default function ProtocolDemo({ initialTab = 'standard' }) {
                     {uploadStatus.status === 'on_chain' && t('demo.status.onChain')}
                     {uploadStatus.status === 'error' && t('common.error')}
                   </div>
-                  {uploadStatus.message && uploadStatus.status !== 'error' && (
-                    <div style={{ fontSize: 'var(--text-sm)', marginTop: 'var(--space-1)' }}>{uploadStatus.message}</div>
+                  {uploadStatus.message && (
+                    <div style={{ fontSize: 'var(--text-sm)', marginTop: 'var(--space-1)' }}>
+                      {uploadStatus.status === 'error' && REPUTATION_ERROR_RE.test(uploadStatus.message)
+                        ? t('demo.chain.reputationRequired')
+                        : uploadStatus.message}
+                    </div>
                   )}
                 </div>
               )}
