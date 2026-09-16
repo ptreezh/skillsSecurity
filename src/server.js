@@ -118,7 +118,7 @@ app.get('/api/events/status', (req, res) => {
 });
 
 // Initialize and start server
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 10001;
 
 async function start() {
   // Try to initialize event watcher if contracts are configured
