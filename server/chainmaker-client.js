@@ -194,6 +194,46 @@ function decodeResult(raw, outputs) {
 }
 
 /**
+ * 解码 Solidity revert reason 的 ABI 编码（ChainMaker EVM 合约，标准 Error(string)）。
+ * 格式：0x08c379a0 + offset(32B) + length(32B) + utf8 data
+ * 实测链上错误示例：
+ *   08c379a0 ... 0000...0020 0000...0032 496e73756666696369656e74206566666563746976652072657075746174696f6e...
+ *   → "Insufficient effective reputation for MEDIUM skill"
+ * 解码失败返回 null（非 Error(string) 形式，交由调用方原样处理）。
+ * 兼容两种形态：
+ *   1) 纯 hex："0x08c379a0..." 或 "08c379a0..."
+ *   2) 带前缀文字："failed to execute evm contract, error reverted : 0x08c379a0..."
+ *      （cmc 的 contract_result.message 实测为后者，先提取 08c379a0 起始的 hex 尾串）
+ */
+function decodeRevertReason(raw) {
+  if (typeof raw !== 'string') return null;
+  // 提取 08c379a0 起始的 hex 片段（含 0x 前缀或裸 hex，最长取到非 hex 字符为止）
+  const m = raw.match(/(?:0x)?08c379a0[0-9a-fA-F]*/);
+  if (!m) return null;
+  let hex = m[0];
+  if (hex.toLowerCase().startsWith('0x')) hex = hex.slice(2);
+  // selector: Error(string) = 0x08c379a0；panic(0x4e487b71) 等暂不解码
+  if (!/^08c379a0/i.test(hex)) return null;
+  let bytes;
+  try {
+    bytes = Buffer.from(hex, 'hex');
+  } catch (e) {
+    return null;
+  }
+  // 最少需要 selector + offset + length + 1 字节数据
+  if (bytes.length < 4 + 32 + 32 + 1) return null;
+  // offset 字（大端）位于 selector 之后；data 区起点 = 4 + offset
+  const offset = bytes.readUInt32BE(4 + 28);
+  const dataStart = 4 + offset;
+  if (dataStart + 32 > bytes.length) return null;
+  const len = bytes.readUInt32BE(dataStart + 28);
+  if (dataStart + 32 + len > bytes.length) return null;
+  const text = bytes.slice(dataStart + 32, dataStart + 32 + len).toString('utf8');
+  // 有效性检查：可解码为可打印文本才采用（防乱码）
+  return /^[\x20-\x7e]+$/.test(text) ? text : null;
+}
+
+/**
  * 执行一次 cmc 调用并解析标准输出为 JSON。
  * @param {string} operation 'get' | 'invoke'
  */
@@ -242,10 +282,16 @@ async function runCmc(operation, contractKey, method, typedParams, opts = {}) {
   // 失败统一以顶层 code=4 标记（get/invoke 一致）；成功时 invoke 无 message 字段，
   // get 有 message:"SUCCESS"。勿以 message 字段作为成功判据。
   if (parsed.code === 4 || (parsed.code !== undefined && parsed.code !== 0)) {
+    const rawMsg =
+      parsed.contract_result && parsed.contract_result.message
+        ? parsed.contract_result.message
+        : parsed.message || '';
+    // revert reason 优先解码成人可读文本（Solidity Error(string) ABI 编码）
+    const reason = decodeRevertReason(rawMsg);
     const detail =
       (parsed.message || '') +
       (parsed.contract_result && parsed.contract_result.message
-        ? ` | ${parsed.contract_result.message}`
+        ? ` | ${reason || parsed.contract_result.message}`
         : '');
     throw new Error(`cmc ${operation} ${method} 链上错误: ${detail || '未知错误'}`);
   }
@@ -432,4 +478,5 @@ module.exports = {
   getSkill,
   health,
   loadAbi,
+  decodeRevertReason,
 };
