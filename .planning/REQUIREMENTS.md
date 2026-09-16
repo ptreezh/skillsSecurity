@@ -1,131 +1,62 @@
-# Requirements: AgentSkills
+# Requirements: AgentSkills v2.0 端到端上线收官
 
-**Defined:** 2026-05-16
-**Core Value:** Skills with accountability — every action is traceable, every contributor is credited, every violation has consequences.
+**Defined:** 2026-09-16
+**Goal:** 打通公网前端 → 后端 API → ChainMaker chain1 的完整生产链路，端到端可演示、可持续运行、有验收证据
 
-## v1.3 Requirements
+**前序需求:** v1.1–v1.7 已全部交付（26 phases，归档见 `milestones/`）
 
-Requirements for test infrastructure and testnet deployment. Each maps to roadmap phases.
+## v2.0 Requirements
 
-### Test Infrastructure
+### E2E 端到端链路
 
-- [ ] **TEST-01**: Install Hardhat test toolbox (chai-matchers, network-helpers, verify)
-- [ ] **TEST-02**: Create test fixture system with correct deployment order (ASKToken → StakingManager → SkillRegistry → Attribution)
-- [ ] **TEST-03**: Configure Mocha test runner with coverage reporting
+- [ ] **E2E-01**: 用户从公网前端上传技能 → 后端审计 → chain1 上链（返回 tx 哈希与区块号）→ 技能出现在浏览列表，全程无本地手工步骤
+- [ ] **E2E-02**: 技能浏览页展示 AS_SkillRegistry 真实链上技能（零 mock、零 Amoy 数据）
+- [ ] **E2E-03**: 用户声誉档案页展示 AS_Staking 真实声誉（含锁定与可恢复值）
+- [ ] **E2E-04**: 排行榜展示真实链上声誉排名（删除 getMockLeaderboard 回退）
 
-### ASKToken Unit Tests
+### API 后端读路径
 
-- [ ] **ASKT-01**: Test token minting with proper access control
-- [ ] **ASKT-02**: Test token burning
-- [ ] **ASKT-03**: Test delegation and vote weight tracking
-- [ ] **ASKT-04**: Test event emissions
+- [ ] **API-01**: GET /api/skills 返回链上技能列表（含风险等级/验证状态，支持分页）
+- [ ] **API-02**: GET /api/skills/:id 返回单个技能详情
+- [ ] **API-03**: GET /api/reputation/:address 返回声誉、锁定、可恢复信息
+- [ ] **API-04**: GET /api/leaderboard 返回按声誉排序的地址排名
+- [ ] **API-05**: GET /api/stats 返回协议级统计（技能总数/声誉总量/参与地址数）
 
-### SkillRegistry Unit Tests
+### FE 前端接线
 
-- [ ] **SKIL-01**: Test reputation tier gates (L1-L5 thresholds)
-- [ ] **SKIL-02**: Test fingerprint generation for skill verification
-- [ ] **SKIL-03**: Test skill verification request and approval flow
-- [ ] **SKIL-04**: Test effective reputation checks
+- [ ] **FE-01**: ContractService 重构为经后端 API 的数据层；`src/` 中零 Polygon Amoy 引用（80002 / rpc-amoy）
+- [ ] **FE-02**: 挂在已废除 v1 合约上的页面（DeployerDashboard / DividendCalculator / DistributionHistory）改接 v2 AgentEcosystem / ReputationBadges 数据或明确降级提示
+- [ ] **FE-03**: 前端网络标识与 deployments.json 一致（ChainMaker chain1，v2 合约地址）
 
-### StakingManager Unit Tests
+### OPS 生产运行
 
-- [ ] **STAK-01**: Test stake and unstake with proper lock period
-- [ ] **STAK-02**: Test slash mechanism with evidence validation
-- [ ] **STAK-03**: Test reputation lock and recovery mechanism
-- [ ] **STAK-04**: Test getRecoverableReputation() and claimRecoverableReputation()
-- [ ] **STAK-05**: Test time-based unlock (90-day period) with evm_increaseTime + evm_mine
+- [ ] **OPS-01**: 后端 API 持久运行（restart: unless-stopped），/api/health 健康检查通过
+- [ ] **OPS-02**: chainmaker-solo 与 cmc-debug 容器持久运行（restart 策略生效）
+- [ ] **OPS-03**: 公网前端（GitHub Pages）指向生产后端地址并完成重新部署
 
-### Attribution Unit Tests
+### SEC 安全
 
-- [ ] **ATTR-01**: Test contribution creation and tracking
-- [ ] **ATTR-02**: Test like mechanism with double-like prevention
-- [ ] **ATTR-03**: Test cross-contract notification to StakingManager
-- [ ] **ATTR-04**: Test positive contribution marking via setPositiveContribution()
+- [ ] **SEC-14**: Slither 本地实跑，报告归档至 REPORTS/，高危清零或记录豁免理由
+- [ ] **SEC-15**: Mythril 本地实跑，报告归档至 REPORTS/，高危清零或记录豁免理由
 
-### Integration Tests
+### QA 验收
 
-- [ ] **INTG-01**: Test full contract deployment with correct dependency wiring
-- [ ] **INTG-02**: Test reputation flow (register → verify → positive contribution → recovery)
-- [ ] **INTG-03**: Test anti-slash flow (like → slash → lock → recover)
-- [ ] **INTG-04**: Test cross-contract state synchronization
+- [ ] **QA-01**: npm test 全量通过（Hardhat，144 用例基线）
+- [ ] **QA-02**: npm run test:chain 13/13 通过（活链 chain1）
+- [ ] **QA-03**: 端到端实测留证：上传→审计→上链→浏览→声誉可见，输出/截图归档 REPORTS/
+- [ ] **QA-04**: 上线就绪报告更新至 v2（总体就绪度 100%，端到端全绿）
 
-### Deployment
+## Out of Scope（本里程碑不做）
 
-- [ ] **DEPL-01**: Update hardhat.config.js for Polygon Amoy (chainId 80002, remove deprecated Mumbai)
-- [ ] **DEPL-02**: Create deploy-all.js deployment script
-- [ ] **DEPL-03**: Deploy contracts to Polygon Amoy testnet
-- [ ] **DEPL-04**: Verify contracts on Polygonscan using hardhat-verify
-
-### Coverage Target
-
-- [ ] **COVR-01**: Achieve 80%+ line coverage for all contracts
-- [ ] **COVR-02**: 100% coverage on critical functions (stake, slash, lock, recover)
-
-## v2 Requirements
-
-Deferred to future release.
-
-### Testnet Operations
-- **DEPL-05**: Monitor deployed contracts on Amoy
-- **DEPL-06**: Set up alerting for contract events
-
-### Mainnet Preparation
-- **DEPL-07**: Mainnet deployment plan
-- **DEPL-08**: Audit engagement for production contracts
-
-## Out of Scope
-
-Explicitly excluded. Documented to prevent scope creep.
-
-| Feature | Reason |
-|---------|--------|
-| Frontend E2E tests | Defer until frontend exists |
-| Mainnet deployment | Testnet first, audit required before mainnet |
-| Token sale/ICO | Token economics not finalized |
-| Upgradeable proxies | Current contracts are not upgradeable |
+- 代币发行（宪法铁律：no tokens ever）
+- 第三方付费审计（另行安排，不在工程环内）
+- 正式域名 / 公网 VPS 采购（依赖托管决策；先以 GitHub Pages + 本机持久服务交付，见 ROADMAP Phase 29 GATE）
 
 ## Traceability
 
-Which phases cover which requirements. Updated during roadmap creation.
-
-| Requirement | Phase | Status |
-|-------------|-------|--------|
-| TEST-01 | Phase 11 | Pending |
-| TEST-02 | Phase 11 | Pending |
-| TEST-03 | Phase 11 | Pending |
-| ASKT-01 | Phase 12 | Pending |
-| ASKT-02 | Phase 12 | Pending |
-| ASKT-03 | Phase 12 | Pending |
-| ASKT-04 | Phase 12 | Pending |
-| STAK-01 | Phase 13 | Pending |
-| STAK-02 | Phase 13 | Pending |
-| STAK-03 | Phase 13 | Pending |
-| STAK-04 | Phase 13 | Pending |
-| STAK-05 | Phase 13 | Pending |
-| SKIL-01 | Phase 14 | Pending |
-| SKIL-02 | Phase 14 | Pending |
-| SKIL-03 | Phase 14 | Pending |
-| SKIL-04 | Phase 14 | Pending |
-| ATTR-01 | Phase 14 | Pending |
-| ATTR-02 | Phase 14 | Pending |
-| ATTR-03 | Phase 14 | Pending |
-| ATTR-04 | Phase 14 | Pending |
-| INTG-01 | Phase 15 | Pending |
-| INTG-02 | Phase 15 | Pending |
-| INTG-03 | Phase 15 | Pending |
-| INTG-04 | Phase 15 | Pending |
-| DEPL-01 | Phase 16 | Pending |
-| DEPL-02 | Phase 16 | Pending |
-| DEPL-03 | Phase 16 | Pending |
-| DEPL-04 | Phase 16 | Pending |
-| COVR-01 | All phases | Pending |
-| COVR-02 | Phase 13 | Pending |
-
-**Coverage:**
-- v1.3 requirements: 28 total
-- Mapped to phases: 28
-- Unmapped: 0 ✓
-
----
-*Requirements defined: 2026-05-16*
-*Last updated: 2026-05-16 after initial definition*
+| Requirement | Phase | Plan |
+|-------------|-------|------|
+| API-01~05 | 27 | 27-01, 27-02 |
+| FE-01~03, E2E-02~04 | 28 | 28-01~03 |
+| OPS-01~03 | 29 | 29-01, 29-02 |
+| SEC-14~15, QA-01~04, E2E-01 | 30 | 30-01, 30-02 |
