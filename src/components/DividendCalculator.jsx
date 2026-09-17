@@ -9,7 +9,9 @@
  */
 
 import React, { useState, useEffect } from 'react'
-import { getDeployerStats, getCumulativeDividends } from '../services/ContractService'
+
+// Phase 28 / v2.0：v1 分红合约（RevenueDistributor）已依无代币宪法下线，
+// 估算改为纯本地计算（历史链上分红恒为 0）
 
 /**
  * DividendCalculator component
@@ -29,9 +31,9 @@ export default function DividendCalculator({ address, tier }) {
   async function calculateEstimate() {
     setLoading(true)
     try {
-      // Get historical data from cumulative dividends
-      const cumulative = await getCumulativeDividends(address)
-      const deployerStats = await getDeployerStats(address)
+      // v1 分红链上数据源已下线：恒以 0 历史分红做本地估算
+      const cumulative = 0
+      const deployerStats = null
 
       // Simple estimation: historical total / months active
       const totalDays = deployerStats?.registeredAt

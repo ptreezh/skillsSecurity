@@ -578,6 +578,8 @@
     "constitutionArticle3": "宪法第三条",
     "freeQuota": "免费限额",
     "walletBalance": "钱包余额",
+    "recoverable": "可恢复声誉",
+    "recoverableHint": "反噬恢复机制（宪法第四条）",
     "vesting": {
       "title": "变现进度",
       "remaining": "距离解锁变现还需 {{count}} 声誉",
@@ -689,6 +691,7 @@
   },
   "selfOps": {
     "title": "四自运营面板",
+    "v1Retired": "v1 代币经济功能（分红/治理提案/健康报告上链）已依无代币宪法下线，界面保留作历史展示；推广榜为 ChainMaker chain1 实时声誉数据（经后端网关）。",
     "features": {
       "revenue": "收益",
       "promotion": "推广",

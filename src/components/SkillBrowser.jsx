@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import ContractService from '../services/ContractService.jsx'
+import ChainDataService from '../services/ChainDataService.js'
 
 export default function SkillBrowser({ user, onUpload }) {
   const { t } = useTranslation()
@@ -9,6 +9,7 @@ export default function SkillBrowser({ user, onUpload }) {
   const [sortBy, setSortBy] = useState('reputation')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [fromChain, setFromChain] = useState(false)
 
   const demoSkills = [
     { id: 1, name: 'email-sender', description: t('browser.demoSkills.emailSender'), owner: '0x1234...abcd', verified: true, riskLevel: 0, likes: 120, reputation: 340 },
@@ -17,27 +18,31 @@ export default function SkillBrowser({ user, onUpload }) {
   ]
 
   useEffect(() => {
-    async function fetchSkills() {
+    async function loadSkills() {
       setLoading(true)
       setError(null)
 
       try {
-        const contractSkills = await ContractService.getSkills()
-        if (contractSkills && contractSkills.length > 0) {
-          setSkills(contractSkills)
+        // 经后端网关读取 ChainMaker chain1 真链数据（Phase 28 / v2.0）
+        const { skills: chainSkills } = await ChainDataService.fetchSkills({ page: 1, pageSize: 50 })
+        if (chainSkills && chainSkills.length > 0) {
+          setSkills(chainSkills)
+          setFromChain(true)
         } else {
           setSkills(demoSkills)
+          setFromChain(false)
         }
       } catch (err) {
         console.error('Error fetching skills:', err)
         setError(err.message)
         setSkills(demoSkills)
+        setFromChain(false)
       } finally {
         setLoading(false)
       }
     }
 
-    fetchSkills()
+    loadSkills()
   }, [user?.address])
 
   const handleLike = async (skillId) => {
@@ -45,21 +50,7 @@ export default function SkillBrowser({ user, onUpload }) {
     if (user.dailyLikes >= 5) return alert(t('browser.dailyLimit'))
 
     try {
-      if (ContractService.isInitialized()) {
-        const result = await ContractService.likeSkill(skillId)
-        if (result.success) {
-          setSkills(skills.map(s =>
-            s.id === skillId ? { ...s, likes: (s.likes || 0) + 1 } : s
-          ))
-          user.dailyLikes++
-          user.reputation += 2
-          return
-        } else {
-          alert(t('common.txFailed') + ': ' + result.error)
-          return
-        }
-      }
-
+      // chain1 无链上点赞概念（无代币宪法）：本地乐观更新仅作产品机制演示
       const skill = skills.find(s => s.id === skillId)
       if (skill?.verified === false) {
         alert(t('common.unverifiedSkillWarning'))
@@ -121,7 +112,7 @@ export default function SkillBrowser({ user, onUpload }) {
         <p className="page-subtitle">{t('browser.subtitle')}</p>
       </div>
 
-      {ContractService.isInitialized() && (
+      {fromChain && (
         <div className="badge badge-success" style={{ marginBottom: 'var(--space-4)' }}>
           {t('browser.stats.verified')}
         </div>

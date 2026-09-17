@@ -9,16 +9,10 @@ import PromotionBarChart from "../components/charts/PromotionBarChart";
 import GovernancePieChart from "../components/charts/GovernancePieChart";
 import HealthReportChart from "../components/charts/HealthReportChart";
 import Leaderboard from "../components/leaderboard/Leaderboard";
-import {
-  getCumulativeDividends,
-  getPendingDividends,
-  getLeaderboard,
-  getActiveProposalCount,
-  getProposal,
-  getReporterStats,
-  getUserVotingPower,
-  submitHealthReport
-} from "../services/ContractService";
+import ChainDataService from "../services/ChainDataService.js";
+
+// Phase 28 / v2.0：v1 代币经济功能（分红/治理提案/健康报告）已依无代币宪法下线；
+// 晋升榜改接 chain1 真链排行（经后端网关），其余 tab 以空态+标注呈现
 
 export default function SelfOpsPanel({ user, deployerStats }) {
   const { t } = useTranslation()
@@ -40,36 +34,36 @@ export default function SelfOpsPanel({ user, deployerStats }) {
   const tierLabel = t(`deployerDashboard.tiers.${['bronze', 'silver', 'gold'][deployerStats?.tier ?? 0]}.name`)
 
   const { data: revenueResult, loading: revenueLoading } = usePolling(
+    // v1 分红已下线（无代币宪法）：恒为 0，保留 UI 结构
     async () => {
       if (!user?.address) return {};
-      return {
-        cumulative: await getCumulativeDividends(user.address),
-        pending: await getPendingDividends()
-      };
+      return { cumulative: 0, pending: 0 };
     },
     30000
   );
 
   const { data: promotionResult, loading: promotionLoading } = usePolling(
-    async () => ({ leaderboard: await getLeaderboard(10) }),
-    30000
-  );
-
-  const { data: governanceResult, loading: governanceLoading } = usePolling(
+    // 晋升榜：chain1 真链声誉排行（v2）
     async () => {
-      const count = await getActiveProposalCount();
-      const proposals = [];
-      for (let i = 1; i <= Math.min(count, 5); i++) {
-        const p = await getProposal(i);
-        if (p && !p.canceled) proposals.push({ id: i, ...p });
+      try {
+        const { users } = await ChainDataService.fetchLeaderboard(10);
+        return { leaderboard: users };
+      } catch (_) {
+        return { leaderboard: [] };
       }
-      return { proposals };
     },
     30000
   );
 
+  const { data: governanceResult, loading: governanceLoading } = usePolling(
+    // v1 治理提案已下线：空提案列表
+    async () => ({ proposals: [] }),
+    30000
+  );
+
   const { data: healthResult, loading: healthLoading } = usePolling(
-    async () => (user?.address ? await getReporterStats(user.address) : {}),
+    // v1 健康报告合约已下线：空统计
+    async () => ({}),
     30000
   );
 
@@ -92,7 +86,7 @@ export default function SelfOpsPanel({ user, deployerStats }) {
   }, [governanceResult]);
 
   useEffect(() => {
-    if (user?.address) getUserVotingPower(user.address).then(setVotingPower);
+    // v1 链上投票权已下线（无代币宪法）：投票权恒为 0
   }, [user]);
 
   useEffect(() => {
@@ -100,12 +94,13 @@ export default function SelfOpsPanel({ user, deployerStats }) {
   }, [healthResult]);
 
   const handleHealthReport = (type) => {
+    // v1 健康报告上链已下线：仅本地记录
     const descriptions = {
       0: t('selfOps.healthReports.bug'),
       1: t('selfOps.healthReports.status'),
       2: t('selfOps.healthReports.stress')
     }
-    submitHealthReport(type, `${descriptions[type]} description`)
+    console.log('[HealthReport] local only:', type, descriptions[type])
   }
 
   return (
@@ -113,6 +108,10 @@ export default function SelfOpsPanel({ user, deployerStats }) {
       <div className="self-ops-header">
         <h2 className="self-ops-title">{t('selfOps.title')}</h2>
         <span className="self-ops-badge">{tierLabel}</span>
+      </div>
+
+      <div className="alert alert-warning" style={{ marginBottom: 'var(--space-4)' }}>
+        {t('selfOps.v1Retired')}
       </div>
 
       <div className="self-ops-tabs" role="tablist">

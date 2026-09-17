@@ -578,6 +578,8 @@
     "constitutionArticle3": "Constitution Article 3",
     "freeQuota": "Free quota",
     "walletBalance": "Wallet Balance",
+    "recoverable": "Recoverable Reputation",
+    "recoverableHint": "Anti-whistleblowing recovery (Constitution §4)",
     "vesting": {
       "title": "Vesting Progress",
       "remaining": "{{count}} reputation to unlock vesting",
@@ -689,6 +691,7 @@
   },
   "selfOps": {
     "title": "Self-Ops Panel",
+    "v1Retired": "V1 token-economy features (dividends, governance proposals, on-chain health reports) are retired per the no-token constitution; UI kept for historical display. The promotion board shows live ChainMaker chain1 reputation via the backend gateway.",
     "features": {
       "revenue": "Revenue",
       "promotion": "Promotion",

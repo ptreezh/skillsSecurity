@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 
-const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:10001';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:10001';
 
 const OpsDashboard = () => {
   const [networkStats, setNetworkStats] = useState({

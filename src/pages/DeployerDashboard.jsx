@@ -8,7 +8,7 @@
 import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import './DeployerDashboard.css'
-import ContractService from '../services/ContractService.jsx'
+import ChainDataService from '../services/ChainDataService.js'
 
 // Tier thresholds (number of users)
 const TIER_THRESHOLDS = {
@@ -46,47 +46,26 @@ export default function DeployerDashboard({ user }) {
       setError(null)
 
       try {
-        // Try to get deployer stats from contract
-        if (ContractService.isInitialized()) {
-          const deployerStats = await ContractService.getDeployerStats(user.address)
-          const registered = await ContractService.isDeployer(user.address)
-
-          if (deployerStats) {
-            setStats({
-              domain: deployerStats.domain,
-              tier: Number(deployerStats.tier),
-              totalUsers: Number(deployerStats.totalUsers),
-              activeUsers: Number(deployerStats.activeUsers),
-              totalRewards: Number(deployerStats.totalRewards),
-              pendingRewards: Number(deployerStats.pendingRewards),
-              monthlyCount: Number(deployerStats.monthlyCount)
-            })
-            setIsRegistered(registered)
-          }
-
-          // Get referral link
-          const link = await ContractService.getReferralLink(user.address)
-          if (link) {
-            setReferralLink(link)
-          }
-        } else {
-          // Demo mode - use mock data
-          setStats({
-            domain: 'demo.agent-skills.xyz',
-            tier: 1,
-            totalUsers: 23,
-            activeUsers: 18,
-            totalRewards: 4500,
-            pendingRewards: 1200,
-            monthlyCount: 5
-          })
-          setIsRegistered(true)
-          setReferralLink(`https://agent-skills.xyz/ref/${user.address.slice(2, 10).toLowerCase()}`)
-        }
+        // Phase 28 / v2.0：改接 chain1 AgentEcosystem 真链数据（经后端网关）
+        // v1 部署者代币经济（分红/推荐奖励）已依无代币宪法下线
+        const stats = await ChainDataService.fetchStats();
+        const eco = stats.ecosystem || {};
+        setStats({
+          domain: 'AgentEcosystem (chain1)',
+          tier: 1,
+          totalUsers: eco.totalUsers || 0,
+          activeUsers: eco.activeRoles || 0,
+          totalRewards: eco.totalRewardsDistributed || 0,
+          pendingRewards: 0, // v1 分红概念已下线，恒为 0
+          monthlyCount: eco.totalContributions || 0
+        })
+        setIsRegistered(true)
+        // 推荐链接为产品机制演示（链上无对应合约存储）
+        setReferralLink(`https://agent-skills.xyz/ref/${user.address.slice(2, 10).toLowerCase()}`)
       } catch (err) {
         console.error('Error fetching deployer data:', err)
         setError(err.message)
-        // Fallback to demo data
+        // 后端不可达 → 演示数据兜底
         setStats({
           domain: 'demo.agent-skills.xyz',
           tier: 1,

@@ -9,7 +9,9 @@
  */
 
 import React, { useState, useEffect } from 'react'
-import { getContract, getProvider } from '../services/ContractService'
+
+// Phase 28 / v2.0：v1 RevenueDistributor 已依无代币宪法下线，
+// 分红历史不再有链上事件来源，固定返回空历史
 
 /**
  * DistributionHistory component
@@ -29,42 +31,8 @@ export default function DistributionHistory({ address }) {
     setLoading(true)
     setError(null)
 
-    try {
-      const provider = getProvider()
-      if (!provider) {
-        setError('Wallet not connected')
-        setLoading(false)
-        return
-      }
-
-      const contract = getContract('RevenueDistributor')
-      if (!contract) {
-        // Fallback: show empty history with message
-        setHistory([])
-        setLoading(false)
-        return
-      }
-
-      // Query past DividendsDistributed events
-      // Note: In production, use The Graph or backend indexer for efficient history
-      const filter = contract.filters.DividendsDistributed(address)
-      const events = await contract.queryFilter(filter, -1000) // Last 1000 blocks
-
-      const distributions = events.slice(-10).reverse().map((event) => ({
-        amount: parseFloat(event.args[1]) / 1e18,
-        totalDistributors: Number(event.args[2]),
-        blockNumber: event.blockNumber,
-        transactionHash: event.transactionHash,
-        timestamp: new Date().toLocaleDateString()
-      }))
-
-      setHistory(distributions)
-    } catch (err) {
-      console.error('Failed to load history:', err)
-      setError('Failed to load history')
-      setHistory([])
-    }
-
+    // v1 分红事件源已下线（无代币宪法）：无历史记录
+    setHistory([])
     setLoading(false)
   }
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import ContractService from '../services/ContractService.jsx'
+import ChainDataService from '../services/ChainDataService.js'
 
 const demoUsers = [
   { address: '0x1234...abcd', reputation: 5000, level: 4, skillsCreated: 15, totalLikes: 1200, flagged: 0 },
@@ -17,29 +17,34 @@ export default function Leaderboard() {
   const [sortBy, setSortBy] = useState('reputation')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [fromChain, setFromChain] = useState(false)
 
   useEffect(() => {
-    async function fetchLeaderboard() {
+    async function loadLeaderboard() {
       setLoading(true)
       setError(null)
 
       try {
-        const leaderboardData = await ContractService.getLeaderboard()
-        if (leaderboardData && leaderboardData.length > 0) {
-          setUsers(leaderboardData)
+        // 经后端网关读取 chain1 真链排行（Phase 28 / v2.0）
+        const { users: chainUsers } = await ChainDataService.fetchLeaderboard(20)
+        if (chainUsers && chainUsers.length > 0) {
+          setUsers(chainUsers)
+          setFromChain(true)
         } else {
           setUsers(demoUsers)
+          setFromChain(false)
         }
       } catch (err) {
         console.error('Error fetching leaderboard:', err)
         setError(err.message)
         setUsers(demoUsers)
+        setFromChain(false)
       } finally {
         setLoading(false)
       }
     }
 
-    fetchLeaderboard()
+    loadLeaderboard()
   }, [])
 
   const sortedUsers = sortBy === 'reputation'
@@ -86,7 +91,7 @@ export default function Leaderboard() {
         <p className="page-subtitle">{t('leaderboard.subtitle')}</p>
       </div>
 
-      {ContractService.isInitialized() && (
+      {fromChain && (
         <div className="badge badge-success" style={{ marginBottom: 'var(--space-4)' }}>
           {t('leaderboard.connectedToContract')}
         </div>

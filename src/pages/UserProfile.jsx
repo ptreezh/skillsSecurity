@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import ContractService from '../services/ContractService.jsx'
+import ChainDataService from '../services/ChainDataService.js'
 
 const getLevel = (rep, levels) => {
   if (rep >= 5000) return levels[4]
@@ -35,24 +35,9 @@ export default function UserProfile({ user }) {
       setError(null)
 
       try {
-        if (ContractService.isInitialized()) {
-          const [reputation, stakes, effective, locked] = await Promise.all([
-            ContractService.getReputation(user.address),
-            ContractService.getStakes(user.address),
-            ContractService.getEffectiveReputation(user.address),
-            ContractService.getLockedReputation(user.address)
-          ])
-
-          setUserProfile({ reputation, stakes, effective, locked, fromContract: true })
-        } else {
-          setUserProfile({
-            reputation: user.reputation,
-            stakes: [],
-            effective: user.reputation,
-            locked: { lockedAmount: 0, lastClaimTime: 0 },
-            fromContract: false
-          })
-        }
+        // 经后端网关一次取回链上声誉全景（Phase 28 / v2.0，替代原 4 个合约直连查询）
+        const profile = await ChainDataService.fetchReputation(user.address)
+        setUserProfile(profile)
       } catch (err) {
         console.error('Error fetching profile:', err)
         setError(err.message)
@@ -61,7 +46,8 @@ export default function UserProfile({ user }) {
           stakes: [],
           effective: user.reputation,
           locked: { lockedAmount: 0, lastClaimTime: 0 },
-          fromContract: false
+          recoverable: 0,
+          fromChain: false
         })
       } finally {
         setLoading(false)
@@ -97,7 +83,8 @@ export default function UserProfile({ user }) {
     effective: user.reputation,
     stakes: [],
     locked: { lockedAmount: 0, lastClaimTime: 0 },
-    fromContract: false
+    recoverable: 0,
+    fromChain: false
   }
 
   const effectiveRep = profile.effective || profile.reputation || 0
@@ -121,7 +108,7 @@ export default function UserProfile({ user }) {
         <p className="page-subtitle">{t('profile.subtitle')}</p>
       </div>
 
-      {profile.fromContract && (
+      {profile.fromChain && (
         <div className="badge badge-success" style={{ marginBottom: 'var(--space-4)' }}>
           {t('profile.connectedToContract')}
         </div>
@@ -161,9 +148,9 @@ export default function UserProfile({ user }) {
         </div>
 
         <div className="card stat" style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-2)' }}>{t('profile.walletBalance')}</div>
-          <div style={{ fontSize: 'var(--text-3xl)', fontWeight: 'var(--font-bold)', color: 'var(--color-warning)' }}>{user.balance || 0}</div>
-          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', marginTop: 'var(--space-1)' }}>ASK</div>
+          <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-2)' }}>{t('profile.recoverable')}</div>
+          <div style={{ fontSize: 'var(--text-3xl)', fontWeight: 'var(--font-bold)', color: 'var(--color-purple-600)' }}>{profile.recoverable || 0}</div>
+          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', marginTop: 'var(--space-1)' }}>{t('profile.recoverableHint')}</div>
         </div>
       </div>
 

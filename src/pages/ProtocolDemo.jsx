@@ -2,13 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { fullAuditFlow } from '../services/uploadService';
 import WalletService from '../services/WalletService.js';
-import {
-  getSkills,
-  getBalance,
-  getReputation,
-  getAddresses,
-  isInitialized
-} from '../services/ContractService.jsx';
+import ChainDataService from '../services/ChainDataService.js';
 
 // Matches real chain revert messages about insufficient reputation (MEDIUM+ gate)
 const REPUTATION_ERROR_RE = /reputation|insufficient|有效声誉|声誉不足/i;
@@ -35,7 +29,6 @@ export default function ProtocolDemo({ initialTab = 'standard' }) {
   const [walletConnected, setWalletConnected] = useState(false);
   const [walletAddress, setWalletAddress] = useState(null);
   const [liveSkills, setLiveSkills] = useState([]);
-  const [userBalance, setUserBalance] = useState('0');
   const [userReputation, setUserReputation] = useState(0);
   const [contractAddresses, setContractAddresses] = useState({});
   const [isDemoMode, setIsDemoMode] = useState(true);
@@ -70,9 +63,11 @@ export default function ProtocolDemo({ initialTab = 'standard' }) {
 
   const loadContractAddresses = async () => {
     try {
-      const addresses = getAddresses();
+      // 经后端网关获取 chain1 v2 合约地址表（Phase 28 / v2.0）
+      const stats = await ChainDataService.fetchStats();
+      const addresses = stats.contracts || {};
       setContractAddresses(addresses);
-      const hasContracts = Object.values(addresses).some(addr => addr !== null);
+      const hasContracts = Object.values(addresses).some(addr => addr);
       setIsDemoMode(!hasContracts);
     } catch (error) {
       console.log('Failed to load contract addresses');
@@ -80,19 +75,13 @@ export default function ProtocolDemo({ initialTab = 'standard' }) {
   };
 
   const loadLiveData = async () => {
-    if (!isInitialized()) return;
-
     try {
-      const skills = await getSkills();
-      setLiveSkills(skills.slice(0, 10));
+      const { skills } = await ChainDataService.fetchSkills({ page: 1, pageSize: 10 });
+      setLiveSkills(skills);
 
       if (walletAddress) {
-        const [balance, reputation] = await Promise.all([
-          getBalance(walletAddress),
-          getReputation(walletAddress)
-        ]);
-        setUserBalance(balance);
-        setUserReputation(reputation);
+        const rep = await ChainDataService.fetchReputation(walletAddress);
+        setUserReputation(rep.effective ?? rep.reputation ?? 0);
       }
     } catch (error) {
       console.error('Failed to load live data:', error);
@@ -120,7 +109,6 @@ export default function ProtocolDemo({ initialTab = 'standard' }) {
     setWalletAddress(null);
     setIsDemoMode(true);
     setLiveSkills([]);
-    setUserBalance('0');
     setUserReputation(0);
   };
 
@@ -231,7 +219,6 @@ export default function ProtocolDemo({ initialTab = 'standard' }) {
   const renderLiveStats = () => (
     <div className="grid-stats" style={{ marginBottom: 'var(--space-6)' }}>
       {[
-        { label: t('wallet.balance'), value: userBalance, color: 'var(--color-primary)' },
         { label: t('profile.reputation'), value: userReputation, color: 'var(--color-success)' },
         { label: t('demo.live.onChainSkills'), value: liveSkills.length, color: 'var(--color-warning)' },
         { label: t('wallet.status'), value: isDemoMode ? t('wallet.demoMode') : walletConnected ? t('wallet.connected') : t('wallet.connect'), color: 'var(--color-text-primary)' }
