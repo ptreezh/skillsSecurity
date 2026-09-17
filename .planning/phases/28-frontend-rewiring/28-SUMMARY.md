@@ -54,6 +54,23 @@
 
 ## 遗留与移交
 
-- `profile.subtitle` 等 i18n 键缺失显示键名（存量问题，非本阶段引入）→ 记入小修清单
 - 360tray 占用 10001：开发/实测用 10002；生产端口最终归属 → **P29 GATE 输入**
 - **P29 ⚠️GATE：托管方案需用户拍板**（A 本机持久+内网穿透 / B 云服务器 docker-compose / C 局域网演示+公网方案文档化）
+
+## 附录：系统级冒烟补测（2026-09-18，用户 grill-down 触发）
+
+针对"P28 按 roadmap 完成但系统级未必完备"的质疑，补测写路径与二级页面，**发现并修复 3 个真缺陷**：
+
+| # | 缺陷 | 根因 | 修复 | 验证 |
+|---|------|------|------|------|
+| 1 | 格式错误的技能文件收到"太棒！全部通过"文案却被 rejected（自相矛盾） | tier1 元数据解析失败不影响 overall 判定分支，而 `passed=false + rec=approve` 落入 rejected | tier1 失败 → `needs_review` + 如实列出缺失字段与 frontmatter 格式提示（安全 critical/high 优先级不变） | curl 上传冒烟：approved/approve/tier1=true；错误格式 → review |
+| 2 | SelfOpsPanel 晋升榜 DEPLOYER/USERS 列空白 | 子组件 Leaderboard 期望 `domain/totalUsers/tier/trend`，未做形状适配 | 轮询处映射（domain=地址，totalUsers=技能数） | 浏览器实测：`1 / 0x3737...f3 / 5 / 🥉` |
+| 3 | ASK 代币单位残留在 7 处 UI（违宪展示） | v1 文案未清干净 | 统一改 RP（Reputation Points）/ 声誉分；ASKToken 展示名加 [已下线] | 浏览器实测 ask=false |
+
+**写路径全链浏览器 E2E 首次闭环**（此前仅 P28 前的 curl 证据）：
+浏览器上传 `browser-e2e-smoke.SKILL.md` → 审计 approved → `POST /api/chain 200` → 链上 skillId=5（txId 18d63a09...）→ SkillBrowser 渲染第 5 条 → 排行榜技能数=5。
+证据：`evidence/p29-evidence-writepath-leaderboard5.png`
+
+**回归全绿**：Hardhat 144 passing / test:chain 13/13 / test:unit 28/28 / build 27.8s / locales JSON 校验 / prettier。
+
+**守护自愈实战验证**：手工杀后端 → 第 32 轮检测 → 7s 内重启新代码（含 audit 修复后 prettier 最终字节的二次冒烟）。
