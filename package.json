@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "test": "hardhat test",
     "test:chain": "node test/e2e/v2-wiring.test.mjs",
-    "test:unit": "node --test test/server/chainmaker-client.test.cjs",
+    "test:unit": "node --test test/server/chainmaker-client.test.cjs test/server/chain-read.test.cjs",
     "coverage": "hardhat coverage",
     "start": "node server/index.js",
     "server": "node server/index.js",
