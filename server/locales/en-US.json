@@ -32,6 +32,12 @@
   "file": {
     "invalidType": "Invalid file type. Allowed: {{types}}"
   },
+  "skill": {
+    "notFound": "Skill not found"
+  },
+  "reputation": {
+    "invalidAddress": "Invalid wallet address"
+  },
   "independence": {
     "features": {
       "noNetwork": "Pure local computation, no external dependencies",

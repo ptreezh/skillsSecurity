@@ -32,6 +32,12 @@
   "file": {
     "invalidType": "不支持的文件类型。允许：{{types}}"
   },
+  "skill": {
+    "notFound": "技能不存在"
+  },
+  "reputation": {
+    "invalidAddress": "无效的钱包地址"
+  },
   "independence": {
     "features": {
       "noNetwork": "纯本地计算，无外部依赖",

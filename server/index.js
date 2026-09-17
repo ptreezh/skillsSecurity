@@ -7,6 +7,7 @@ const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const { processAuditJob } = require('./audit-agent');
 const { submitToChain } = require('./chain-submit');
+const chainRead = require('./chain-read');
 const { jobs, addJob, updateJob, getJob } = require('./jobs');
 const { localeMiddleware } = require('./locale-middleware');
 
@@ -173,6 +174,72 @@ app.post('/api/chain', async (req, res) => {
   }
 });
 
+// ── 链上读端点（Phase 27：经 cmc 网关的真实链数据，零 mock）──
+
+// 技能列表（分页）
+app.get('/api/skills', async (req, res) => {
+  try {
+    const page = Number(req.query.page) || 1;
+    const pageSize = Number(req.query.pageSize) || 20;
+    const result = await chainRead.listSkills({ page, pageSize });
+    res.json(result);
+  } catch (error) {
+    console.error('List skills error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 单个技能详情
+app.get('/api/skills/:id', async (req, res) => {
+  try {
+    const skill = await chainRead.getSkillById(req.params.id);
+    res.json(skill);
+  } catch (error) {
+    if (error.status === 404) {
+      return res.status(404).json({ error: req.t('skill.notFound') });
+    }
+    console.error('Get skill error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 用户声誉（含锁定 / 可恢复）
+app.get('/api/reputation/:address', async (req, res) => {
+  try {
+    const reputation = await chainRead.getReputation(req.params.address);
+    res.json(reputation);
+  } catch (error) {
+    if (error.status === 400) {
+      return res.status(400).json({ error: req.t('reputation.invalidAddress') });
+    }
+    console.error('Get reputation error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 声誉排行榜
+app.get('/api/leaderboard', async (req, res) => {
+  try {
+    const limit = Number(req.query.limit) || 10;
+    const result = await chainRead.getLeaderboard({ limit });
+    res.json(result);
+  } catch (error) {
+    console.error('Get leaderboard error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 协议统计
+app.get('/api/stats', async (req, res) => {
+  try {
+    const stats = await chainRead.getStats();
+    res.json(stats);
+  } catch (error) {
+    console.error('Get stats error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('Server error:', err);
@@ -186,6 +253,11 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`Status endpoint: GET http://localhost:${PORT}/api/status/:jobId`);
   console.log(`Chain endpoint: POST http://localhost:${PORT}/api/chain`);
   console.log(`Health endpoint: GET http://localhost:${PORT}/api/health`);
+  console.log(`Skills endpoint: GET http://localhost:${PORT}/api/skills?page=1&pageSize=20`);
+  console.log(`Skill detail endpoint: GET http://localhost:${PORT}/api/skills/:id`);
+  console.log(`Reputation endpoint: GET http://localhost:${PORT}/api/reputation/:address`);
+  console.log(`Leaderboard endpoint: GET http://localhost:${PORT}/api/leaderboard?limit=10`);
+  console.log(`Stats endpoint: GET http://localhost:${PORT}/api/stats`);
   if (process.env.CORS_ORIGIN) {
     console.log(`CORS origins: ${process.env.CORS_ORIGIN}`);
   } else {
