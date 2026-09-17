@@ -21,12 +21,19 @@ if (!fs.existsSync(TEMP_DIR)) {
   fs.mkdirSync(TEMP_DIR, { recursive: true });
 }
 
-// CORS: allow local dev and configured production origins
+// CORS: allow local dev, the production frontend, and any extra configured origins
+// 根治策略（P28/P29）：生产前端 origin（GitHub Pages）默认放行，不再依赖逐环境手配；
+// 额外 origin 仍可用 CORS_ORIGIN=xxx,yyy 扩展
 const CORS_ORIGIN = process.env.CORS_ORIGIN;
 const corsOptions = {
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
-    const allowed = ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173'];
+    const allowed = [
+      'http://localhost:5173',
+      'http://localhost:3000',
+      'http://127.0.0.1:5173',
+      'https://ptreezh.github.io' // 生产前端（GitHub Pages，公网访问链路）
+    ];
     if (CORS_ORIGIN) {
       CORS_ORIGIN.split(',').forEach(o => allowed.push(o.trim()));
     }
