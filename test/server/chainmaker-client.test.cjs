@@ -87,3 +87,48 @@ test('throws on 未注册合约 key (CONTRACTS registry integrity)', async () =>
   const { get } = require('../../server/chainmaker-client.js');
   await assert.rejects(get('NotARealContract', 'foo', []), /未注册的合约 key/);
 });
+
+// ── decodeResult 扩展（Phase 27）：负数 int256 与多值数值返回 ──
+
+const { decodeResult } = require('../../server/chainmaker-client.js');
+
+const OUT_INT = [{ type: 'int256' }];
+const OUT_UINT_PAIR = [{ type: 'uint256' }, { type: 'uint256' }];
+
+test('decodeResult: 单值负数 int256（反噬扣减后的声誉）', () => {
+  assert.equal(decodeResult('[-42]', OUT_INT), -42);
+  assert.equal(decodeResult('[42]', OUT_INT), 42);
+  assert.equal(decodeResult('[0]', OUT_INT), 0);
+});
+
+test('decodeResult: 超出安全整数的负数返回字符串', () => {
+  const big = '-' + '9'.repeat(20);
+  assert.equal(decodeResult(`[${big}]`, OUT_INT), big);
+});
+
+test('decodeResult: 多值数值返回 → 数组（reputationLocks 形状）', () => {
+  assert.deepEqual(decodeResult('[100 200]', OUT_UINT_PAIR), [100, 200]);
+  assert.deepEqual(decodeResult('[0 0]', OUT_UINT_PAIR), [0, 0]);
+});
+
+test('decodeResult: 多值但段数不符 → 原始字符串', () => {
+  assert.equal(decodeResult('[100 200]', OUT_INT), '[100 200]');
+});
+
+test('decodeResult: 嵌套数组（address 混合）不误判为多值数值', () => {
+  const out = [{ type: 'address' }, { type: 'uint256' }];
+  const raw = '[[16 109 54 134 218 189 171 209 60 99 167 178 106 198 138 172 172 203 192 66] 42]';
+  const decoded = decodeResult(raw, out);
+  // 不抛错；不产出伪数值数组（返回原串或其它非数组）
+  assert.equal(Array.isArray(decoded) && decoded.every(Number.isFinite), false);
+});
+
+test('decodeResult: 单值回归 — bool / address 不受影响', () => {
+  assert.equal(decodeResult('[true]', [{ type: 'bool' }]), true);
+  const addr = '0x' + Buffer.from([16, 109, 54]).toString('hex');
+  const out20 = [{ type: 'address' }];
+  const bytes = Array.from({ length: 20 }, (_, i) => i + 1);
+  const raw = '[[' + bytes.join(' ') + ']]';
+  const expect = '0x' + bytes.map((b) => b.toString(16).padStart(2, '0')).join('');
+  assert.equal(decodeResult(raw, out20), expect);
+});

@@ -159,7 +159,9 @@ function toTypedParams(methodAbi, params) {
 
 /**
  * 解码 cmc --result-to-string 输出的 result 字段。
- * 支持：单值 bool / uint / address；失败返回原始字符串（不强解）。
+ * 支持：单值 bool / 有符号整数（声誉可为负——反噬机制）/ address；
+ *       多值全数值返回（如 reputationLocks → "[100 200]"）。
+ * 失败返回原始字符串（不强解）。
  */
 function decodeResult(raw, outputs) {
   const s = String(raw).trim();
@@ -169,10 +171,29 @@ function decodeResult(raw, outputs) {
   if (/^\[(true|false)\]$/.test(s)) {
     return s === '[true]';
   }
-  // uint: "[42]"
-  if (/^\[\d+\]$/.test(s)) {
+  // 多值数值返回："[a b c]"（外层方括号、内部无嵌套、段数与 ABI 输出数一致且均为有符号整数）
+  // 例：getRecoverableReputation(address) returns(uint256,uint256) → "[500 1718000000]"
+  if (outputs.length > 1 && /^\[[^\[\]]*\]$/.test(s)) {
+    const parts = s.slice(1, -1).trim().split(/\s+/).filter(Boolean);
+    if (parts.length === outputs.length && parts.every((p) => /^-?\d+$/.test(p))) {
+      return parts.map((p) => {
+        const big = BigInt(p);
+        return big >= BigInt(-Number.MAX_SAFE_INTEGER) &&
+          big <= BigInt(Number.MAX_SAFE_INTEGER)
+          ? Number(big)
+          : big.toString();
+      });
+    }
+    // 形似多值但段数/格式不符 → 落回原始字符串
+    return s;
+  }
+  // 单值有符号整数: "[42]" / "[-42]"
+  if (/^\[-?\d+\]$/.test(s)) {
     const big = BigInt(s.slice(1, -1));
-    return big <= BigInt(Number.MAX_SAFE_INTEGER) ? Number(big) : big.toString();
+    return big >= BigInt(-Number.MAX_SAFE_INTEGER) &&
+      big <= BigInt(Number.MAX_SAFE_INTEGER)
+      ? Number(big)
+      : big.toString();
   }
   // address: "[[16 109 54 ...20 字节]]"
   const addrMatch = s.match(/^\[\[([0-9 ]+)\]\]$/);
@@ -482,4 +503,5 @@ module.exports = {
   health,
   loadAbi,
   decodeRevertReason,
+  decodeResult,
 };
