@@ -5,7 +5,9 @@ module.exports = defineConfig({
   plugins: [react()],
   base: '/skillsSecurity/',
   server: {
-    port: 5173
+    port: 5173,
+    // 端口被占时直接失败（CORS 白名单只认 5173，静默换端口会在运行时坏掉）
+    strictPort: true
   },
   build: {
     // Optimize chunk size with code splitting
@@ -14,9 +16,6 @@ module.exports = defineConfig({
         manualChunks: {
           // React libraries
           'react-vendor': ['react', 'react-dom'],
-
-          // Ethers.js is large, split separately
-          'ethers': ['ethers'],
 
           // Recharts for charts
           'charts': ['recharts'],
@@ -48,7 +47,7 @@ module.exports = defineConfig({
 
   // Optimize dependencies
   optimizeDeps: {
-    include: ['react', 'react-dom', 'ethers', 'recharts'],
+    include: ['react', 'react-dom', 'recharts'],
     exclude: ['lucide-react']
   },
 
