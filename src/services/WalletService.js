@@ -1,174 +1,89 @@
 /**
- * WalletService - Wallet connection with contract access
- * Phase 18: Contract Integration
- * Constitution §2: low-friction participation, embedded wallet (seamless registration)
+ * WalletService - 内嵌钱包（纯身份层）
+ * Constitution §2: 低门槛参与、无缝注册（嵌入式钱包，无需 MetaMask）
+ *
+ * Phase 28 / v2.0 变更：
+ *   - 链上读写全部经后端网关（ChainDataService / uploadService），
+ *     前端钱包不再持有 ethers provider/signer，也不初始化任何合约实例
+ *   - 移除 ASK 代币空投余额（无代币宪法，永不发行代币）
+ *   - 本地身份仅作为声誉账户标识，链上数据以 /api/reputation 为准
  */
 
-import { ethers } from 'ethers'
-import ContractService from './ContractService.jsx'
+const STORAGE_KEY = 'agentskills_user'
 
 class WalletService {
   constructor() {
     this.user = null
-    this.provider = null
-    this.signer = null
-    this.contracts = null
   }
 
+  /**
+   * 初始化：恢复本地身份；不存在则注册新内嵌身份（宪法 §2 无缝注册）
+   * 注意：本地 reputation 仅作离线兜底展示，真实声誉以链上查询为准
+   */
   async init() {
-    // Simplified: email registration → auto-generated wallet (Constitution §2)
-    const savedUser = localStorage.getItem('agentskills_user')
+    const savedUser = localStorage.getItem(STORAGE_KEY)
     if (savedUser) {
-      this.user = JSON.parse(savedUser)
-      return this.user
+      try {
+        this.user = JSON.parse(savedUser)
+        return this.user
+      } catch (_) {
+        localStorage.removeItem(STORAGE_KEY) // 损坏数据 → 重建身份
+      }
     }
 
-    // New user registration (embedded, seamless)
     const newUser = {
-      address: '0x' + Math.random().toString(16).substr(2, 40),
+      address: '0x' + Array.from({ length: 40 }, () =>
+        '0123456789abcdef'[Math.floor(Math.random() * 16)]
+      ).join(''),
       reputation: 0,
       level: 1,
       dailyLikes: 0,
       lastLikeDate: 0,
-      balance: 100  // Airdrop: 100 ASK
+      chain: 'chain1'
     }
 
-    localStorage.setItem('agentskills_user', JSON.stringify(newUser))
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(newUser))
     this.user = newUser
     return this.user
   }
 
   /**
-   * Connect wallet with MetaMask or WalletConnect
-   * Initializes ContractService with deployed addresses
+   * 连接钱包：内嵌身份直接激活（无浏览器扩展依赖）
    */
   async connect() {
-    try {
-      // Check for MetaMask
-      if (window.ethereum) {
-        const provider = new ethers.BrowserProvider(window.ethereum)
-        const signer = await provider.getSigner()
-        const address = await signer.getAddress()
-
-        // Load deployments.json for contract addresses
-        let addresses = {}
-        try {
-          const response = await fetch('/deployments.json')
-          if (response.ok) {
-            const data = await response.json()
-            addresses = {
-              ASKToken: data.contracts?.ASKToken || null,
-              SkillRegistry: data.contracts?.SkillRegistry || null,
-              StakingManager: data.contracts?.StakingManager || null,
-              Attribution: data.contracts?.Attribution || null
-            }
-          }
-        } catch (e) {
-          console.log('Deployments.json not found, running in demo mode')
-        }
-
-        // Initialize contracts with signer
-        const contracts = await ContractService.initContractsWithSigner(signer, addresses)
-
-        this.provider = provider
-        this.signer = signer
-        this.contracts = contracts
-
-        // Update user with real wallet address
-        const savedUser = localStorage.getItem('agentskills_user')
-        const userData = savedUser ? JSON.parse(savedUser) : this.user
-
-        this.user = {
-          ...userData,
-          address: address,
-          connected: true
-        }
-
-        localStorage.setItem('agentskills_user', JSON.stringify(this.user))
-        return this.user
-
-      } else {
-        // No wallet extension - use demo mode
-        console.log('No wallet extension found, using demo mode')
-        return this.init()
-      }
-    } catch (error) {
-      console.error('Wallet connection error:', error)
-      throw error
-    }
-  }
-
-  /**
-   * Disconnect wallet and reset contract state
-   */
-  disconnect() {
-    ContractService.resetContracts()
-    this.provider = null
-    this.signer = null
-    this.contracts = null
-
-    // Keep local user data but clear wallet connection
-    if (this.user) {
-      this.user = {
-        ...this.user,
-        connected: false
-      }
-      localStorage.setItem('agentskills_user', JSON.stringify(this.user))
-    }
-  }
-
-  /**
-   * Get current user
-   */
-  getUser() {
+    const user = await this.init()
+    this.user = { ...user, connected: true }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(this.user))
     return this.user
   }
 
   /**
-   * Get ethers.js provider
+   * 断开：保留本地身份数据，仅清除连接态
    */
-  getProvider() {
-    return this.provider
+  disconnect() {
+    if (this.user) {
+      this.user = { ...this.user, connected: false }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.user))
+    }
+  }
+
+  /** 当前用户 */
+  getUser() {
+    return this.user
+  }
+
+  /** 是否已连接 */
+  isConnected() {
+    return Boolean(this.user && this.user.connected)
   }
 
   /**
-   * Get ethers.js signer
-   */
-  getSigner() {
-    return this.signer
-  }
-
-  /**
-   * Get all contract instances
-   */
-  getContracts() {
-    return this.contracts
-  }
-
-  /**
-   * Sign a transaction (backend signing, Constitution §2)
+   * 交易签名（兼容保留）：链上交易由后端网关提交（ChainMaker chain1），
+   * 前端无签名能力，演示模式直接返回占位结果
    */
   async signTransaction(tx) {
-    if (!this.signer) {
-      // Fallback to demo mode
-      console.log('TX signed (demo):', tx)
-      return { success: true, hash: '0x...' + Date.now() }
-    }
-
-    try {
-      const result = await this.signer.signTransaction(tx)
-      return { success: true, hash: result }
-    } catch (error) {
-      console.error('Transaction signing error:', error)
-      return { success: false, error: error.message }
-    }
-  }
-
-  /**
-   * Check if wallet is connected with contracts initialized
-   */
-  isConnected() {
-    return ContractService.isInitialized()
+    console.log('TX via backend gateway (demo):', tx)
+    return { success: true, hash: '0x' + Date.now().toString(16) }
   }
 }
 
