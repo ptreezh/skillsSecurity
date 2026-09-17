@@ -1,1 +1,1 @@
-done — all 26 phases (v1.1–v1.7) complete, awaiting v2.0
+phase 28 — 前端接线重构（v2.0）; phase 27 已完成 (2026-09-17)

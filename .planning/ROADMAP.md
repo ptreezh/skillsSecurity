@@ -22,7 +22,7 @@
 
 ---
 
-### Phase 27: 后端链上读路径 API
+### Phase 27: 后端链上读路径 API ✅ Complete (2026-09-17)
 
 **Requirements:** API-01, API-02, API-03, API-04, API-05
 **Depends on:** 无（cmc 容器已恢复运行）

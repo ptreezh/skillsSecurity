@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: 端到端上线收官
 status: in_progress
-last_updated: "2026-09-16T00:00:00.000Z"
+last_updated: "2026-09-17T00:00:00.000Z"
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 1
   phase_numbering: 27-30
   total_plans: 9
-  completed_plans: 0
-  percent: 0
+  completed_plans: 2
+  percent: 22
 ---
 
 # AgentSkills - Current State
@@ -25,16 +25,16 @@ See: .planning/PROJECT.md (updated 2026-05-18)
 ## Current Position
 
 Milestone: v2.0 (端到端上线收官) - IN PROGRESS
-Phase: 27 (后端链上读路径 API) - NEXT
-Status: v2.0 已定义（REQUIREMENTS 21 项 / ROADMAP 4 phases），待执行 Phase 27
+Phase: 28 (前端接线重构) - NEXT
+Status: Phase 27 完成 — 5 个链上读端点上线（28/28 单测，6 端点真链实测留证），待执行 Phase 28
 
-Progress: [░░░░░░░░░░░░░░░░░░░░] 0%
+Progress: [████░░░░░░░░░░░░░░░░] 22%
 
 ## v2.0 Active Phases
 
 | Phase | Name | Plans | Status |
 |-------|------|-------|--------|
-| 27 | 后端链上读路径 API | 0/2 | Pending |
+| 27 | 后端链上读路径 API | 2/2 | ✅ Complete (2026-09-17) |
 | 28 | 前端接线重构 | 0/3 | Pending |
 | 29 | 生产部署固化 ⚠️GATE | 0/2 | Pending |
 | 30 | 安全扫描与端到端验收 | 0/2 | Pending |
@@ -74,6 +74,13 @@ Progress: [░░░░░░░░░░░░░░░░░░░░] 0%
 | Phase | Name | Plans | Status |
 |-------|------|-------|--------|
 | 26-01 | 测试对齐 | 1/1 | Complete |
+
+## v2.0 Completed Phases
+
+| Phase | Name | Plans | Status |
+|-------|------|-------|--------|
+| 27-01 | chainmaker-client 读封装（chain-read.js 聚合 + decodeResult 有符号/多值解码） | 1/1 | Complete |
+| 27-02 | REST 读端点 ×5 + i18n 错误 + 单测 28/28 | 1/1 | Complete |
 
 ---
 
@@ -125,4 +132,4 @@ Progress: [░░░░░░░░░░░░░░░░░░░░] 0%
 
 ---
 
-*Last updated: 2026-05-27*
+*Last updated: 2026-09-17*
