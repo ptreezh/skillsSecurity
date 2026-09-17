@@ -8,7 +8,7 @@
  * - Current tier (Bronze/Silver/Gold)
  */
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from "react";
 
 // Phase 28 / v2.0：v1 分红合约（RevenueDistributor）已依无代币宪法下线，
 // 估算改为纯本地计算（历史链上分红恒为 0）
@@ -19,47 +19,51 @@ import React, { useState, useEffect } from 'react'
  * @param {number} tier - Current tier (0=Bronze, 1=Silver, 2=Gold)
  */
 export default function DividendCalculator({ address, tier }) {
-  const [monthlyEstimate, setMonthlyEstimate] = useState(0)
-  const [historicalAvg, setHistoricalAvg] = useState(0)
-  const [loading, setLoading] = useState(false)
+  const [monthlyEstimate, setMonthlyEstimate] = useState(0);
+  const [historicalAvg, setHistoricalAvg] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!address) return
-    calculateEstimate()
-  }, [address, tier])
+    if (!address) return;
+    calculateEstimate();
+  }, [address, tier]);
 
   async function calculateEstimate() {
-    setLoading(true)
+    setLoading(true);
     try {
       // v1 分红链上数据源已下线：恒以 0 历史分红做本地估算
-      const cumulative = 0
-      const deployerStats = null
+      const cumulative = 0;
+      const deployerStats = null;
 
       // Simple estimation: historical total / months active
       const totalDays = deployerStats?.registeredAt
-        ? Math.max(1, (Date.now() / 1000 - Number(deployerStats.registeredAt)) / (30 * 24 * 60 * 60))
-        : 1
-      const monthlyAvg = parseFloat(cumulative || 0) / totalDays
+        ? Math.max(
+            1,
+            (Date.now() / 1000 - Number(deployerStats.registeredAt)) /
+              (30 * 24 * 60 * 60),
+          )
+        : 1;
+      const monthlyAvg = parseFloat(cumulative || 0) / totalDays;
 
       // Tier-based projection
       const tierMultiplier = {
-        0: 1.0,  // Bronze: base rate
-        1: 1.5,  // Silver: +50%
-        2: 2.0   // Gold: +100%
-      }
+        0: 1.0, // Bronze: base rate
+        1: 1.5, // Silver: +50%
+        2: 2.0, // Gold: +100%
+      };
 
-      setHistoricalAvg(monthlyAvg)
-      setMonthlyEstimate(monthlyAvg * (tierMultiplier[tier] || 1.0))
+      setHistoricalAvg(monthlyAvg);
+      setMonthlyEstimate(monthlyAvg * (tierMultiplier[tier] || 1.0));
     } catch (error) {
-      console.error('Calculation error:', error)
-      setMonthlyEstimate(0)
-      setHistoricalAvg(0)
+      console.error("Calculation error:", error);
+      setMonthlyEstimate(0);
+      setHistoricalAvg(0);
     }
-    setLoading(false)
+    setLoading(false);
   }
 
-  const tierNames = { 0: 'Bronze', 1: 'Silver', 2: 'Gold' }
-  const tierColors = { 0: '#94a3b8', 1: '#60a5fa', 2: '#fbbf24' }
+  const tierNames = { 0: "Bronze", 1: "Silver", 2: "Gold" };
+  const tierColors = { 0: "#94a3b8", 1: "#60a5fa", 2: "#fbbf24" };
 
   return (
     <div className="dividend-calculator">
@@ -71,20 +75,23 @@ export default function DividendCalculator({ address, tier }) {
         <div className="estimate-results">
           <div className="estimate-row">
             <span className="label">Historical Monthly Avg:</span>
-            <span className="value">{historicalAvg.toFixed(2)} ASK</span>
+            <span className="value">{historicalAvg.toFixed(2)} RP</span>
           </div>
 
           <div
             className="estimate-row highlight"
             style={{ borderLeftColor: tierColors[tier] || tierColors[0] }}
           >
-            <span className="label">Projected ({tierNames[tier] || 'Bronze'}):</span>
-            <span className="value">{monthlyEstimate.toFixed(2)} ASK</span>
+            <span className="label">
+              Projected ({tierNames[tier] || "Bronze"}):
+            </span>
+            <span className="value">{monthlyEstimate.toFixed(2)} RP</span>
           </div>
 
           <p className="estimate-note">
-            Based on your {tierNames[tier] || 'Bronze'} tier and current promotion performance.
-            Actual income may vary based on protocol revenue.
+            Based on your {tierNames[tier] || "Bronze"} tier and current
+            promotion performance. Actual income may vary based on protocol
+            revenue.
           </p>
 
           <button
@@ -97,5 +104,5 @@ export default function DividendCalculator({ address, tier }) {
         </div>
       )}
     </div>
-  )
+  );
 }

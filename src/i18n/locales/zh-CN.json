@@ -211,13 +211,7 @@
       "extensionFieldsCode": "freeskill (fingerprint, ipfsHash...),\nresponsibility (liability...),\nantiSlash (enabled, slashRate...),\nhumanAuth (required...)",
       "exampleCode": "---\nname: skill-name                              # AgentSkills 基础\ndescription: 功能描述\ntrigger: \"触发条件 {param}\"\nmetadata:\n  version: \"1.0.0\"\n  author: \"0x...\"\n  riskLevel: \"LOW\"\nscripts:\n  - name: \"main\"\n    language: \"python\"\n    code: |\n      def main(param):\n          return {\"status\": \"ok\"}\nresources: []\n\n# === FreeSkill 治理扩展 ===\nfreeskill:\n  fingerprint: \"0x...\"\n  creator: \"0x...\"\n  ipfsHash: \"Qm...\"\n  stakeRequired: 10\n  standard: \"freeskill\"\nresponsibility:\n  liabilityDeclaration: \"我对此技能行为负全部责任\"\n  scopeDeclaration: \"此技能仅访问声明的资源\"\nantiSlash:\n  enabled: true\n  slashRate: 0.5\nhumanAuth:\n  required: [\"stake\", \"submit\"]\n---",
       "workflowTitle": "上传后流程",
-      "workflowSteps": [
-        "上传",
-        "自动解析",
-        "风险评估",
-        "安全审核",
-        "上链"
-      ],
+      "workflowSteps": ["上传", "自动解析", "风险评估", "安全审核", "上链"],
       "altEntries": {
         "title": "需要更严格的治理标准？",
         "desc": "使用 FreeSkill 扩展或技能模板，快速生成带责任声明、反噬机制和验证流程的技能包。",
@@ -248,13 +242,7 @@
         "反噬惩罚"
       ],
       "comparisonTitle": "可信技能 vs 普通技能",
-      "comparisonDimensions": [
-        "追溯",
-        "归因",
-        "验证",
-        "授权",
-        "反噬"
-      ],
+      "comparisonDimensions": ["追溯", "归因", "验证", "授权", "反噬"],
       "comparisonRegular": "普通技能",
       "comparisonFreeskill": "FreeSkill",
       "requiredFieldsTitle": "FreeSkill 必需字段",
@@ -425,8 +413,8 @@
           "variant": "success"
         },
         {
-          "name": "ASKToken",
-          "desc": "积分代币（延迟发行）",
+          "name": "[已下线] ASKToken",
+          "desc": "v1 积分代币已依无代币宪法移除（永不发行）",
           "status": "规划中",
           "variant": "warning"
         }
@@ -506,13 +494,7 @@
         }
       ],
       "generated": "指纹已生成",
-      "steps": [
-        "提交验证池",
-        "分配验证者",
-        "代码审查",
-        "投票共识",
-        "上链完成"
-      ],
+      "steps": ["提交验证池", "分配验证者", "代码审查", "投票共识", "上链完成"],
       "emptyState": "指纹在上链技能流程中通过验证后生成，用于追溯整个生命周期"
     },
     "antislas": {
@@ -547,16 +529,12 @@
         }
       ],
       "appealTitle": "申诉流程",
-      "appealSteps": [
-        "收到通知",
-        "7天内申诉",
-        "长老团审核",
-        "结果通知"
-      ]
+      "appealSteps": ["收到通知", "7天内申诉", "长老团审核", "结果通知"]
     }
   },
   "profile": {
     "title": "我的声誉",
+    "subtitle": "你的链上声誉与等级档案（经后端网关实时读取 ChainMaker chain1）",
     "level": "当前等级",
     "reputation": "声誉值",
     "skillsPublished": "已发布技能",
@@ -583,12 +561,12 @@
     "vesting": {
       "title": "变现进度",
       "remaining": "距离解锁变现还需 {{count}} 声誉",
-      "unlocked": "已解锁 30% 变现权限（月度上限 500 ASK）",
+      "unlocked": "已解锁 30% 变现权限（月度上限 500 声誉分）",
       "apply": "申请变现",
       "locked": "需 {{count}} 声誉解锁",
       "rule": "宪法第二条：达到 1000 声誉后才可变现",
       "requirement": "需声誉 >= 1000 才可变现（当前：{{current}}）\n宪法第二条：渐进变现",
-      "applied": "变现申请已提交！\n可提取：30%（月度上限 500 ASK）\n宪法第二条：防早期 rush"
+      "applied": "变现申请已提交！\n可提取：30%（月度上限 500 声誉分）\n宪法第二条：防早期 rush"
     },
     "levelSystem": "等级体系",
     "current": "当前",

@@ -425,8 +425,8 @@
           "variant": "success"
         },
         {
-          "name": "ASKToken",
-          "desc": "Point token (delayed issuance)",
+          "name": "[Retired] ASKToken",
+          "desc": "V1 point token removed per the no-token constitution (never issued)",
           "status": "Planned",
           "variant": "warning"
         }
@@ -557,6 +557,7 @@
   },
   "profile": {
     "title": "My Reputation",
+    "subtitle": "Your on-chain reputation and tier profile (live from ChainMaker chain1 via the backend gateway)",
     "level": "Current Level",
     "reputation": "Reputation",
     "skillsPublished": "Skills Published",
@@ -583,12 +584,12 @@
     "vesting": {
       "title": "Vesting Progress",
       "remaining": "{{count}} reputation to unlock vesting",
-      "unlocked": "30% vesting unlocked (monthly cap 500 ASK)",
+      "unlocked": "30% vesting unlocked (monthly cap 500 RP)",
       "apply": "Apply for Vesting",
       "locked": "{{count}} reputation required",
       "rule": "Constitution §2: Vesting unlocks at 1,000 reputation",
       "requirement": "Reputation >= 1,000 required to vest (current: {{current}})\nConstitution §2: Gradual vesting",
-      "applied": "Vesting application submitted!\nWithdrawable: 30% (monthly cap 500 ASK)\nConstitution §2: Anti early rush"
+      "applied": "Vesting application submitted!\nWithdrawable: 30% (monthly cap 500 RP)\nConstitution §2: Anti early rush"
     },
     "levelSystem": "Level System",
     "current": "Current",

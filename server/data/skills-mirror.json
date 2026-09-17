@@ -24,5 +24,18 @@
     "blockHeight": 60,
     "submitter": "0x3737f0d872f386f170c20e2ae73b81cfe6b7ecf3",
     "submittedAt": "2026-09-16T00:07:03.968Z"
+  },
+  "5": {
+    "skillId": 5,
+    "name": "browser-e2e-smoke",
+    "description": "Browser end-to-end smoke test skill (upload, audit, chain submit, browse loop verification)",
+    "trigger": "run browser e2e smoke test",
+    "metadataIPFS": "0x4a367395141bca33e2ccb85225eb47e7953eabd8",
+    "riskLevel": 0,
+    "version": "1.0.0",
+    "txId": "18d63a099b11ba62ca61c6e0964fd51b2275755cbab340af98fc12f3b592f793",
+    "blockHeight": 64,
+    "submitter": "0x3737f0d872f386f170c20e2ae73b81cfe6b7ecf3",
+    "submittedAt": "2026-09-17T21:48:35.038Z"
   }
 }
