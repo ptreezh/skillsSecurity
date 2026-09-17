@@ -27,3 +27,5 @@ temp_audit_*.py
 # Timestamped local deployment snapshots (canonical: deployments/core-latest.json)
 deployments/core-hardhat-*.json
 deployments/core-localhost-*.json
+
+.playwright-mcp/
