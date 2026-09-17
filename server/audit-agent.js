@@ -2,169 +2,187 @@
  * Audit Agent - 使用 SkillRunner 执行 freeskill-audit
  */
 
-const fs = require('fs');
-const path = require('path');
-const yaml = require('js-yaml');
-const { spawn } = require('child_process');
-const { updateJob, getJob } = require('./jobs');
-const { calculateIndependenceScore } = require('./independence-scorer');
-const { t } = require('./i18n');
+const fs = require("fs");
+const path = require("path");
+const yaml = require("js-yaml");
+const { spawn } = require("child_process");
+const { updateJob, getJob } = require("./jobs");
+const { calculateIndependenceScore } = require("./independence-scorer");
+const { t } = require("./i18n");
 
 /**
  * 处理审核任务
  */
-async function processAuditJob(jobId, filePath, originalName, locale = 'zh-CN') {
-	const _t = (key, data) => t(locale, key, data);
-	console.log(`[Audit Agent] Starting job ${jobId} for ${originalName}`);
+async function processAuditJob(
+  jobId,
+  filePath,
+  originalName,
+  locale = "zh-CN",
+) {
+  const _t = (key, data) => t(locale, key, data);
+  console.log(`[Audit Agent] Starting job ${jobId} for ${originalName}`);
 
-	updateJob(jobId, { status: 'auditing', message: _t('audit.auditing') });
+  updateJob(jobId, { status: "auditing", message: _t("audit.auditing") });
 
-	try {
-		const skillContent = fs.readFileSync(filePath, 'utf-8');
-		const result = await runAudit(skillContent, originalName, locale);
+  try {
+    const skillContent = fs.readFileSync(filePath, "utf-8");
+    const result = await runAudit(skillContent, originalName, locale);
 
-		// Localize user-facing audit messages
-		const counts = result.counts || {};
-		const critical = counts.critical || 0;
-		const high = counts.high || 0;
-		const medium = counts.medium || 0;
-		const low = counts.low || 0;
-		const tier4Errors = result.tier4?.errors?.length || 0;
-		const tier4Warnings = result.tier4?.warnings?.length || 0;
-		const tier3Warnings = result.tier3?.warnings?.length || 0;
+    // Localize user-facing audit messages
+    const counts = result.counts || {};
+    const critical = counts.critical || 0;
+    const high = counts.high || 0;
+    const medium = counts.medium || 0;
+    const low = counts.low || 0;
+    const tier4Errors = result.tier4?.errors?.length || 0;
+    const tier4Warnings = result.tier4?.warnings?.length || 0;
+    const tier3Warnings = result.tier3?.warnings?.length || 0;
 
-		let message;
-		if (critical > 0) {
-			message = _t('audit.criticalIssues', { count: critical });
-		} else if (high > 0) {
-			message = _t('audit.highIssues', { count: high });
-		} else if (tier4Errors > 0) {
-			message = _t('audit.missingGovernance');
-		} else if (medium > 0 || tier4Warnings > 0 || tier3Warnings > 0) {
-			message = _t('audit.approvedWithWarnings');
-		} else if (low > 0) {
-			message = _t('audit.approvedMinor');
-		} else {
-			message = _t('audit.approvedAll');
-		}
+    let message;
+    if (critical > 0) {
+      message = _t("audit.criticalIssues", { count: critical });
+    } else if (high > 0) {
+      message = _t("audit.highIssues", { count: high });
+    } else if (tier4Errors > 0) {
+      message = _t("audit.missingGovernance");
+    } else if (medium > 0 || tier4Warnings > 0 || tier3Warnings > 0) {
+      message = _t("audit.approvedWithWarnings");
+    } else if (low > 0) {
+      message = _t("audit.approvedMinor");
+    } else {
+      message = _t("audit.approvedAll");
+    }
 
-		result.message = message;
-		result.summary = _t('audit.summary', { critical, high, medium, low });
+    result.message = message;
+    result.summary = _t("audit.summary", { critical, high, medium, low });
 
-		const finalStatus = result.passed ? 'approved' :
-		                  result.recommendation === 'needs_review' ? 'review' : 'rejected';
+    const finalStatus = result.passed
+      ? "approved"
+      : result.recommendation === "needs_review"
+        ? "review"
+        : "rejected";
 
-		updateJob(jobId, {
-			status: finalStatus,
-			message,
-			result,
-			completedAt: new Date().toISOString()
-		});
+    updateJob(jobId, {
+      status: finalStatus,
+      message,
+      result,
+      completedAt: new Date().toISOString(),
+    });
 
-		console.log(`[Audit Agent] Job ${jobId} completed: ${finalStatus}`);
-		return result;
-
-	} catch (error) {
-		console.error(`[Audit Agent] Job ${jobId} failed:`, error);
-		updateJob(jobId, {
-			status: 'failed',
-			error: error.message
-		});
-		throw error;
-	}
+    console.log(`[Audit Agent] Job ${jobId} completed: ${finalStatus}`);
+    return result;
+  } catch (error) {
+    console.error(`[Audit Agent] Job ${jobId} failed:`, error);
+    updateJob(jobId, {
+      status: "failed",
+      error: error.message,
+    });
+    throw error;
+  }
 }
 
 /**
  * 运行审核
  */
-async function runAudit(skillContent, skillName, locale = 'zh-CN') {
-	let skillData = {};
-	try {
-		const parts = skillContent.split('---');
-		if (parts.length >= 2) {
-			const yamlContent = parts[1].split('---')[0];
-			skillData = yaml.load(yamlContent);
-		}
-	} catch (e) {
-		console.log('[Audit] YAML parse warning:', e.message);
-	}
+async function runAudit(skillContent, skillName, locale = "zh-CN") {
+  let skillData = {};
+  try {
+    const parts = skillContent.split("---");
+    if (parts.length >= 2) {
+      const yamlContent = parts[1].split("---")[0];
+      skillData = yaml.load(yamlContent);
+    }
+  } catch (e) {
+    console.log("[Audit] YAML parse warning:", e.message);
+  }
 
-	const auditScript = buildAuditScript(skillContent);
-	const tmpScript = path.join(__dirname, `../temp_audit_${Date.now()}.py`);
-	fs.writeFileSync(tmpScript, auditScript);
+  const auditScript = buildAuditScript(skillContent);
+  const tmpScript = path.join(__dirname, `../temp_audit_${Date.now()}.py`);
+  fs.writeFileSync(tmpScript, auditScript);
 
-	console.log('[Audit] Running freeskill-audit...');
+  console.log("[Audit] Running freeskill-audit...");
 
-	return new Promise((resolve, reject) => {
-		const proc = spawn('py', ['-u', tmpScript], {
-			shell: true,
-			timeout: 60000,
-			maxBuffer: 10 * 1024 * 1024
-		});
+  return new Promise((resolve, reject) => {
+    const proc = spawn("py", ["-u", tmpScript], {
+      shell: true,
+      timeout: 60000,
+      maxBuffer: 10 * 1024 * 1024,
+    });
 
-		let stdout = '';
-		let stderr = '';
+    let stdout = "";
+    let stderr = "";
 
-		proc.stdout.on('data', (data) => { stdout += data.toString(); });
-		proc.stderr.on('data', (data) => { stderr += data.toString(); });
+    proc.stdout.on("data", (data) => {
+      stdout += data.toString();
+    });
+    proc.stderr.on("data", (data) => {
+      stderr += data.toString();
+    });
 
-		proc.on('close', (code) => {
-			try { fs.unlinkSync(tmpScript); } catch (e) {}
+    proc.on("close", (code) => {
+      try {
+        fs.unlinkSync(tmpScript);
+      } catch (e) {}
 
-			// 计算独立性评分
-			const independenceScore = calculateIndependenceScore(skillContent, locale);
+      // 计算独立性评分
+      const independenceScore = calculateIndependenceScore(
+        skillContent,
+        locale,
+      );
 
-			if (code === 0 && stdout) {
-				try {
-					const result = JSON.parse(stdout);
-					result.independence = independenceScore;
-					resolve(result);
-				} catch (e) {
-					resolve({
-						passed: true,
-						score: 80,
-						summary: stdout,
-						recommendation: 'approve',
-						independence: independenceScore
-					});
-				}
-			} else {
-				console.error('[Audit] stderr:', stderr);
-				resolve({
-					passed: true,
-					score: 70,
-					summary: stderr || t(locale, 'audit.completedWithWarnings'),
-					recommendation: 'needs_review',
-					error: stderr,
-					independence: independenceScore
-				});
-			}
-		});
+      if (code === 0 && stdout) {
+        try {
+          const result = JSON.parse(stdout);
+          result.independence = independenceScore;
+          resolve(result);
+        } catch (e) {
+          resolve({
+            passed: true,
+            score: 80,
+            summary: stdout,
+            recommendation: "approve",
+            independence: independenceScore,
+          });
+        }
+      } else {
+        console.error("[Audit] stderr:", stderr);
+        resolve({
+          passed: true,
+          score: 70,
+          summary: stderr || t(locale, "audit.completedWithWarnings"),
+          recommendation: "needs_review",
+          error: stderr,
+          independence: independenceScore,
+        });
+      }
+    });
 
-		proc.on('error', (err) => {
-			try { fs.unlinkSync(tmpScript); } catch (e) {}
-			resolve({
-				passed: true,
-				score: 60,
-				summary: t(locale, 'audit.serviceUnavailable'),
-				recommendation: 'needs_review',
-				error: err.message,
-				independence: calculateIndependenceScore(skillContent, locale)
-			});
-		});
-	});
+    proc.on("error", (err) => {
+      try {
+        fs.unlinkSync(tmpScript);
+      } catch (e) {}
+      resolve({
+        passed: true,
+        score: 60,
+        summary: t(locale, "audit.serviceUnavailable"),
+        recommendation: "needs_review",
+        error: err.message,
+        independence: calculateIndependenceScore(skillContent, locale),
+      });
+    });
+  });
 }
 
 /**
  * 构建审核脚本
  */
 function buildAuditScript(skillContent) {
-	const escapedContent = skillContent
-		.replace(/\\/g, '\\\\')
-		.replace(/"""/g, '\\"\\"\\"')
-		.replace(/\n/g, '\\n');
+  const escapedContent = skillContent
+    .replace(/\\/g, "\\\\")
+    .replace(/"""/g, '\\"\\"\\"')
+    .replace(/\n/g, "\\n");
 
-	return `
+  return `
 import yaml
 import json
 import re
@@ -305,6 +323,11 @@ elif high_count > 0:
     overall = 'NEEDS_REVISION'
     recommendation = 'fix_required'
     message = f'Found {high_count} high-risk issue(s). Recommended to fix for better security.'
+elif not tier1.get('passed'):
+    # 元数据解析失败/缺必填字段：如实降级为 needs_review（修复"approved 文案 + rejected 状态"的自相矛盾）
+    overall = 'NEEDS_REVISION'
+    recommendation = 'needs_review'
+    message = 'Skill metadata invalid or incomplete: ' + '; '.join(tier1.get('errors', [])) + '. Wrap YAML metadata in --- frontmatter (see demo format example).'
 elif tier4.get('errors'):
     overall = 'NEEDS_REVISION'
     recommendation = 'fix_required'
@@ -349,6 +372,6 @@ print(json.dumps(result, indent=2))
 }
 
 module.exports = {
-	processAuditJob,
-	runAudit
+  processAuditJob,
+  runAudit,
 };
