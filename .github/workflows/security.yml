@@ -49,7 +49,10 @@ jobs:
         run: |
           echo "=== Running Slither ==="
           solc --version
-          slither . --sarif results.sarif --exclude-dependencies --solc-remaps "@openzeppelin=node_modules/@openzeppelin"
+          # SARIF is the artifact gate below; crytic-compile's post-run
+          # hardhat clean/compile hooks may exit non-zero (255) even when
+          # analysis succeeded, so do not propagate their exit code.
+          slither . --sarif results.sarif --exclude-dependencies --solc-remaps "@openzeppelin=node_modules/@openzeppelin" || true
           test -s results.sarif || { echo "FAIL: results.sarif not generated"; exit 1; }
           echo "Slither analysis completed: $(wc -c < results.sarif) bytes"
 
@@ -109,10 +112,15 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install Mythril
+      - name: Install Mythril and solc
         run: |
-          pip install mythril[cli]
+          pip install mythril[cli] solc-select setuptools
           pip show mythril | grep -E '^(Name|Version):'
+          solc-select install 0.8.20
+          solc-select use 0.8.20
+          if [ -d "$HOME/.local/bin" ]; then echo "$HOME/.local/bin" >> "$GITHUB_PATH"; fi
+          if [ -d "$HOME/.solc-select/artifacts/solc-0.8.20" ]; then echo "$HOME/.solc-select/artifacts/solc-0.8.20" >> "$GITHUB_PATH"; fi
+          solc --version
           echo "=== mythril analyze --help (diagnostic) ==="
           myth analyze --help > /tmp/mythril-help.txt 2>&1 || true
           head -30 /tmp/mythril-help.txt
@@ -131,6 +139,11 @@ jobs:
             f="results_mythril_$contract.txt"
             if [ ! -s "$f" ]; then
               echo "FAIL: $f missing or empty — mythril did not run"
+              exit 1
+            fi
+            if grep -qE "Compiler not found|Traceback|No such file|ModuleNotFoundError" "$f"; then
+              echo "FAIL: $f contains a fatal toolchain error:"
+              head -5 "$f"
               exit 1
             fi
             echo "$f: $(wc -l < "$f") lines, $(wc -c < "$f") bytes"
