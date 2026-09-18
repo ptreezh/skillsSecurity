@@ -15,8 +15,10 @@ Get-CimInstance Win32_Process -Filter "Name='pwsh.exe'" -ErrorAction SilentlyCon
 }
 
 # 兜底：清理受管进程（后端 node + cloudflared）
+# 注意：node 由 Start-Process -WorkingDirectory 启动，CommandLine 是相对路径
+#  `"E:\nvm4w\nodejs\node.exe" server/index.js` → 不含仓库路径，只匹配 server/index.js 即可
 Get-CimInstance Win32_Process -Filter "Name='node.exe'" -ErrorAction SilentlyContinue | ForEach-Object {
-  if ($_.CommandLine -and $_.CommandLine -match 'server[\/\\]index\.js' -and $_.CommandLine -match 'skillsSecurity') {
+  if ($_.CommandLine -and $_.CommandLine -match 'server[\/\\]index\.js') {
     try { Stop-Process -Id $_.ProcessId -Force -ErrorAction Stop; Write-Output "已停止后端 PID=$($_.ProcessId)" } catch {}
   }
 }
