@@ -49,39 +49,39 @@ jobs:
         run: |
           echo "=== Running Slither ==="
           solc --version
-          slither . --json results.json --exclude-dependencies --solc-remaps "@openzeppelin=node_modules/@openzeppelin"
-          test -s results.json || { echo "FAIL: results.json not generated"; exit 1; }
-          echo "Slither analysis completed: $(wc -c < results.json) bytes"
+          slither . --sarif results.sarif --exclude-dependencies --solc-remaps "@openzeppelin=node_modules/@openzeppelin"
+          test -s results.sarif || { echo "FAIL: results.sarif not generated"; exit 1; }
+          echo "Slither analysis completed: $(wc -c < results.sarif) bytes"
 
       - name: Upload Slither results
-        if: always() && hashFiles('results.json') != ''
+        if: always() && hashFiles('results.sarif') != ''
         uses: github/codeql-action/upload-sarif@v4
         with:
-          sarif_file: results.json
+          sarif_file: results.sarif
           category: slither
 
       - name: Archive Slither report
-        if: always() && hashFiles('results.json') != ''
+        if: always() && hashFiles('results.sarif') != ''
         uses: actions/upload-artifact@v4
         with:
-          name: slither-results.json
-          path: results.json
+          name: slither-results.sarif
+          path: results.sarif
 
       - name: Display findings summary
         if: always()
         run: |
           echo "=== Slither Findings Summary ==="
-          if [ -f results.json ] && command -v jq &> /dev/null; then
-            HIGH=$(jq '[.results.detectors[]? | select(.impact == "High" or .impact == "HIGH")] | length' results.json)
-            MEDIUM=$(jq '[.results.detectors[]? | select(.impact == "Medium" or .impact == "MEDIUM")] | length' results.json)
-            LOW=$(jq '[.results.detectors[]? | select(.impact == "Low" or .impact == "LOW")] | length' results.json)
+          if [ -f results.sarif ] && command -v jq &> /dev/null; then
+            HIGH=$(jq '[.runs[0].results[]? | select(.properties.tags[0] == "High")] | length' results.sarif)
+            MEDIUM=$(jq '[.runs[0].results[]? | select(.properties.tags[0] == "Medium")] | length' results.sarif)
+            LOW=$(jq '[.runs[0].results[]? | select(.properties.tags[0] == "Low")] | length' results.sarif)
             echo "HIGH: $HIGH"
             echo "MEDIUM: $MEDIUM"
             echo "LOW: $LOW"
             echo "DETECTORS:"
-            jq -r '.results.detectors[]? | "\(.impact)/\(.confidence) \(.check) \(.description | split(".")[0])"' results.json
+            jq -r '.runs[0].results[]? | "\(.properties.tags[0]) \(.message.text | split("\n")[0])"' results.sarif || true
           else
-            echo "No results.json or jq not available"
+            echo "No results.sarif or jq not available"
             exit 1
           fi
 
@@ -112,14 +112,17 @@ jobs:
       - name: Install Mythril
         run: |
           pip install mythril[cli]
-          myth --version
+          pip show mythril | grep -E '^(Name|Version):'
+          echo "=== mythril analyze --help (diagnostic) ==="
+          myth analyze --help > /tmp/mythril-help.txt 2>&1 || true
+          head -30 /tmp/mythril-help.txt
 
       - name: Run Mythril on core contracts
         run: |
           echo "=== Mythril Analysis ==="
           for contract in StakingManager SkillRegistry Attribution; do
             echo "Analyzing $contract..."
-            myth analyze contracts/$contract.sol --solc-json .github/mythril-solc.json > results_mythril_$contract.txt 2>&1 || { echo "mythril exit=$? for $contract (analysis may have found issues)"; true; }
+            myth analyze contracts/$contract.sol --solc-json .github/mythril-solc.json > results_mythril_$contract.txt 2>&1 || { echo "mythril exit=$? for $contract (exited during analysis)"; true; }
           done
 
       - name: Verify mythril reports exist
