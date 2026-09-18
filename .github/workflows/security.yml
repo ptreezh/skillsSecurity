@@ -22,28 +22,36 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
-      - name: Install Slither
+      - name: Install Slither and solc
         run: |
-          pip install slither-analyzer setuptools
-
-      - name: Install solc
-        run: |
-          pip install solc-select
+          pip install slither-analyzer solc-select setuptools
           solc-select install 0.8.20
           solc-select use 0.8.20
+          if [ -d "$HOME/.local/bin" ]; then echo "$HOME/.local/bin" >> "$GITHUB_PATH"; fi
+          if [ -d "$HOME/.solc-select/artifacts/solc-0.8.20" ]; then echo "$HOME/.solc-select/artifacts/solc-0.8.20" >> "$GITHUB_PATH"; fi
 
       - name: Run Slither
         id: slither
         run: |
           echo "=== Running Slither ==="
-          slither . --json results.json --exclude-dependencies --solc-remaps "@openzeppelin=node_modules/@openzeppelin" || true
-          echo "Slither analysis completed"
-          ls -la results.json 2>/dev/null || echo "No results file generated"
+          solc --version
+          slither . --json results.json --exclude-dependencies --solc-remaps "@openzeppelin=node_modules/@openzeppelin"
+          test -s results.json || { echo "FAIL: results.json not generated"; exit 1; }
+          echo "Slither analysis completed: $(wc -c < results.json) bytes"
 
       - name: Upload Slither results
         if: always() && hashFiles('results.json') != ''
@@ -52,22 +60,29 @@ jobs:
           sarif_file: results.json
           category: slither
 
+      - name: Archive Slither report
+        if: always() && hashFiles('results.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: slither-results.json
+          path: results.json
+
       - name: Display findings summary
         if: always()
         run: |
           echo "=== Slither Findings Summary ==="
           if [ -f results.json ] && command -v jq &> /dev/null; then
-            HIGH=$(cat results.json | jq '[.results[]? | select(.severity == "HIGH") | length]' 2>/dev/null || echo "0")
-            CRITICAL=$(cat results.json | jq '[.results[]? | select(.severity == "CRITICAL") | length]' 2>/dev/null || echo "0")
-            MEDIUM=$(cat results.json | jq '[.results[]? | select(.severity == "MEDIUM") | length]' 2>/dev/null || echo "0")
-            LOW=$(cat results.json | jq '[.results[]? | select(.severity == "LOW") | length]' 2>/dev/null || echo "0")
+            HIGH=$(jq '[.results.detectors[]? | select(.impact == "High" or .impact == "HIGH")] | length' results.json)
+            MEDIUM=$(jq '[.results.detectors[]? | select(.impact == "Medium" or .impact == "MEDIUM")] | length' results.json)
+            LOW=$(jq '[.results.detectors[]? | select(.impact == "Low" or .impact == "LOW")] | length' results.json)
             echo "HIGH: $HIGH"
-            echo "CRITICAL: $CRITICAL"
             echo "MEDIUM: $MEDIUM"
             echo "LOW: $LOW"
+            echo "DETECTORS:"
+            jq -r '.results.detectors[]? | "\(.impact)/\(.confidence) \(.check) \(.description | split(".")[0])"' results.json
           else
             echo "No results.json or jq not available"
-            echo "Slither may have encountered issues - check logs"
+            exit 1
           fi
 
   mythril:
@@ -80,6 +95,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -88,24 +112,43 @@ jobs:
       - name: Install Mythril
         run: |
           pip install mythril[cli]
+          myth --version
 
       - name: Run Mythril on core contracts
         run: |
           echo "=== Mythril Analysis ==="
           for contract in StakingManager SkillRegistry Attribution; do
             echo "Analyzing $contract..."
-            myth analyze contracts/$contract.sol --sout results_mythril_$contract.txt || true
+            myth analyze contracts/$contract.sol --solc-json .github/mythril-solc.json > results_mythril_$contract.txt 2>&1 || { echo "mythril exit=$? for $contract (analysis may have found issues)"; true; }
           done
+
+      - name: Verify mythril reports exist
+        run: |
+          for contract in StakingManager SkillRegistry Attribution; do
+            f="results_mythril_$contract.txt"
+            if [ ! -s "$f" ]; then
+              echo "FAIL: $f missing or empty — mythril did not run"
+              exit 1
+            fi
+            echo "$f: $(wc -l < "$f") lines, $(wc -c < "$f") bytes"
+          done
+
+      - name: Archive Mythril reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mythril-reports
+          path: results_mythril_*.txt
 
       - name: Display Mythril results
         run: |
           echo "=== Issues Found ==="
           for f in results_mythril_*.txt; do
-            if [ -f "$f" ]; then
+            if [ -s "$f" ]; then
               echo "--- $f ---"
-              head -50 "$f"
+              head -40 "$f"
             fi
-          done || echo "Mythril analysis completed"
+          done
 
   test:
     name: Contract Tests
@@ -128,7 +171,7 @@ jobs:
         run: npx hardhat compile
 
       - name: Run tests
-        run: npx hardhat test test/contracts/StakingManager.test.cjs test/contracts/SkillRegistry.test.cjs test/contracts/Attribution.test.cjs
+        run: npx hardhat test test/contracts/StakingManager.test.cjs test/contracts/SkillRegistry.test.cjs test/contracts/Attribution.test.cjs test/contracts/Governance.test.cjs test/contracts/Integration.test.cjs test/contracts/ReputationBadges.test.cjs test/contracts/SelfSustainingEcosystem.test.cjs
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
@@ -154,9 +197,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Audit dependencies
-        run: npm audit --audit-level=high
-        continue-on-error: true
+      - name: Audit runtime dependencies (production gate)
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Audit all dependencies (dev-tooling backlog, informational)
+        run: |
+          npm audit --audit-level=high || true
+          echo "Dev-tooling high backlog is tracked in REPORTS/, informational only."
 
   lint:
     name: Code Quality
@@ -181,5 +228,4 @@ jobs:
 
       - name: Solidity lint
         run: |
-          npm install --save-dev solhint 2>/dev/null || true
-          npx solhint contracts/*.sol 2>/dev/null || echo "Solhint check completed"
+          npx solhint contracts/*.sol || echo "solhint exit code: $? (informational, not gating)"

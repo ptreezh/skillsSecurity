@@ -1,0 +1,5 @@
+{
+  "optimizer": { "enabled": true, "runs": 200 },
+  "evmVersion": "paris",
+  "remappings": ["@openzeppelin/=node_modules/@openzeppelin/"]
+}
