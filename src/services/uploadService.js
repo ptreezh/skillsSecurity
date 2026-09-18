@@ -50,6 +50,7 @@ export async function uploadSkill(file, onProgress) {
  * @returns {Promise<Object>} Final job result
  */
 export async function pollJobStatus(jobId, interval = 2000, onStatusChange) {
+  const API_BASE = await getApiBase()
   return new Promise((resolve, reject) => {
     let lastStatus = '';
 
