@@ -133,14 +133,18 @@ export async function fullAuditFlow(file, callbacks = {}) {
       onStatusChange?.({ status: 'submitting', message: i18n.t('demo.status.submitting') });
       const chainResult = await submitToChain(jobId);
 
-      onComplete?.({
+      const successResult = {
         success: true,
+        status: chainResult.status || 'on_chain',
         skillId: chainResult.skillId,
         txHash: chainResult.txHash,
         auditResult: finalResult.result
-      });
+      };
 
-      return chainResult;
+      onStatusChange?.({ status: successResult.status, message: i18n.t('demo.status.onChain') });
+      onComplete?.(successResult);
+
+      return successResult;
     } else if (finalResult.status === 'review') {
       onStatusChange?.({ status: 'review', message: i18n.t('demo.status.review') });
       onComplete?.({ success: false, status: 'review', auditResult: finalResult.result });

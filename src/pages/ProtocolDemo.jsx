@@ -1196,7 +1196,7 @@ export default function ProtocolDemo({ initialTab = "standard" }) {
 
               {uploadStatus && (
                 <div
-                  className={`alert alert-${uploadStatus.status === "error" ? "danger" : uploadStatus.status === "approved" ? "success" : "warning"}`}
+                  className={`alert alert-${uploadStatus.status === "error" ? "danger" : (uploadStatus.status === "approved" || uploadStatus.status === "on_chain") ? "success" : "warning"}`}
                   style={{ marginTop: "var(--space-4)", textAlign: "left" }}
                 >
                   <div style={{ fontWeight: "var(--font-semibold)" }}>
