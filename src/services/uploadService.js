@@ -3,8 +3,7 @@
  */
 
 import i18n from '../i18n'
-
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:10001';
+import { getApiBase } from './apiConfig.js'
 
 function getHeaders() {
   return {
@@ -19,6 +18,7 @@ function getHeaders() {
  * @returns {Promise<{jobId: string, status: string}>}
  */
 export async function uploadSkill(file, onProgress) {
+  const API_BASE = await getApiBase()
   const formData = new FormData();
   formData.append('file', file);
 

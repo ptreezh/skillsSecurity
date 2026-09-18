@@ -16,10 +16,11 @@
  *   - 网络标识统一 ChainMaker chain1（去 Polygon Amoy 化，28-03）
  */
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:10001'
+import { getApiBase as resolveApiBase } from './apiConfig.js'
 
 /** 带超时的统一请求器；非 2xx 抛 Error（消息取后端 i18n error 字段） */
 async function request(path, { timeoutMs = 20000 } = {}) {
+  const API_BASE = await resolveApiBase()
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), timeoutMs)
   try {
@@ -162,9 +163,9 @@ export function getNetworkConfig() {
   }
 }
 
-/** API 基址（调试用） */
+/** API 基址（调试用，异步解析） */
 export function getApiBase() {
-  return API_BASE
+  return resolveApiBase()
 }
 
 // 聚合默认导出（页面侧统一 ChainDataService.xxx() 调用风格）
