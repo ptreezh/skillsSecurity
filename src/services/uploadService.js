@@ -92,6 +92,7 @@ export async function pollJobStatus(jobId, interval = 2000, onStatusChange) {
  * @returns {Promise<{skillId: string, txHash: string}>}
  */
 export async function submitToChain(jobId) {
+  const API_BASE = await getApiBase()
   const response = await fetch(`${API_BASE}/api/chain`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders() },
