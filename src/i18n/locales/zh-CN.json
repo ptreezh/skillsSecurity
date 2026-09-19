@@ -11,7 +11,6 @@
     "demo": "协议演示",
     "leaderboard": "排行榜",
     "dashboard": "激励面板",
-    "selfops": "四自系统",
     "profile": "我的声誉",
     "uploadSkill": "上传技能"
   },
@@ -666,29 +665,5 @@
         "benefit": "VIP 支持"
       }
     }
-  },
-  "selfOps": {
-    "title": "四自运营面板",
-    "v1Retired": "v1 代币经济功能（分红/治理提案/健康报告上链）已依无代币宪法下线，界面保留作历史展示；推广榜为 ChainMaker chain1 实时声誉数据（经后端网关）。",
-    "features": {
-      "revenue": "收益",
-      "promotion": "推广",
-      "governance": "治理",
-      "health": "健康"
-    },
-    "revenueOverview": "收益概览",
-    "promotionLeaderboard": "推广排行榜",
-    "myVotingPower": "我的投票权",
-    "noActiveProposals": "暂无活跃提案",
-    "votesFor": "支持 {{count}}",
-    "votesAgainst": "反对 {{count}}",
-    "voteFor": "支持",
-    "voteAgainst": "反对",
-    "healthReports": {
-      "bug": "漏洞报告",
-      "status": "状态报告",
-      "stress": "压力测试"
-    },
-    "monthlyRemaining": "本月剩余提交次数："
   }
 }

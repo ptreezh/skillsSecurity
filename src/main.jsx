@@ -6,7 +6,6 @@ import UserProfile from './pages/UserProfile'
 import Leaderboard from './pages/Leaderboard'
 import ProtocolDemo from './pages/ProtocolDemo'
 import DeployerDashboard from './pages/DeployerDashboard'
-import SelfOpsPanel from './pages/SelfOpsPanel'
 import LandingPage from './pages/LandingPage'
 import LanguageSwitcher from './components/LanguageSwitcher'
 import WalletService from './services/WalletService'
@@ -32,7 +31,6 @@ function App() {
     { id: 'leaderboard', label: t('nav.leaderboard') },
     ...(user ? [
       { id: 'dashboard', label: t('nav.dashboard') },
-      { id: 'selfops', label: t('nav.selfops') },
       { id: 'profile', label: `${t('nav.profile')} (${user.reputation || 0})` }
     ] : [])
   ]
@@ -82,7 +80,6 @@ function App() {
         {page === 'demo' && <ProtocolDemo initialTab={demoTab} />}
         {page === 'leaderboard' && <Leaderboard />}
         {page === 'dashboard' && <DeployerDashboard user={user} />}
-        {page === 'selfops' && <SelfOpsPanel user={user} deployerStats={user?.deployerStats} />}
         {page === 'profile' && <UserProfile user={user} />}
       </main>
     </div>
