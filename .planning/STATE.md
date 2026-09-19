@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: 端到端上线收官
-status: in_progress
-last_updated: "2026-09-18T05:00:00.000Z"
+status: completed
+last_updated: "2026-09-19T01:20:00.000Z"
 progress:
   total_phases: 4
-  completed_phases: 3
+  completed_phases: 4
   phase_numbering: 27-30
   total_plans: 9
-  completed_plans: 7
-  percent: 78
+  completed_plans: 9
+  percent: 100
 ---
 
 # AgentSkills - Current State
@@ -24,11 +24,11 @@ See: .planning/PROJECT.md (updated 2026-05-18)
 
 ## Current Position
 
-Milestone: v2.0 (端到端上线收官) - IN PROGRESS
-Phase: 30 (安全扫描与端到端验收) - NEXT
-Status: Phase 29 完成（用户拍板方案 A：本机持久+内网穿透）— 公网全链路上线：隧道 /api/health 200、公网站点三页真数据、重启自恢复等效验证通过（计划任务拉起+URL 自动重发布）
+Milestone: v2.0 (端到端上线收官) - COMPLETE (2026-09-19)
+Phase: 30 (安全扫描与端到端验收) - COMPLETE
+Status: v2.0 里程碑关闭 — 安全扫描全绿（Slither 184w/0e + Mythril 3 报告 2 无问题+1 Low 可接受，REPORTS/SECURITY_SCAN_2026-09-18.md）、Failed to fetch 根因修复（5173 CORS 白名单 + api-config.json 运行时配置，永不走被 360tray 占用的 10001）、四自系统退役删除已 push（872eaaf）、公网端到端验收全过（技能浏览器 7 条真数据 / 排行榜真地址 / 写路径 skill7 真实上链 / 我的声誉经隧道读 chain1）
 
-Progress: [███████████████████░░] 78%
+Progress: [████████████████████] 100%
 
 ## v2.0 Active Phases
 
@@ -37,7 +37,7 @@ Progress: [███████████████████░░] 78%
 | 27 | 后端链上读路径 API | 2/2 | ✅ Complete (2026-09-17) |
 | 28 | 前端接线重构 | 3/3 | ✅ Complete (2026-09-18) |
 | 29 | 生产部署固化（方案 A 本机+穿透）| 2/2 | ✅ Complete (2026-09-18) |
-| 30 | 安全扫描与端到端验收 | 0/2 | Pending |
+| 30 | 安全扫描与端到端验收 | 2/2 | ✅ Complete (2026-09-19) |
 
 ## Milestone Summary
 
@@ -86,6 +86,8 @@ Progress: [███████████████████░░] 78%
 | 28-03 | 去 Amoy 清零 + strictPort + CORS 根治 + 双层 dev 守护 | 1/1 | Complete |
 | 29-01 | 生产守护 + 隧道 + 运行时 API 配置（prod-supervisor/prod-stop/register-prod-task/apiConfig.js） | 1/1 | Complete |
 | 29-02 | 公网验收 + 重启自恢复等效验证 + 自动发布闭环（Task Scheduler + git 护栏） | 1/1 | Complete |
+| 30-01 | 安全扫描全绿（Slither 184w/0e + Mythril 3 报告非空 2 无问题+1 Low 可接受）→ REPORTS/SECURITY_SCAN_2026-09-18.md | 1/1 | Complete (2026-09-18) |
+| 30-02 | 端到端验收（Failed to fetch 根因修复 5173/10002/api-config + 四自系统退役删除 872eaaf + 公网三页真数据 + 写路径 skill7 真实上链） | 1/1 | Complete (2026-09-19) |
 
 ---
 
@@ -100,8 +102,8 @@ Progress: [███████████████████░░] 78%
 | SEC-05: Overflow Protection | ✅ Complete |
 | SEC-08: Access Control | ✅ Complete |
 | SEC-09: Event Monitoring | ✅ Complete |
-| SEC-10: Static Analysis | ⚠️ Via CI workflow (SECURITY.yml) |
-| SEC-11: Symbolic Analysis | ⚠️ Via CI workflow (SECURITY.yml) |
+| SEC-10: Static Analysis | ✅ Complete (Slither CI 184 warning/0 error, 2026-09-18) |
+| SEC-11: Symbolic Analysis | ✅ Complete (Mythril CI 3 报告: 2 无问题 + 1 Low SWC-116 可接受, 2026-09-18) |
 | SEC-12: Audit Package | ✅ Complete |
 | SEC-13: Bug Bounty | ✅ ACTIVE - Immunefi pending submission |
 

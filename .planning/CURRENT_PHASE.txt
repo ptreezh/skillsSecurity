@@ -1,2 +1,6 @@
-phase 29 — 生产部署固化 ⚠️GATE（v2.0）; phase 28 已完成 (2026-09-18)
-⚠️ 托管方案待用户拍板：A 本机持久+内网穿透 / B 云服务器 docker-compose / C 局域网演示+公网方案文档化
+phase 30 — 安全扫描与端到端验收 ✅ COMPLETE (2026-09-19); v2.0 里程碑关闭 (100%)
+✅ Slither 184w/0e + Mythril 3 报告 2 无问题+1 Low 可接受 → REPORTS/SECURITY_SCAN_2026-09-18.md
+✅ Failed to fetch 根因修复：开发走 5173 (CORS 白名单)，生产走 api-config.json 运行时隧道 URL，永不走 10001 (360tray)
+✅ 四自系统退役删除 (872eaaf) push，公网端到端验收全过：技能浏览器 7 真技能 / 排行榜真地址 / 写路径 skill7 真实上链 / 我的声誉经隧道读 chain1
+
+Next: v3.0 里程碑规划（开放项：第三方审计、Bug Bounty Immunefi、端口角色文档化、favicon）

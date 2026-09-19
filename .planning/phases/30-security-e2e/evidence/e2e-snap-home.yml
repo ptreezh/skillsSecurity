@@ -1,0 +1,97 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - generic [ref=e7]: A
+        - heading "AgentSkills" [level=1] [ref=e8]
+      - navigation "Main navigation" [ref=e9]:
+        - button "开始" [ref=e10] [cursor=pointer]
+        - button "技能浏览器" [ref=e11] [cursor=pointer]
+        - button "协议演示" [ref=e12] [cursor=pointer]
+        - button "排行榜" [ref=e13] [cursor=pointer]
+        - button "激励面板" [ref=e14] [cursor=pointer]
+        - button "四自系统" [ref=e15] [cursor=pointer]
+        - button "我的声誉 (0)" [ref=e16] [cursor=pointer]
+        - button "上传技能" [ref=e17] [cursor=pointer]
+        - button "切换语言" [ref=e18] [cursor=pointer]:
+          - generic [ref=e19]: 🇨🇳
+          - generic [ref=e20]: 中文
+  - main [ref=e21]:
+    - generic [ref=e22]:
+      - generic [ref=e23]:
+        - generic [ref=e24]:
+          - generic [ref=e25]: ✦
+          - generic [ref=e26]: 可信 Agent 技能市场
+        - heading "发现与共建高质量的 Agent 技能" [level=1] [ref=e27]
+        - paragraph [ref=e28]: AgentSkills 连接技能创作者、使用者和领域专家。每个 Skill 都经过公开验证与声誉背书，让你找工具更放心、发技能被看见、做审核有回报。
+        - generic [ref=e29]:
+          - button "探索技能库" [ref=e30] [cursor=pointer]
+          - button "看看你能获得什么" [ref=e31] [cursor=pointer]
+        - generic [ref=e32]:
+          - button "上传技能" [ref=e33] [cursor=pointer]
+          - generic [ref=e34]: 已有技能？立即发布，获得声誉背书
+      - generic [ref=e35]:
+        - generic [ref=e36]:
+          - generic [ref=e37]: 平台价值
+          - heading "不同角色，都能在这里获得可信价值" [level=2] [ref=e38]
+          - paragraph [ref=e39]: 不管你是想使用 Agent 技能、发布自己的技能，还是成为质量审核专家，AgentSkills 都为你提供透明、可验证的声誉与机会。
+        - generic [ref=e40]:
+          - generic [ref=e41]:
+            - generic [ref=e42]: 🔧
+            - heading "使用者：用得放心" [level=3] [ref=e43]
+            - paragraph [ref=e44]: 浏览经过验证的 Agent Skills，查看评分、审核记录和创作者声誉。降低试错成本，找到真正可靠的工具。
+          - generic [ref=e45]:
+            - generic [ref=e46]: 🚀
+            - heading "创作者：被看见、被信任" [level=3] [ref=e47]
+            - paragraph [ref=e48]: 把你的 Agent 能力发布为 Skill，通过社区验证建立专业声誉。优质技能会获得更多曝光和使用机会。
+            - button "上传技能" [ref=e49] [cursor=pointer]
+          - generic [ref=e50]:
+            - generic [ref=e51]: 🏅
+            - heading "审核者：建立专家影响力" [level=3] [ref=e52]
+            - paragraph [ref=e53]: 通过测试、评估和同行审核为优质技能背书。你的专业判断会转化为可迁移的行业声誉。
+      - generic [ref=e54]:
+        - generic [ref=e55]:
+          - generic [ref=e56]: 如何开始
+          - heading "三步进入 Agent 技能生态" [level=2] [ref=e57]
+          - paragraph [ref=e58]: 无需复杂流程，从浏览到贡献只需要几分钟。
+        - generic [ref=e59]:
+          - generic [ref=e60]:
+            - heading "浏览与发现" [level=3] [ref=e61]
+            - paragraph [ref=e62]: 在技能库中按类别、评分、风险等级筛选，找到适合你场景的 Agent Skill。
+          - generic [ref=e63]:
+            - heading "使用或发布" [level=3] [ref=e64]
+            - paragraph [ref=e65]: 直接调用已验证技能；或者注册自己的 Skill，让社区看到你的能力。
+            - button "上传技能" [ref=e66] [cursor=pointer]
+          - generic [ref=e67]:
+            - heading "贡献与验证" [level=3] [ref=e68]
+            - paragraph [ref=e69]: 提交使用反馈、测试报告或审核意见。有价值的贡献会记录在你的声誉档案中。
+          - generic [ref=e70]:
+            - heading "积累声誉" [level=3] [ref=e71]
+            - paragraph [ref=e72]: 声誉越高，你能发布和验证的技能等级越高，在生态中的话语权和机会也越大。
+      - generic [ref=e74]:
+        - heading "为什么 AgentSkills 更可信" [level=3] [ref=e75]
+        - paragraph [ref=e76]: 每个 Skill 的行为记录、验证历史和贡献者声誉都公开可查。没有暗箱操作，只有可验证的质量。我们相信：好技能会自己说话，好贡献者会被看见。
+      - generic [ref=e77]:
+        - generic [ref=e78]:
+          - generic [ref=e79]: 常见问题
+          - heading "你还有这些疑问吗？" [level=2] [ref=e80]
+          - paragraph [ref=e81]: 我们整理了大多数新用户最关心的问题，帮你更快判断 AgentSkills 是否适合你。
+        - generic [ref=e82]:
+          - generic [ref=e83]:
+            - heading "Q 参与 AgentSkills 需要付费吗？" [level=3] [ref=e84]
+            - paragraph [ref=e85]: 不需要。浏览技能、注册账户、提交基础反馈都不收费。你只需投入时间和专业能力，就能获得对应的声誉记录。
+          - generic [ref=e86]:
+            - heading "Q 没有技术背景可以参与吗？" [level=3] [ref=e87]
+            - paragraph [ref=e88]: 当然可以。你可以作为使用者发现并评价技能；如果你有业务经验，也可以从实际应用角度提交反馈。技术和非技术视角的审核同样有价值。
+          - generic [ref=e89]:
+            - heading "Q 发布技能后我能获得什么？" [level=3] [ref=e90]
+            - paragraph [ref=e91]: 你的技能会被收录进可搜索的技能库，被更多用户发现；通过验证后还会获得声誉加成，提升你在生态中的可见度和信任度。
+          - generic [ref=e92]:
+            - heading "Q 声誉到底有什么用？" [level=3] [ref=e93]
+            - paragraph [ref=e94]: 声誉是你在这个生态中的可信度凭证。声誉越高，你可以发布和验证的技能等级越高，参与重要决策的权重也越大，同时更容易被其他用户和合作方信任。
+          - generic [ref=e95]:
+            - heading "Q 怎么保证技能质量？" [level=3] [ref=e96]
+            - paragraph [ref=e97]: 每个 Skill 都需要经过社区测试、风险评估和同行审核；所有审核记录和贡献者声誉都公开透明。低质或恶意技能会被标记，优质技能会自然获得更高排名。
+          - generic [ref=e98]:
+            - heading "Q 我的贡献会被记录吗？" [level=3] [ref=e99]
+            - paragraph [ref=e100]: 会。你发布的技能、提交的验证、提供的反馈都会被记录为不可篡改的声誉记录，成为你长期可信度的组成部分。
