@@ -41,6 +41,20 @@
 | 我的声誉 | `evidence/06-reputation-page.png` — 「已连接到合约」+ 经后端网关实时读取 ChainMaker chain1 + 全球排名 | ✅ |
 | 四自系统 | `evidence/05-fourself-promotion-tab.png` — **导航无四自系统**，推广榜由独立排行榜页承担（删除提交 872eaaf push 后 Pages 复检无该 tab） | ✅ |
 
+### 最终公网验收（2026-09-19，Pages 部署后 Playwright 实测）
+
+| 检查项 | 结果 | 证据 |
+|--------|------|------|
+| 静态扫描 | 公网 bundle `index-DyQK2MwI.js`（169 KB, UTF-8）**13 个四自系统特征串全为 0**（四自系统/自我运营/自我管理/自我营销/自我升级/SelfOps/SelfOperation/DistributionHistory/DividendCalculator/PromotionBarChart/RevenueChart/GovernancePieChart/HealthReportChart/usePolling），排行榜保留（leaderboard×36） | 静态 grep 实测 |
+| 运行时标题 | `AgentSkills - Skill Browser` | Playwright |
+| 导航 | 7 项：开始/技能浏览器/协议演示/排行榜/激励面板/我的声誉/上传技能/中文 — **无四自系统** | `evidence/07-pages-final-acceptance.png` |
+| Failed to fetch 横幅 | **0 次** | Playwright console + DOM |
+| Console / 页面 JS 错误 | **0 / 0** | Playwright |
+| 数据链路 | Pages `api-config.json`(200) → 隧道 URL → `/api/health`(200, chain1) + `/api/stats`(200, skillCount=7) + `/api/leaderboard?limit=10`(200, 真地址 0x3737f0d… rank 1) | curl 实测 |
+| final CI（90b28e9） | Deploy Pages ✅ / Deploy ✅ / Formal Verification ✅ / Security Scan ⏳（~2h 含 Mythril，与 35316100896 同合约集） | gh run |
+
+**结论：✅ 公网端到端验收全过 — 无四自系统、无 Failed to fetch、真链上数据渲染、console 零错误。**
+
 **四自系统退役删除**：P28 遗留的 v1 代币经济组件（SelfOpsPanel 及 12 个关联文件，1354 行）全量删除，`npm run build` exit 0，残留扫描 CLEAN，提交 `872eaaf` 已 push，最终 CI（run 35428649427）Security Scan / Deploy Pages 全链路复验。
 
 ## 四、成功标准对照
