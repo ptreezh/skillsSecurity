@@ -24,8 +24,14 @@ class WalletService {
     const savedUser = localStorage.getItem(STORAGE_KEY)
     if (savedUser) {
       try {
-        this.user = JSON.parse(savedUser)
-        return this.user
+        const parsed = JSON.parse(savedUser)
+        // 校验地址格式（后端 validateAddress 要求严格 40 hex，与 chain-read.js 保持一致）；
+        // 旧版本/损坏身份若含非法地址，会令 /api/reputation 返回 Invalid wallet address → 重建
+        if (parsed && typeof parsed.address === 'string' && /^(?:0[xX])?[0-9a-fA-F]{40}$/.test(parsed.address.trim())) {
+          this.user = { ...parsed, address: '0x' + parsed.address.trim().replace(/^0[xX]/, '').toLowerCase() }
+          return this.user
+        }
+        localStorage.removeItem(STORAGE_KEY) // 非法地址 → 重建身份
       } catch (_) {
         localStorage.removeItem(STORAGE_KEY) // 损坏数据 → 重建身份
       }
