@@ -21,6 +21,8 @@
     "auditing": "Security audit in progress (AI Agent scan)...",
     "serviceUnavailable": "Audit service unavailable",
     "completedWithWarnings": "Audit completed with warnings",
+    "rejected": "Skill rejected: {{reason}}",
+    "rejectedGeneric": "Skill rejected. Please fix the format and re-upload.",
     "criticalIssues": "Found {{count}} critical security issue(s). Please fix before resubmitting.",
     "highIssues": "Found {{count}} high-risk issue(s). Recommended to fix for better security.",
     "missingGovernance": "Missing required governance fields. Add FreeSkill metadata for full compliance.",

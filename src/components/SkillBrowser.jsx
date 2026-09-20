@@ -52,8 +52,10 @@ export default function SkillBrowser({ user, onUpload }) {
     try {
       // chain1 无链上点赞概念（无代币宪法）：本地乐观更新仅作产品机制演示
       const skill = skills.find(s => s.id === skillId)
-      if (skill?.verified === false) {
+      // 未验证技能（审核中/未上架）不可点赞：提示后直接返回，绝不执行点赞逻辑
+      if (!skill?.verified) {
         alert(t('common.unverifiedSkillWarning'))
+        return
       }
 
       user.dailyLikes++
@@ -173,14 +175,25 @@ export default function SkillBrowser({ user, onUpload }) {
                   </div>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 'var(--space-2)', flexShrink: 0 }}>
-                  <button
-                    className={!skill.verified ? 'btn btn-danger btn-sm' : canLike ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm'}
-                    onClick={() => handleLike(skill.id)}
-                    disabled={!canLike}
-                    aria-label={`Like skill ${skill.name}`}
-                  >
-                    {!skill.verified ? t('browser.stats.pending') : `${t('browser.like')} (${user?.dailyLikes || 0}/5)`}
-                  </button>
+                  {!skill.verified ? (
+                    <button
+                      className="btn btn-secondary btn-sm"
+                      disabled
+                      title={t('common.unverifiedSkillWarning')}
+                      aria-label={`Skill ${skill.name} under review`}
+                    >
+                      {t('browser.stats.pending')}
+                    </button>
+                  ) : (
+                    <button
+                      className={canLike ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm'}
+                      onClick={() => handleLike(skill.id)}
+                      disabled={!canLike}
+                      aria-label={`Like skill ${skill.name}`}
+                    >
+                      {`${t('browser.like')} (${user?.dailyLikes || 0}/5)`}
+                    </button>
+                  )}
                 </div>
               </div>
             )

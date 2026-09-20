@@ -39,7 +39,12 @@ async function processAuditJob(
     const tier3Warnings = result.tier3?.warnings?.length || 0;
 
     let message;
-    if (critical > 0) {
+    if (!result.passed) {
+      // 未通过审核：优先展示审计器返回的具体原因（缺字段/风险项等），拒绝绝不显示"通过"
+      message = result.message
+        ? _t("audit.rejected", { reason: result.message })
+        : _t("audit.rejectedGeneric");
+    } else if (critical > 0) {
       message = _t("audit.criticalIssues", { count: critical });
     } else if (high > 0) {
       message = _t("audit.highIssues", { count: high });
@@ -136,24 +141,13 @@ async function runAudit(skillContent, skillName, locale = "zh-CN") {
           result.independence = independenceScore;
           resolve(result);
         } catch (e) {
-          resolve({
-            passed: true,
-            score: 80,
-            summary: stdout,
-            recommendation: "approve",
-            independence: independenceScore,
-          });
+          // Python 正常退出但输出无法解析 → 服务端故障，拒绝放行（绝不 auto-approve）
+          reject(new Error(`Audit output parse failed: ${e.message}`));
         }
       } else {
         console.error("[Audit] stderr:", stderr);
-        resolve({
-          passed: true,
-          score: 70,
-          summary: stderr || t(locale, "audit.completedWithWarnings"),
-          recommendation: "needs_review",
-          error: stderr,
-          independence: independenceScore,
-        });
+        // Python 非零退出 → 服务端故障，拒绝放行（绝不 auto-approve）
+        reject(new Error(stderr || t(locale, "audit.serviceUnavailable")));
       }
     });
 
@@ -161,14 +155,8 @@ async function runAudit(skillContent, skillName, locale = "zh-CN") {
       try {
         fs.unlinkSync(tmpScript);
       } catch (e) {}
-      resolve({
-        passed: true,
-        score: 60,
-        summary: t(locale, "audit.serviceUnavailable"),
-        recommendation: "needs_review",
-        error: err.message,
-        independence: calculateIndependenceScore(skillContent, locale),
-      });
+      // py 未安装/进程启动失败 → 服务端故障，拒绝放行（绝不 auto-approve）
+      reject(new Error(`${t(locale, "audit.serviceUnavailable")}: ${err.message}`));
     });
   });
 }
@@ -324,9 +312,10 @@ elif high_count > 0:
     recommendation = 'fix_required'
     message = f'Found {high_count} high-risk issue(s). Recommended to fix for better security.'
 elif not tier1.get('passed'):
-    # 元数据解析失败/缺必填字段：如实降级为 needs_review（修复"approved 文案 + rejected 状态"的自相矛盾）
+    # 元数据解析失败/缺必填字段：这是用户可修复的格式错误 → 直接拒绝并给出原因，
+    # 不进入 review（系统无人工复审通道，review 是死胡同导致前端卡死）
     overall = 'NEEDS_REVISION'
-    recommendation = 'needs_review'
+    recommendation = 'fix_required'
     message = 'Skill metadata invalid or incomplete: ' + '; '.join(tier1.get('errors', [])) + '. Wrap YAML metadata in --- frontmatter (see demo format example).'
 elif tier4.get('errors'):
     overall = 'NEEDS_REVISION'

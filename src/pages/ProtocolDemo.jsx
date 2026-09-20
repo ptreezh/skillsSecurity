@@ -178,7 +178,13 @@ export default function ProtocolDemo({ initialTab = "standard" }) {
       });
       setUploadResult(result);
     } catch (error) {
+      // 网络/上传服务异常：透传为失败结果，提供重新上传入口
       setUploadStatus({ status: "error", message: error.message });
+      setUploadResult({
+        success: false,
+        status: "error",
+        message: error.message,
+      });
     }
   };
 
@@ -1263,11 +1269,41 @@ export default function ProtocolDemo({ initialTab = "standard" }) {
                       </div>
                     </>
                   ) : (
-                    <div style={{ fontWeight: "var(--font-semibold)" }}>
-                      {uploadResult.status === "review"
-                        ? t("demo.status.review")
-                        : t("demo.audit.rejected")}
-                    </div>
+                    <>
+                      <div style={{ fontWeight: "var(--font-semibold)" }}>
+                        {uploadResult.status === "review"
+                          ? t("demo.status.review")
+                          : t("demo.audit.rejected")}
+                      </div>
+                      {uploadResult.message && (
+                        <div
+                          style={{
+                            fontSize: "var(--text-sm)",
+                            marginTop: "var(--space-2)",
+                            color: "var(--color-text-secondary)",
+                            whiteSpace: "pre-line",
+                            wordBreak: "break-word",
+                          }}
+                        >
+                          {uploadResult.message}
+                        </div>
+                      )}
+                      <button
+                        className="btn btn-primary btn-sm"
+                        style={{ marginTop: "var(--space-3)" }}
+                        onClick={() => {
+                          setUploadResult(null);
+                          setUploadStatus(null);
+                          // 允许重新选择同一个文件
+                          if (fileInputRef.current) {
+                            fileInputRef.current.value = "";
+                          }
+                          fileInputRef.current?.click();
+                        }}
+                      >
+                        {t("common.retry")}
+                      </button>
+                    </>
                   )}
                 </div>
               )}

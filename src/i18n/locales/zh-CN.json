@@ -34,7 +34,7 @@
     "copied": "已复制",
     "loginRequired": "请先注册",
     "txFailed": "交易失败",
-    "unverifiedSkillWarning": "你点赞了一个未验证技能"
+    "unverifiedSkillWarning": "该技能正在审核中，暂不可点赞，请等待审核通过"
   },
   "landing": {
     "badge": "可信 Agent 技能市场",

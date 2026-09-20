@@ -71,7 +71,7 @@ export async function pollJobStatus(jobId, interval = 2000, onStatusChange) {
         }
 
         // Check if terminal state
-        if (['approved', 'rejected', 'failed'].includes(job.status)) {
+        if (['approved', 'rejected', 'failed', 'review'].includes(job.status)) {
           resolve(job);
           return;
         }
@@ -146,12 +146,26 @@ export async function fullAuditFlow(file, callbacks = {}) {
 
       return successResult;
     } else if (finalResult.status === 'review') {
-      onStatusChange?.({ status: 'review', message: i18n.t('demo.status.review') });
-      onComplete?.({ success: false, status: 'review', auditResult: finalResult.result });
-      return { success: false, status: 'review' };
+      const failedResult = {
+        success: false,
+        status: 'review',
+        message: finalResult.message || i18n.t('demo.status.review'),
+        auditResult: finalResult.result
+      };
+      onStatusChange?.({ status: 'review', message: failedResult.message });
+      onComplete?.(failedResult);
+      return failedResult;
     } else {
-      onError?.({ status: finalResult.status, error: i18n.t('demo.status.rejected'), auditResult: finalResult.result });
-      throw new Error(`${i18n.t('demo.audit.rejected')}: ${finalResult.status}`);
+      // rejected / failed：完成回调携带原因，绝不 throw —— throw 会让 UI 停在 error 无下一步
+      const failedResult = {
+        success: false,
+        status: finalResult.status || 'rejected',
+        message: finalResult.message || i18n.t('demo.audit.rejected'),
+        auditResult: finalResult.result
+      };
+      onStatusChange?.({ status: failedResult.status, message: failedResult.message });
+      onComplete?.(failedResult);
+      return failedResult;
     }
   } catch (error) {
     onError?.({ error: error.message });

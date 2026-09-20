@@ -21,6 +21,8 @@
     "auditing": "安全审核中 (AI Agent 扫描)...",
     "serviceUnavailable": "审计服务不可用",
     "completedWithWarnings": "审计完成，但出现警告",
+    "rejected": "技能未通过审核：{{reason}}",
+    "rejectedGeneric": "技能未通过审核，请检查格式后重新上传",
     "criticalIssues": "发现 {{count}} 个关键安全问题，请在重新提交前修复。",
     "highIssues": "发现 {{count}} 个高风险问题，建议修复以提升安全性。",
     "missingGovernance": "缺少必需的治理字段。添加 FreeSkill 元数据以完全合规。",

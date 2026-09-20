@@ -35,7 +35,7 @@
     "copied": "Copied",
     "loginRequired": "Please sign in first",
     "txFailed": "Transaction failed",
-    "unverifiedSkillWarning": "You liked an unverified skill"
+    "unverifiedSkillWarning": "This skill is under review and cannot be liked yet, please wait for approval"
   },
   "landing": {
     "badge": "Trustworthy Agent Skill Marketplace",
