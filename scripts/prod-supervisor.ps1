@@ -32,6 +32,11 @@ Remove-Item $stopFile -ErrorAction SilentlyContinue
 $tunnelBin = Join-Path $env:LOCALAPPDATA 'agentskills\bin\cloudflared.exe'
 $apiConfigFile = Join-Path $Repo 'public\api-config.json'
 
+# Docker 引擎守护（v2.0 盲点修复：链容器依赖本机 Docker daemon，supervisor 须负责拉起引擎与容器）
+$dockerDesktopExe = Join-Path $env:LOCALAPPDATA 'Programs\DockerDesktop\Docker Desktop.exe'
+$dockerCli = Join-Path $env:LOCALAPPDATA 'Programs\DockerDesktop\resources\bin\docker.exe'
+$chainContainers = @('cmc-debug', 'chainmaker-solo')
+
 $script:owned = @{ backend = $null; tunnel = $null }
 $script:publishedUrl = $null
 $startedAt = Get-Date
@@ -66,6 +71,51 @@ function Test-ApiHealth() {
     $r = Invoke-WebRequest -Uri "http://localhost:$ApiPort/api/health" -TimeoutSec 5 -UseBasicParsing
     return $r.StatusCode -eq 200
   } catch { return $false }
+}
+
+function Test-DockerReady() {
+  if (-not (Test-Path $dockerCli)) { return $false }
+  try {
+    $null = & $dockerCli info --format '{{.ServerVersion}}' 2>$null
+    return $LASTEXITCODE -eq 0
+  } catch { return $false }
+}
+
+function Start-DockerEngine() {
+  if (Test-DockerReady) { return $true }
+  if (-not (Test-Path $dockerDesktopExe)) {
+    Log "Docker: 未找到 Docker Desktop ($dockerDesktopExe) → 无法拉起引擎，链将不可用"
+    return $false
+  }
+  Log "Docker: daemon 不可用 → 拉起 Docker Desktop"
+  $null = Start-Process -FilePath $dockerDesktopExe
+  $deadline = (Get-Date).AddSeconds(180)
+  while ((Get-Date) -lt $deadline) {
+    Start-Sleep -Seconds 5
+    if (Test-DockerReady) {
+      $v = & $dockerCli info --format '{{.ServerVersion}}' 2>$null
+      Log "Docker: daemon 就绪 (server v$v)"
+      return $true
+    }
+  }
+  Log "Docker: 180 秒内未就绪 → 本轮放弃（下轮重试）"
+  return $false
+}
+
+function Ensure-ChainContainers() {
+  if (-not (Test-DockerReady)) { return }
+  foreach ($c in $chainContainers) {
+    $running = & $dockerCli inspect -f '{{.State.Running}}' $c 2>$null
+    if ($LASTEXITCODE -ne 0) {
+      Log "Docker: 容器 $c 不存在 → 需人工重建（docker run 参数见迁移清单）"
+      continue
+    }
+    if ($running -ne 'true') {
+      Log "Docker: 容器 $c 未运行 → docker start"
+      & $dockerCli start $c 2>$null | Out-Null
+      if ($LASTEXITCODE -eq 0) { Log "Docker: $c 已启动" } else { Log "Docker: $c 启动失败" }
+    }
+  }
 }
 
 # 与 dev-supervisor 互斥：杀掉仍在跑的开发守护（避免两侧争抢同一后端/端口守卫打架）
@@ -184,6 +234,11 @@ Stop-DevSupervisor
 Stop-Zombies
 Start-Sleep -Seconds 2
 
+# Docker 引擎守护（盲点修复：链容器依赖本机 Docker daemon，先于后端拉起）
+Start-DockerEngine | Out-Null
+Start-Sleep -Seconds 3
+Ensure-ChainContainers
+
 if (-not (Test-ApiHealth)) { Start-Backend }
 if (-not (Test-Path $tunnelBin)) { Log "隧道: cloudflared 缺失 → 仅后端守护（公网不可达）" }
 elseif (-not $script:owned.tunnel) { Start-Tunnel }
@@ -207,7 +262,15 @@ while ($true) {
     Write-Status 'stopped' $false $false $null 'stopped'
     break
   }
-  $round++
+$round++
+  if ($round % 6 -eq 1) {
+    # Docker 引擎每 ~1 分钟探活一次（不每轮打日志刷屏）：引擎退去拉起，容器停则启动
+    if (-not (Test-DockerReady)) {
+      Log "监测: Docker daemon 不可达 (第 $round 轮) → 拉起引擎"
+      Start-DockerEngine | Out-Null
+    }
+    Ensure-ChainContainers
+  }
 
   # 后端自愈
   $apiOk = Test-ApiHealth
