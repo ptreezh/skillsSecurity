@@ -1,0 +1,11 @@
+{
+  "name": "example-skill",
+  "version": "1.0.0",
+  "description": "这是一个示例模板文件",
+  "author": "AgentSkills Team",
+  "created_at": "2026-09-24",
+  "parameters": {
+    "input": "string",
+    "output": "json"
+  }
+}

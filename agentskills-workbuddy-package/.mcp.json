@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "agentskills-backend": {
+      "url": "http://localhost:10001",
+      "transport": "streamableHttp",
+      "headers": {
+        "Accept-Language": "zh-CN"
+      }
+    }
+  }
+}

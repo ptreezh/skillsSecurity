@@ -1,0 +1,24 @@
+{
+  "name": "AgentSkills Team",
+  "version": "1.0.0",
+  "description": "AgentSkills 专家团队，提供技能审计、发布、注册、查询等端到端能力",
+  "teamLead": "agents/agentskills-team-lead.md",
+  "members": [
+    "agents/skill-auditor.md",
+    "agents/skill-publisher.md",
+    "agents/skill-registry.md",
+    "agents/reputation-analyst.md",
+    "agents/skill-browser.md",
+    "agents/fingerprint-verifier.md",
+    "agents/risk-classifier.md"
+  ],
+  "skills": [
+    "skill-auditor",
+    "skill-publisher",
+    "skill-registry",
+    "reputation-analyst",
+    "skill-browser",
+    "fingerprint-verifier",
+    "risk-classifier"
+  ]
+}
