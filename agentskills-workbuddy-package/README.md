@@ -10,18 +10,50 @@ agentskills-workbuddy-package/
 │   └── plugin.json          # WorkBuddy 专家智能体配置
 ├── avatars/                 # 头像目录
 ├── agents/                  # Agent 定义目录
+│   ├── agentskills-team-lead.md
+│   ├── skill-auditor.md
+│   ├── skill-publisher.md
+│   ├── skill-registry.md
+│   ├── reputation-analyst.md
+│   ├── skill-browser.md
+│   ├── fingerprint-verifier.md
+│   └── risk-classifier.md
 ├── skills/                  # SKILL 目录
-│   └── template/            # 模板技能
+│   ├── template/            # 模板技能
+│   │   ├── SKILL.md
+│   │   ├── references/
+│   │   ├── scripts/
+│   │   └── templates/
+│   ├── skill-auditor/       # 技能审计师
+│   │   ├── SKILL.md
+│   │   ├── references/
+│   │   └── scripts/
+│   ├── skill-publisher/     # 技能发布器
+│   │   ├── SKILL.md
+│   │   ├── references/
+│   │   └── scripts/
+│   └── skill-registry/      # 技能注册器
 │       ├── SKILL.md
-│       ├── references/
-│       ├── scripts/
-│       └── templates/
+│       └── scripts/
 ├── connectors/              # 连接器目录
 │   └── template/
+│       ├── backend-mcp.md
+│       ├── backend_mcp.py
+│       ├── chain-mcp.md
+│       └── chain_mcp.py
 ├── tools/                   # 开发工具
-│   ├── skill-lint.py        # SKILL.md 规范检查器
+│   ├── skill_lint.py        # SKILL.md 规范检查器
 │   └── packager.py          # 打包工具
 ├── tests/                   # 测试目录
+│   ├── test_skill_lint.py
+│   ├── test_packager.py
+│   ├── test_template_skill.py
+│   ├── test_skill_auditor.py
+│   ├── test_skill_publisher.py
+│   ├── test_skill_registry.py
+│   └── test_e2e.py
+├── docs/                    # 文档目录
+│   └── OPEN_WORKBUDDY_LAUNCH.md
 ├── .mcp.json                # MCP 依赖声明
 └── settings.json            # WorkBuddy 设置
 ```
@@ -31,30 +63,57 @@ agentskills-workbuddy-package/
 ### 1. 检查技能规范
 
 ```bash
-python tools/skill-lint.py skills/template/
+python tools/skill_lint.py skills/template/
 ```
 
 ### 2. 打包技能
 
 ```bash
-python tools/packager.py skills/template/
+python tools/packager.py skills/skill-auditor/
 ```
 
-### 3. 在 WorkBuddy 中测试
+### 3. 审计技能
 
-1. 打开 WorkBuddy
-2. 进入「导入技能」
-3. 选择生成的 .zip 文件
-4. 测试技能调用
+```bash
+python skills/skill-auditor/scripts/audit_runner.py skills/skill-auditor/
+```
 
-## 开发新技能
+### 4. 发布技能
 
-1. 复制 `skills/template/` 目录
-2. 修改 `SKILL.md` frontmatter 和正文
-3. 在 `scripts/` 下添加可执行脚本
-4. 在 `references/` 下添加参考资料
-5. 运行 `skill-lint.py` 检查规范性
-6. 运行 `packager.py` 打包
+```bash
+python skills/skill-publisher/scripts/publish_runner.py skills/skill-publisher/
+```
+
+### 5. 注册技能
+
+```bash
+python skills/skill-registry/scripts/register_runner.py skills/skill-registry/ http://localhost:10001
+```
+
+## 运行测试
+
+```bash
+# 运行所有单元测试
+python tests/test_skill_lint.py
+python tests/test_packager.py
+python tests/test_skill_auditor.py
+python tests/test_skill_publisher.py
+python tests/test_skill_registry.py
+
+# 运行 e2e 测试
+python tests/test_e2e.py
+```
+
+## 上架到 open.workbuddy.cn
+
+1. 完成 Phase 35 本地验证
+2. 打包所有技能为 .zip
+3. 访问 https://open.workbuddy.cn
+4. 完成实名认证
+5. 上传技能包
+6. 等待审核
+
+详见 `docs/OPEN_WORKBUDDY_LAUNCH.md`
 
 ## 审核要求
 
