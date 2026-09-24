@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.0
-milestone_name: 端到端上线收官
-status: completed
-last_updated: "2026-09-19T01:20:00.000Z"
+milestone: v3.0
+milestone_name: WorkBuddy 技能化发布
+status: planning
+last_updated: "2026-09-24T07:53:38.000Z"
 progress:
-  total_phases: 4
-  completed_phases: 4
-  phase_numbering: 27-30
-  total_plans: 9
-  completed_plans: 9
-  percent: 100
+  total_phases: 6
+  completed_phases: 0
+  phase_numbering: 31-36
+  total_plans: 17
+  completed_plans: 0
+  percent: 0
 ---
 
 # AgentSkills - Current State
@@ -89,6 +89,31 @@ Progress: [████████████████████] 100%
 | 30-01 | 安全扫描全绿（Slither 184w/0e + Mythril 3 报告非空 2 无问题+1 Low 可接受）→ REPORTS/SECURITY_SCAN_2026-09-18.md | 1/1 | Complete (2026-09-18) |
 | 30-02 | 端到端验收（Failed to fetch 根因修复 5173/10002/api-config + 四自系统退役删除 872eaaf + 公网三页真数据 + 写路径 skill7 真实上链） | 1/1 | Complete (2026-09-19) |
 
+## v3.0 Active Phases
+
+| Phase | Name | Plans | Status |
+|-------|------|-------|--------|
+| 31 | 技能包结构标准化与最小可发布单元准备 | 4 | 🔵 Planning |
+| 32 | 核心技能开发（3 个） | 3 | 🔵 Planning |
+| 33 | 专家智能体编排层开发 | 4 | 🔵 Planning |
+| 34 | MCP/CLI 连接器实现 | 3 | 🔵 Planning |
+| 35 | 本地端到端联调与验证 | 4 | 🔵 Planning |
+| 36 | open.workbuddy.cn 上架与审核 | 5 | 🔵 Planning |
+
+## Milestone Summary
+
+| Milestone | Phases | Status | Completed |
+|-----------|--------|--------|-----------|
+| v1.1 标准文档完善 | 1-7 | Complete | 2026-05-15 |
+| v1.2 技术债补齐 | 8-10 | Complete | 2026-05-16 |
+| v1.3 测试与部署 | 11-19 | Complete | 2026-05-18 |
+| v1.4 自主运营 | 20-23 | Complete | 2026-05-21 |
+| v1.5 安全加固 | 24 | Complete | 2026-05-23 |
+| v1.6 产品完善 | 25 | Complete | 2026-05-23 |
+| v1.7 测试对齐 | 26 | Complete | 2026-05-25 |
+| v2.0 端到端上线收官 | 27-30 | Complete | 2026-09-19 |
+| v3.0 WorkBuddy 技能化发布 | 31-36 | Planning | - |
+
 ---
 
 ## Security Status
@@ -139,4 +164,4 @@ Progress: [████████████████████] 100%
 
 ---
 
-*Last updated: 2026-09-18*
+*Last updated: 2026-09-24 — v3.0 WorkBuddy 技能化发布启动*

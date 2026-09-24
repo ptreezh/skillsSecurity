@@ -159,7 +159,208 @@ Phase 3: 生态成熟（6-12月）
 
 ---
 
+## v3.0 Milestone: WorkBuddy 技能化发布
+
+**Goal:** 将 AgentSkills 系统能力分解为 WorkBuddy 可消费的 SKILL + 专家智能体 + 连接器，并上架 open.workbuddy.cn。
+
+**背景:** v2.0 已完结，系统具备完整的技能审计、链上注册、声誉查询、排行榜、指纹生成等核心能力。下一步通过 WorkBuddy 开放平台触达更广泛的 AI 开发者和企业用户。
+
+---
+
+### Phase 31: 技能包结构标准化 ✅ Planned
+
+**Requirements:** REQ-31
+**Depends on:** 无
+
+**Plans:**
+- 31-01 建立技能包模板仓库 — 统一 SKILL.md + references/ + scripts/ + templates/ 结构
+- 31-02 定义 SKILL.md 规范检查器 — 校验 frontmatter、YAML 语法、脚本可执行性
+- 31-03 定义打包规范 — 生成符合 WorkBuddy 标准的 .zip + manifest.yaml
+- 31-04 建立本地测试环境 — pytest 覆盖 80%+
+
+**Success criteria:**
+1. `skills/template/SKILL.md` frontmatter 包含所有必填字段
+2. `python tools/skill-lint.py skills/template/` 输出 `PASS`
+3. `python tools/packager.py skills/template/` 生成有效 .zip
+4. `pytest tests/` 全部通过
+
+---
+
+### Phase 32: 核心技能开发（3 个） ✅ Planned
+
+**Requirements:** REQ-32
+**Depends on:** Phase 31
+
+**Plans:**
+- 32-01 skill-auditor（技能审计师）— 审计 .SKILL.md 合规性，输出 JSON 报告
+- 32-02 skill-publisher（技能发布者）— 打包为 WorkBuddy 标准 .zip + manifest.yaml
+- 32-03 skill-registry（技能注册官）— 调用后端 /api/upload → /api/chain 完成上链注册
+
+**Success criteria:**
+1. 3 个 SKILL 全部可通过 WorkBuddy 本地加载并调用
+2. 审计合规 .SKILL.md → passed: true
+3. 打包生成有效 .zip，含正确 manifest.yaml
+4. 注册技能返回 txHash + skillId（或 demo 模式模拟数据）
+
+---
+
+### Phase 33: 专家智能体编排层开发 ✅ Planned
+
+**Requirements:** REQ-33
+**Depends on:** Phase 32
+
+**Plans:**
+- 33-01 定义 Team Lead（主理人）— 协调 7 个 Member 完成端到端流程
+- 33-02 定义 7 个 Member Agent 配置 — 每个 Member 对应一个 SKILL
+- 33-03 配置 .codebuddy-plugin/plugin.json — WorkBuddy 专家智能体配置
+- 33-04 配置 settings.json — 设置 Team Lead 为默认 Agent
+
+**Success criteria:**
+1. Team Lead 能正确识别「发布技能」意图并编排完整流程
+2. 7 个 Member 能独立响应各自的触发词
+3. plugin.json 和 settings.json 语法正确
+
+---
+
+### Phase 34: MCP/CLI 连接器实现 ✅ Planned
+
+**Requirements:** REQ-34
+**Depends on:** Phase 32
+
+**Plans:**
+- 34-01 AgentSkills Backend MCP Connector — 封装后端 API（/api/upload, /api/chain, /api/skills 等）
+- 34-02 AgentSkills Chain MCP Connector（可选）— 封装链上交互（通过后端网关）
+- 34-03 连接器本地测试 — 对接测试、错误处理、认证测试
+
+**Success criteria:**
+1. Backend Connector 能正确调用本地后端 API
+2. 支持 Bearer Token 认证
+3. 后端不可用时返回清晰错误信息
+
+---
+
+### Phase 35: 本地端到端联调与验证 ✅ Planned
+
+**Requirements:** REQ-35
+**Depends on:** Phase 33, 34
+
+**Plans:**
+- 35-01 7 个 SKILL 独立加载测试 — 13 个测试场景
+- 35-02 专家智能体编排测试 — 完整发布流程 + 查询流程
+- 35-03 连接器对接测试 — 本地后端可用/不可用场景
+- 35-04 性能与稳定性测试 — 响应时间、内存泄漏
+
+**Success criteria:**
+1. 13 个 SKILL 测试场景全部通过
+2. Team Lead 完整发布流程执行成功
+3. 连接器对接测试全部通过
+4. 性能测试达标（平均响应时间 < 2s）
+
+---
+
+### Phase 36: open.workbuddy.cn 上架与审核 ✅ Planned
+
+**Requirements:** REQ-36
+**Depends on:** Phase 35
+
+**Plans:**
+- 36-01 准备上架材料 — Skill 包、icon.svg、README.md
+- 36-02 完成实名认证 — 个人认证获取发布权限
+- 36-03 提交审核 — 上传 .zip，填写基本信息
+- 36-04 审核跟进与问题修复 — 根据反馈修改重提
+- 36-05 上架后验证 — 搜索、安装、调用测试
+
+**Success criteria:**
+1. 至少 1 个 SKILL + AgentSkills Team 通过审核并上架
+2. 用户可在 WorkBuddy 市场搜索到「AgentSkills」相关技能
+3. 技能可正常安装和调用
+
+---
+
+## v3.0 完成标准
+```
+✅ 7 个 SKILL 全部可通过 WorkBuddy 本地加载
+✅ AgentSkills Team 专家智能体可完成端到端流程
+✅ 2 个 MCP 连接器实现并测试通过
+✅ 至少 1 个 SKILL 通过 open.workbuddy.cn 审核并上架
+✅ 用户可在 WorkBuddy 市场搜索到 AgentSkills 相关技能
+```
+
+---
+
+*本路线图更新于 2026-09-24 — v3.0 WorkBuddy 技能化发布启动。*
+
+---
+
 ## 对比：原计划 vs 新计划
+
+| 维度 | 原计划 | 新计划 | 优势 |
+|------|--------|--------|------|
+| 代币时间 | 第1月 | 永不 | ✅ 合规 |
+| 激励机制 | 代币 | 积分/声望 | ✅ 合规 |
+| 用户获取 | 先圈后用 | 先用后圈 | 更高留存 |
+| 信任建立 | 靠代币激励 | 靠标准规范 | 更稳固 |
+| 生态扩展 | 自建前端 | WorkBuddy 生态 | 更低成本，更快触达 |
+
+---
+
+## 积分/声望系统（无代币版）
+
+### 积分系统（平台内虚拟积分）
+| 行为 | 积分奖励 |
+|------|----------|
+| 创建技能 | +100 |
+| 技能被调用 | +10 |
+| 验证他人技能 | +20 |
+| 报告 Bug | +50 |
+| 修复漏洞 | +100 |
+
+**注意**：积分是平台内虚拟积分，不可转让、不可交易、不可兑换任何加密货币。
+
+### 声望系统（链上记录）
+| 等级 | 要求 | 权限 |
+|------|------|------|
+| 观察者 | 0+ | 浏览 |
+| 贡献者 | 100+ | 创建技能 |
+| 验证者 | 500+ | 验证技能 |
+| 守护者 | 1000+ | 监督 |
+| 长老 | 5000+ | 治理 |
+
+---
+
+## 📋 当前任务列表
+
+### 即刻执行
+1. [ ] 创建 v3.0 完整实施计划
+2. [ ] 准备技能包模板仓库
+3. [ ] 开发 skill-auditor 和 skill-publisher
+
+### 即将执行
+4. [ ] 开发 skill-registry
+5. [ ] 实现专家智能体编排
+6. [ ] 实现 MCP 连接器
+7. [ ] 本地端到端验证
+8. [ ] 提交 open.workbuddy.cn 审核
+
+---
+
+## ⏰ 定时任务
+
+### 每周检查（周一 09:00）
+```bash
+# 检查进度
+grep -c "\[x\]" ROADMAP.md  # 已完成
+grep -c "\[ \]" ROADMAP.md  # 未完成
+```
+
+### 每月评估（每月1日）
+- Phase 任务完成度
+- 标准文档进度
+- 社区反馈收集
+
+---
+
+*本路线图调整于 2026-05-27，强调标准先行、积分激励、零代币、法律合规。v3.0 更新于 2026-09-24。*
 
 | 维度 | 原计划 | 新计划 | 优势 |
 |------|--------|--------|------|
