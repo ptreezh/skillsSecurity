@@ -71,9 +71,25 @@ OFFICIAL_SUBDIRS = frozenset({"references", "scripts", "templates"})
 REPO_INTRODUCED_FRONTMATTER = frozenset({"display_name_en"})
 
 # 技能目录内绝不允许出现的构建产物（R18 的仓库层卫生）
+# `.DS_Store` 必须按文件名单列：裸名以点号开头，pathlib 的 .suffix 为空串，
+# `[^/]+\.(pyc|pyo|zip|DS_Store)` 这类「后缀」写法匹配不到它。
 ARTIFACT_RE = re.compile(
-    r"(^|/)(__pycache__|[^/]+\.(pyc|pyo|zip|DS_Store))($|/)"
+    r"(^|/)(\.DS_Store|__pycache__|[^/]+\.(pyc|pyo|zip))($|/)"
 )
+
+# 进入市场提交集合的技能（D10 / R11：skill-registry 依赖本机 docker 容器，
+# 第三方用户不可能运行，故随插件分发但不提交市场）
+EXPECTED_LISTING_SKILLS = (
+    "attribution-auditor",
+    "skill-auditor",
+    "skill-publisher",
+    "workbuddy-skill-deployer",
+)
+
+# plugin.json 声明但不提交市场的技能。显式列出，避免「四技能」只存在于
+# 方案文档散文里：此前 listing_skills() 直接取 plugin.json，会把
+# skill-registry 一并纳入官方门禁，使市场边界既无断言也不可见。
+NOT_LISTED = frozenset({"skill-registry"})
 
 KEY_LINE = re.compile(r"^([A-Za-z0-9_-]+):(.*)$")
 
@@ -81,7 +97,8 @@ KEY_LINE = re.compile(r"^([A-Za-z0-9_-]+):(.*)$")
 def listing_skills():
     """从 plugin.json 取可上架技能，避免在此处硬编码而与清单漂移"""
     with open(PLUGIN_JSON, "r", encoding="utf-8") as f:
-        return list(json.load(f)["skills"])
+        declared = list(json.load(f)["skills"])
+    return [name for name in declared if name not in NOT_LISTED]
 
 
 def read_frontmatter(skill_md: Path):
@@ -239,14 +256,20 @@ def test_no_local_artifacts_leak_into_zip():
 
     这是磁盘层与 zip 层的接缝断言：即使 `__pycache__` 因跑过 runner 而
     存在于工作区，用户按官方流程打包出来的 zip 仍必须是干净的。
+
+    「脏」的判定用本文件独立的 ARTIFACT_RE，而不是复用
+    packager.should_skip。后者是逻辑倒置：should_skip 为真恰好意味着
+    「打包器会排除它」，一旦有人从 EXCLUDE_FILES 删掉某条，谓词变假、
+    目录不再被判脏、zip 永不构建，断言永不执行——排除层被破坏也无人发现。
+    门禁必须用与被测对象**独立**的判据，才有识别能力。
     """
     dirty = [
         name
         for name in listing_skills()
         if any(
-            part == "__pycache__" or p.suffix in (".pyc", ".pyo", ".zip")
+            ARTIFACT_RE.search(p.relative_to(SKILLS_DIR / name).as_posix())
             for p in (SKILLS_DIR / name).rglob("*")
-            for part in p.parts
+            if p.is_file()
         )
     ]
     if not dirty:
@@ -263,8 +286,31 @@ def test_no_local_artifacts_leak_into_zip():
     print(f"✓ test_no_local_artifacts_leak_into_zip ({len(dirty)} 个目录有残留，均已被排除)")
 
 
+def test_listing_set_is_exactly_four():
+    """
+    FATAL：进入市场提交集合的技能必须恰好是方案文档锁定的四个
+
+    这条断言守护的是**市场边界**，不是目录卫生：
+    plugin.json 里的 skills[] 表达「随插件分发」，与「提交 open.workbuddy.cn
+    市场」不是同一集合。skill-registry 属于前者但不属于后者（其链访问依赖
+    本机 docker 容器，第三方无法运行）。若二者被混为一谈，后果是双向的：
+    多提交一个跑不通的技能，或少提交一个合规技能。
+    """
+    got = tuple(listing_skills())
+    assert got == EXPECTED_LISTING_SKILLS, (
+        "市场提交集合与锁定集合不一致：\n"
+        f"  期望（顺序敏感）：{list(EXPECTED_LISTING_SKILLS)}\n"
+        f"  实际：{list(got)}\n"
+        f"  被排除（随插件分发但不提交市场）：{sorted(NOT_LISTED)}\n"
+        "  若确需变更四技能集合，先更新方案文档的决策登记与风险登记，"
+        "再改此处的两个常量。"
+    )
+    print("✓ test_listing_set_is_exactly_four")
+
+
 def main():
     tests = (
+        test_listing_set_is_exactly_four,
         test_official_required_frontmatter_present,
         test_frontmatter_keys_are_declared_or_known,
         test_no_undocumented_subdirectories,
