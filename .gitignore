@@ -11,6 +11,17 @@ node_modules/
 # Build output
 dist/
 
+# Python build artifacts (R18: 16 tracked .pyc/__pycache__ leaked into git;
+# stale bytecode can shadow behavior and leaks local paths + Python version)
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Generated skill zip artifacts (R18: skills/template-1.0.0.zip was tracked,
+# letting a stale release artifact ship inside the skills/ tree)
+agentskills-workbuddy-package/skills/*.zip
+
 # Logs
 progress.log
 *.log
@@ -20,6 +31,9 @@ progress.log
 
 # Runtime upload artifacts (API tests / temp skill files)
 uploads/temp/
+
+# Runtime identity store (P2: scrypt-hashed users + sessions; never commit)
+server/data/users.json
 
 # Audit agent temp scripts
 temp_audit_*.py
