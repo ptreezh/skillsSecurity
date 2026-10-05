@@ -136,14 +136,15 @@ distinctness 检查：1 与 2/3 是不同机制族（内容 vs 服务 vs 进程�
 | D7 | 现有 `docs/OPEN_WORKBUDDY_LAUNCH.md` 按实测结果重写 | **settled → 已执行** | 该文档与官方规范多处冲突（见 §8 O1~O5） | — | 高 | supporting |
 | D8 | 零服务器是硬排序约束：任何需要公网 HTTPS / 备案 / SLA 的方案不得进入主路径 | settled（rev.2） | 官方要求远程 MCP HTTPS、建议 ≥99.9%、单请求 ≤30s | 若项目获得长期运维预算 → 可重议 | 高 | core |
 | D9 | 上架内容包**不得**包含 `__pycache__` / `.pyc` 等构建产物 | settled（rev.2） | 实测包内存在 6 个 `__pycache__` 目录，会随 zip 一并提交 | 无 | 高 | supporting |
-| D10 | `skill-registry` 暂不提交市场；且所有技能描述不得暗示「用户可验证的链上存证」 | **待你确认**（rev.2） | 链访问依赖本机 `docker exec cmc-debug cmc`，无网络端点，第三方用户无法运行 | 若未来提供公网可达的链节点或远程 MCP → 解禁 | 高 | core |
-| D11 | 可上架技能为 **5 个**（`skill-auditor`、`skill-publisher`、`skill-registry`、`attribution-auditor`、`workbuddy-skill-deployer`）；`template` 仅作脚手架，不提交 | settled（rev.3） | 实测 `skills/` 共 6 个目录，其中 `template` 为参考模板 | 若日后拆分为多个可上架单元 → 逐个追加 | 高 | core |
-| D12 | 技能标识与目录名对齐（不使用 `agentskills-` 前缀） | **待你确认**（rev.3） | 实测前缀约定仅 1/5 生效（`agentskills-publisher` 有效，其余无前缀）；WorkBuddy 以 frontmatter `name` 为标识，zip 文件名由其派生 | 若市场重名 → 统一加前缀（改 frontmatter 即可，目录名可不动） | 中 | supporting |
-| D10 | `skill-registry` **暂不上市场**，但**保留代码与 plugin.json 条目** | **settled**（rev.5，2026-10-05 你已确认） | R11（high）：该技能依赖本机 `docker exec cmc-debug cmc`，链上无公网端点，第三方装了必然失败。但它是本项目的注册工具（`register_runner.py` 被 README 与方案 F 依赖），物理删除会连带删掉注册能力 | 等 ChainMaker 提供公网端点，或改走远程 HTTPS MCP（B 方案）后 → 再评估上架 | 高 | core |
-| D16 | 本次平台上架 **4 个技能**：`skill-auditor`、`skill-publisher`、`attribution-auditor`、`workbuddy-skill-deployer` | settled（rev.5） | 按 D10 剔除 `skill-registry` 后的集合；`skill-auditor` 零耦合（vendored_tools=0）适合作为首个试水技能 | 若 `skill-registry` 后续满足 R11 → 追加为第 5 个 | 高 | core |
+| D10 | `skill-registry` **暂不上市场**，但**保留代码与 plugin.json 条目**；且所有技能描述不得暗示「用户可验证的链上存证」 | **settled**（rev.5 确认，rev.6 合并 rev.2 残留行） | R11（high）：该技能依赖本机 `docker exec cmc-debug cmc`，链上无公网端点，第三方装了必然失败。但它是本项目的注册工具（`register_runner.py` 被 README 与方案 F 依赖），物理删除会连带删掉注册能力。描述约束来自 rev.2 D10 后半句，ChainMaker 阶段无公网端点时不得让用户误以为可自行验链 | 等 ChainMaker 提供公网端点，或改走远程 HTTPS MCP（B 方案）后 → 再评估上架 | 高 | core |
+| D11 | `template` 为参考脚手架，**不作为可上架单元**（上架数量以 D16 为准） | settled（rev.3，rev.6 移除与 D16 冲突的数量表述） | 实测 `skills/` 共 6 个目录，其中 `template` 为参考模板 | 若日后拆分为多个可上架单元 → 逐个追加 | 高 | supporting |
+| D12 | 技能标识与目录名对齐，**统一不加 `agentskills-` 前缀** | **settled**（rev.6 由实测结案） | 实测 6/6 目录 frontmatter `name` 与目录名完全一致，`agentskills-*` 目录命中 **0**；WorkBuddy 以 frontmatter `name` 为标识，zip 文件名由其派生 | 若市场重名 → 统一加前缀（改 frontmatter 即可，目录名可不动） | 中 | supporting |
 | D13 | **发布物必须通过「脱离仓库可运行」验证**，而非仅验证仓库内可运行 | settled（rev.4） | R16 实测：5 个 zip 卫生全 CLEAN，但带脚本的技能在解压目录内仍因缺 `packager` 崩溃。卫生检查与功能闭包是两个独立维度，前者全绿不代表后者成立 | 若 WorkBuddy 官方改为在完整仓库/插件包内运行脚本 → 可撤销隔离要求 | 高 | core |
 | D14 | `packager.py` **保持零第三方依赖**（不得引入 PyYAML） | settled（rev.4） | 打包器同时是「开发工具」和「随包运行时」；一旦依赖 PyYAML，vendoring 进用户环境即失效，R16 会以另一种形式复发 | 若官方提供受控 Python 运行环境并预装 PyYAML → 可放开 | 高 | core |
 | D15 | 发布卫生是**两层**：`packager` 保证 zip 内容（D9），`.gitignore` + `git rm --cached` 保证仓库内容（R18） | settled（rev.5） | 只做 zip 过滤会漏掉「直接打包仓库 `skills/` 目录」这条路径；被跟踪的 `skills/template-1.0.0.zip` 就在 `skills/` 树内，可自我包含；陈旧 `.pyc` 还会泄漏本机路径与 Python 版本 | 若改为 monorepo 统一 lint/归档策略 → 可并入共享 `.gitignore` | 中 | core |
+| D16 | 本次平台上架 **4 个技能**：`skill-auditor`、`skill-publisher`、`attribution-auditor`、`workbuddy-skill-deployer` | settled（rev.5） | 按 D10 剔除 `skill-registry` 后的集合；`skill-auditor` 零耦合（vendored_tools=0）适合作为首个试水技能 | 若 `skill-registry` 后续满足 R11 → 追加为第 5 个 | 高 | core |
+| D17 | 链选型**不做「论文论证 vs 国内合规」二选一**；许可制联盟链可作为填补责任真空的治理层。论文须**分开归因**：链提供不可篡改/可追溯/不可抵赖，准入委员会提供身份锚点与准入权 | **settled**（rev.6，2026-10-05） | `paper-draft-en.md:124` 将责任真空定义为「四类治理机制缺失」（开发者侧声明、渠道侧审核、平台侧基础设施、使用侧授权与追溯），`:126` 归因为「规范设计缺陷 + 治理机构缺位」——**两者均未以「无许可性」为成因**；`:56` RQ2 要求在 Collingridge 锁定窗口前嵌入责任追溯机制，`:66` design contribution 即「五阶段治理流程 + 防篡改审计链」。许可准入层是该贡献的合法实例化，而非反例 | 若论文正文出现「责任真空由无许可性导致」或「补上责任必须保持无许可」的**显式**主张 → 本决策需重审 | 高 | core |
+| D18 | **论文论证合规与产品部署合规分离**；治理**接口层**保持开放/协议级（R-Skills 向后兼容 AgentSkills.io），治理**执行层**机构化/许可制（准入审计 + 防篡改链） | **settled**（rev.6） | 论文为 EN 研究稿且自定位 exploratory design science（`:199`），不涉及 ICP/实名/备案；部署侧要求来自官方平台规范与公网服务 SLA，与论文论证正交。宪法第一条禁代币、第四条已要求分层准入（L1 邮箱 → L3 身份证 KYC + 声誉 ≥1000），本身即要求准入边界 | 若论文被要求以国内商业上线作为实证场景 → 须在论文中显式声明部署合规边界 | 高 | supporting |
 
 ---
 
@@ -306,12 +307,13 @@ rev.4 的隔离实测推翻了一个更危险的隐含假设：**「5 个 zip �
 | 3 | 2026-10-05 | R10 结案（链无网络端点）；打包器夹带 `__pycache__`（R12）；`plugin.json` 4 幽灵 + 3 遗漏（R13）；frontmatter 名不一致（R14）；后端不可容器化（R15）；新增 D11/D12 | 「包已干净」原为手工清理所得，非工具保证；`plugin.json` 从未与磁盘对账；「Docker 可部署后端」假设经实测不成立 |
 | 4 | 2026-10-05 | **R16（critical）**：隔离实测 `skill-registry` zip 解压后退出码 1，报 `Packaging failed: No module named 'packager'`——runner 依赖仓库级 `tools/`，而打包器只收集 `SKILL_DIRS`；**R17**：早期隔离命令（`--help`）非合法入口，失败结论不可信。新增 D13/D14；G5 理由改写；步骤 2h 完成 | rev.3 把「5 个 zip 卫生全 CLEAN」当成就绪依据，但卫生维度（无 `.pyc`）与闭包维度（依赖是否随包）正交，前者全绿不代表后者成立；且 rev.3 对 auditor/publisher 的失败结论使用了无效 CLI 参数，属未经验证的断言 |
 | 5 | 2026-10-05 | **R18（high）**：`git ls-files` 实测仓库**跟踪了 16 个构建产物**（`.pyc`/`__pycache__` + `skills/template-1.0.0.zip`），根 `.gitignore` 仅覆盖 `dist/`。已补 5 类 `.gitignore` 规则并 `git rm --cached` 16 项；复测 4 脚本全 PASS、5 zip `junk=0`。新增 D15（两层卫生）、步骤 2i | rev.4 修好了「zip 装什么」，却没检查「git 跟踪了什么」——`template-1.0.0.zip` 就躺在 `skills/` 树内，若有人直接打包该目录会**自我包含**；陈旧 `.pyc` 还会泄漏本机路径与 Python 版本。发布卫生必须在 zip 层和仓库层各做一次 |
+| 6 | 2026-10-05 | **决策表纠错**：§5 存在**重复 `D10`**（rev.2「待你确认」与 rev.5「settled」并存，编号冲突）；**D11 与 D16 冲突**（「可上架 5 个」vs「上架 4 个」）；**D12 状态与实现背离**（表内「待你确认」，实测早已落地）。已合并 D10、把 D11 收窄为 `template` 不上架、把 D12 按实测结案为 settled。**新增 D17/D18**：撤销「论文论证 vs 国内合规」伪二选一，确认许可准入层为责任来源，并分离论文合规与部署合规 | rev.5 修内容时未回头审计决策表自身的编号与状态一致性——决策结论正确但登记表内部自相矛盾，后续 grill 会读到两个 D10；D12 则是「代码已改、表未更新」的典型漂移。另：前序把「许可链不能补无许可真空」当作核心矛盾，经核对论文 `:124`/`:126`/`:56`/`:66` 原文，该判断建立在错误前提上（误把问题发生的环境当成论题要求），已撤回 |
 
 ---
 
 ## 12. Delta 日志
 
-> **编号说明**：本表的 `D*` 是**修订批次序号**（rev.1→D1、rev.2→D2…），与第 6 节决策表的 `D1~D15`（决策条目编号）**是两套独立命名空间**，不互相引用。决策请以第 6 节为准。
+> **编号说明**：本表的 `D*` 是**修订批次序号**（rev.1→D1、rev.2→D2…），与第 5 节决策表的 `D1~D18`（决策条目编号）**是两套独立命名空间**，不互相引用。决策请以第 5 节为准。
 
 | # | 日期 | 观察事实 | 与本文冲突？ | 是否已更新 |
 |---|---|---|---|---|
@@ -330,3 +332,5 @@ rev.4 的隔离实测推翻了一个更危险的隐含假设：**「5 个 zip �
 | D13 | 2026-10-05 | `Dockerfile` 为 `node:24-alpine`，compose 挂载宿主 `docker.sock`，但容器内无 `docker` CLI → `docker exec cmc-debug` 不可用 | 是（推翻「后端可 Docker 一键部署」） | 产出 R15；确认 A/F 零服务器路径不依赖后端，不阻塞上架 |
 | D14 | 2026-10-05 | 隔离实测：`skill-registry` zip 解压后运行退出码 1，报 `Packaging failed: No module named 'packager'`；zip 内仅 3 个文件，不含 `tools/` | 是（推翻 rev.3「5 zip 全 CLEAN 即就绪」的隐含门禁） | 产出 R16 + D13/D14；步骤 2h 完成 |
 | D15 | 2026-10-05 | `audit_runner.py` 的 `from skill_lint import lint_skill` 为**死代码**（实际调用的是本文件 `lint_skill_from_content`）；`publish_runner.py` 在 import 失败时降级为抛 `RuntimeError` 的桩函数 | 是（此前把两者的失败一概归因为「缺 packager」不准确） | 产出 R17；`audit_runner` 改为真正自包含并移除死导入；`publish_runner` 删除静默降级 |
+| D16 | 2026-10-05 | §5 决策表实测存在**两个 `D10`**（rev.2「待你确认」/ rev.5「settled」）；`D11`「可上架 5 个」与 `D16` 决策「上架 4 个」冲突；`plugin.json` 实测 **5 条**（4 上架 + `skill-registry` 保留），`skills/` 实测 **6 目录** | 是（决策表内部自相矛盾，且与 plugin.json 实际条目不一致） | 合并 D10；D11 收窄为「`template` 不上架」；产出决策 D17/D18 |
+| D17 | 2026-10-05 | 实测 6/6 目录 frontmatter `name` 与目录名一致，`agentskills-*` 目录命中 **0** —— D12 的实现早已完成，但决策表状态仍为「待你确认」 | 是（典型的「代码已改、表未更新」状态漂移） | D12 按实测结案为 **settled** |
