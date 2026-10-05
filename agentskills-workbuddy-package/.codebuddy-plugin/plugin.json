@@ -13,12 +13,10 @@
     "agents/risk-classifier.md"
   ],
   "skills": [
+    "attribution-auditor",
     "skill-auditor",
     "skill-publisher",
     "skill-registry",
-    "reputation-analyst",
-    "skill-browser",
-    "fingerprint-verifier",
-    "risk-classifier"
+    "workbuddy-skill-deployer"
   ]
 }

@@ -86,8 +86,23 @@ python skills/skill-publisher/scripts/publish_runner.py skills/skill-publisher/
 
 ### 5. 注册技能
 
+无需后端即可先做离线打包与指纹计算：
+
 ```bash
-python skills/skill-registry/scripts/register_runner.py skills/skill-registry/ http://localhost:10001
+python skills/skill-registry/scripts/register_runner.py skills/skill-registry/
+```
+
+配置后端后上传至审计队列（后端地址与令牌不硬编码）：
+
+```bash
+# 方式一：环境变量
+export AGENTSKILLS_API_URL="https://your-backend"
+export AGENTSKILLS_API_TOKEN="<bearer-token>"
+python skills/skill-registry/scripts/register_runner.py skills/skill-registry/
+
+# 方式二：命令行参数
+python skills/skill-registry/scripts/register_runner.py skills/skill-registry/ \
+  --url "https://your-backend" --token "<bearer-token>"
 ```
 
 ## 运行测试
@@ -106,14 +121,21 @@ python tests/test_e2e.py
 
 ## 上架到 open.workbuddy.cn
 
-1. 完成 Phase 35 本地验证
-2. 打包所有技能为 .zip
-3. 访问 https://open.workbuddy.cn
-4. 完成实名认证
-5. 上传技能包
-6. 等待审核
+Skill 与连接器是两条不同的上架路径，务必区分：
 
-详见 `docs/OPEN_WORKBUDDY_LAUNCH.md`
+### 路径 A：Skill 市场（自服务上架）
+
+1. 打包技能为 `.zip`
+2. 在 WorkBuddy 客户端内通过引导式对话提交
+3. 等待审核
+
+### 路径 B：连接器（需 WorkBuddy 团队审核）
+
+1. 准备 `connector-meta.json`、`mcp.json`、`icon.svg`
+2. 远程 MCP 必须是公网 HTTPS（SSE / streamableHttp）
+3. 提交至 open.workbuddy.cn 审核
+
+完整的字段要求、前置条件与服务器需求见 `docs/OPEN_WORKBUDDY_LAUNCH.md`。
 
 ## 审核要求
 
