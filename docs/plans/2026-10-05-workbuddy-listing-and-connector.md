@@ -93,7 +93,9 @@ distinctness 检查：1 与 2/3 是不同机制族（内容 vs 服务 vs 进程�
 
 技能上架（A）的弱点是**曝光位**：技能散布在市场里，没有一个「AgentSkills」统一入口，用户要装 5 个技能就得分别找到 5 个。连接器市场则天然提供单一入口与统一品牌位。`skill-only` 恰好同时满足「零服务器」与「连接器曝光位」——这是 B（要服务器 + SLA + 备案）和 C（要写 MCP server）都要付代价才换来曝光位，而 F 不用付。对论文而言，一个名为 AgentSkills 的连接器条目比 5 个散装技能更接近「我们构建了一个系统」的论断强度。
 
-代价：连接器需团队审核（技能是自助），摩擦更高、周期更长，且 `skill-only` 的文件结构官方未明示，存在「按猜测打包被退回」的风险。
+代价：连接器需团队审核（技能是自助），摩擦更高、周期更长。**rev.7 更新**：`type: skill-only` 已确认为合法枚举值且属「基础」版本（不需 `minWorkbuddyVersion`），字段层面风险已消除；但官方**未为 `skill-only` 单独公布目录结构**（只定义了 MCP + Skill 与 CLI + Skill 两种接入方式及各自结构），且本仓库**缺 `connector-meta.json` 与 `icon.svg`**（详见 R19/D20）。故 F 的真实成本是「需新建连接器元信息 + 图标 + 猜结构」，而非「把技能换个地方放」。
+
+> **rev.7 实测的 `connector-meta.json` 必填项**：`name` / `name_en`（可补 `name_zh`）、`description` / `description_zh` / `description_en`、`source`（**全局唯一，kebab-case，仅小写字母数字与连字符**）、`examples_zh` / `examples_en`（最低版本 **4.24.0**，故用则**必须**声明 `minWorkbuddyVersion ≥ 4.24.0`）、`icon.svg`（必须）。展示优先级 `name_map > name_zh > name_en > name`，故 `name` 虽可省略，仍建议显式给出以兼容旧客户端。
 
 ### 第二轮 grill：代码审计发现（rev.2 触发）
 
@@ -145,6 +147,8 @@ distinctness 检查：1 与 2/3 是不同机制族（内容 vs 服务 vs 进程�
 | D16 | 本次平台上架 **4 个技能**：`skill-auditor`、`skill-publisher`、`attribution-auditor`、`workbuddy-skill-deployer` | settled（rev.5） | 按 D10 剔除 `skill-registry` 后的集合；`skill-auditor` 零耦合（vendored_tools=0）适合作为首个试水技能 | 若 `skill-registry` 后续满足 R11 → 追加为第 5 个 | 高 | core |
 | D17 | 链选型**不做「论文论证 vs 国内合规」二选一**；许可制联盟链可作为填补责任真空的治理层。论文须**分开归因**：链提供不可篡改/可追溯/不可抵赖，准入委员会提供身份锚点与准入权 | **settled**（rev.6，2026-10-05） | `paper-draft-en.md:124` 将责任真空定义为「四类治理机制缺失」（开发者侧声明、渠道侧审核、平台侧基础设施、使用侧授权与追溯），`:126` 归因为「规范设计缺陷 + 治理机构缺位」——**两者均未以「无许可性」为成因**；`:56` RQ2 要求在 Collingridge 锁定窗口前嵌入责任追溯机制，`:66` design contribution 即「五阶段治理流程 + 防篡改审计链」。许可准入层是该贡献的合法实例化，而非反例 | 若论文正文出现「责任真空由无许可性导致」或「补上责任必须保持无许可」的**显式**主张 → 本决策需重审 | 高 | core |
 | D18 | **论文论证合规与产品部署合规分离**；治理**接口层**保持开放/协议级（R-Skills 向后兼容 AgentSkills.io），治理**执行层**机构化/许可制（准入审计 + 防篡改链） | **settled**（rev.6） | 论文为 EN 研究稿且自定位 exploratory design science（`:199`），不涉及 ICP/实名/备案；部署侧要求来自官方平台规范与公网服务 SLA，与论文论证正交。宪法第一条禁代币、第四条已要求分层准入（L1 邮箱 → L3 身份证 KYC + 声誉 ≥1000），本身即要求准入边界 | 若论文被要求以国内商业上线作为实证场景 → 须在论文中显式声明部署合规边界 | 高 | supporting |
+| D19 | **官方 schema 已实测核验，作为上架门禁的硬依据**：zip 交付形态正确；4 个上架技能 frontmatter 与子目录**全部合规**；路线 A 无需任何新增产物即可提交 | **settled**（rev.7，2026-10-05） | `/docs/skill` 明确存在 zip 提交与「解析失败」排查路径 → zip 是正确交付形态（推翻 O1 对「仅对话式创建」的过度解读）；官方必填 `description`/`description_zh`/`description_en`/`version`/`author` 经实测 4/4 技能齐备，官方子目录 `references`/`scripts`/`templates` 亦无未申报项。故**路线 A 当前无阻塞项**，可立即进入步骤 3 试水提交 | 后续新增/改名技能 → 必须重跑 frontmatter 与子目录校验（建议固化为 `tests/test_official_skill_spec.py`） | 高 | core |
+| D20 | **路线 F 在实现上与路线 A 是两套不同产物**，不可复用 `.codebuddy-plugin/plugin.json` | **settled**（rev.7） | 官方连接器必备 `connector-meta.json`（含全局唯一 kebab-case `source`、中英 `examples_*`、按需 `minWorkbuddyVersion`）与 `icon.svg`，本仓库两者皆无。`plugin.json` 属 AgentSkills 插件清单，语义与字段集均不同（前者是「市场注册元信息」，后者是「技能包集合声明」）。故 F 的工作量**不在**技能本身上，而在连接器元信息与图标 | 若官方补发 `skill-only` 目录结构 → 先按官方结构生成 `connector-meta.json`；在此之前不盲打包 | 中 | supporting |
 
 ---
 
@@ -170,7 +174,11 @@ distinctness 检查：1 与 2/3 是不同机制族（内容 vs 服务 vs 进程�
 | R5 | 技能被装后无人调用（装了不用） | medium | 成功判据含「真实调用」而非「安装」；用 `skill-auditor` 提升可发现性 | — | open |
 | R6 | 现有上架文档误导后续执行者 | medium | **D7 已执行**：按官方规范重写，错误的 manifest.yaml / 开发者中心表单 / 5 分钟审核 / support 邮箱已移除 | — | **mitigated** |
 | R7 | 上架包夹带 `__pycache__`/`.pyc`，暴露本机路径与 Python 版本 | low | D9：已清理包内 6 个 `__pycache__`，复测为 0；打包前需复验 | — | **mitigated** |
-| R8 | `skill-only` 文件结构未明示，F 可能打包即被退回 | medium | D3 已把 F 降级为 A 成功后的增强位；先向官方邮件确认结构再投入 | — | open |
+| R8 | `skill-only` 文件结构未明示，F 可能打包即被退回 | medium | D3 已把 F 降级为 A 成功后的增强位；先向官方邮件确认结构再投入 | — | **partially closed（字段已闭合 → R8a；目录结构仍缺 → R19）** |
+| R8a | **官方 `connector-meta.json` 字段清单**（rev.7 实测 `open.workbuddy.cn/docs/connector`） | — | `type: skill-only` **确认为合法枚举值且属「基础」版本**（版本兼容表：type: skill-only / auth_mode: server-side / cli.json 的 unAuth·statusMatch·authUrlDomain 同为「基础」，**无需** `minWorkbuddyVersion`）。但官方仅定义两种**接入方式**（MCP + Skill、CLI + Skill）并给出各自 `基础结构`，**未为 `skill-only` 单独给出目录结构**——故结构只能推断为「`connector-meta.json` + `icon.svg` + `skills/`，无 `mcp.json`/`cli.json`」，属推断而非官方明示 | — | **部分闭合（字段已闭合，结构仍为推断）** |
+| R19 | **路线 F 缺一整类产物**：官方连接器必备 `connector-meta.json` + `icon.svg`，本仓库**均不存在**；现有 `.codebuddy-plugin/plugin.json` 是**另一套 schema**，不能替代 | high | 官方必填字段：`name`/`name_en`（+`name_zh`）、`description`/`description_zh`/`description_en`、`source`（**全局唯一 kebab-case**，仅小写字母数字连字符）、`examples_zh`/`examples_en`（最低版本 **4.24.0** → 用则**必须**声明 `minWorkbuddyVersion ≥ 4.24.0`）、`icon.svg`（必须，PNG/JPG 建议 64×64）。另注意：同一服务若同时支持 OAuth 与 Token，须用**两个不同 `source`** 分别提交为两个连接器 | 官方补发 `skill-only` 结构文档 → 按官方结构对齐；或改以 `name_en` 兜底 `name` | 高 | **open（新增，rev.7）** |
+| R20 | 官方 `SKILL.md` frontmatter 必填字段缺失将导致「**提交 zip 后解析失败**」 | high | **rev.7 已实测 4 个上架技能全部齐备**：官方必填 `description`、`description_zh`、`description_en`、`version`、`author` 五项**均不缺**（各 9 个 key）；官方可选子目录仅 `references/`、`scripts/`、`templates/`，4 个技能实测子目录为 `[references, scripts]` 与 `[references]`，**无未申报目录**。官方页面确实存在 zip 提交与解析失败排查说明 → **zip 交付形态正确** | 后续新增/改名技能时重跑该校验，建议固化为回归测试 | 中 | **mitigated（已实测，建议加测试守护）** |
+| R21 | 备案是否为 F 的硬门槛（假设 A4） | low | **rev.7 证据（局部）**：`/docs/connector` 全文**未出现** ICP/备案要求，安全要求仅「远程 MCP 使用 HTTPS」+ 最小权限 + 不硬编码凭证。即 `skill-only`（零服务器、无远程 MCP）**在连接器规范内不触发备案**。但 `入驻指南` 未同步复核，故不构成对 A4 的完全否证 | 补核 `/docs/onboarding` 与 `/docs/what-is-open-platform` → 若仍无备案条款，可将 A4 由「待确认」降级 | 低 | **open（证据已积累，待补核）** |
 | R9 | 文档与代码漂移：SKILL.md/README 曾描述不存在的端点 | medium | 本轮已同步 SKILL.md + README.md；后续改动需同步三处文档 | — | **mitigated** |
 | R10 | 「链上」表述可能超出用户可验证范围 | high | **已实测结案**：链访问方式是 `docker exec cmc-debug cmc`（`chainmaker-client.js:78-79`），全文件**无任何网络端点**（无 localhost / 127.0.0.1 / http / https）。故链为**单机私有链**，用户与远程服务器均不可达 | — | **mitigated（结论转为下述 D10）** |
 | R11 | `skill-registry` 对任何第三方用户**不可能工作**——其链访问依赖本机 `cmc-debug` 容器 | high | D10：暂不将 `skill-registry` 提交市场；或改写为「仅本机/研究环境可用」并明示限制 | — | **open（需你决定）** |
@@ -272,6 +280,19 @@ rev.4 的隔离实测推翻了一个更危险的隐含假设：**「5 个 zip �
 
 上架提交前每个技能须满足：zip `junk=0`、解压后 CLI 退出码正确、manifest 与 frontmatter `name` 一致。
 
+**rev.7 追加官方硬门禁**（源自 `/docs/skill` 与 `/docs/connector`，缺任一项即触发「提交 zip 后解析失败」）：
+
+| # | 门禁项 | 依据 | 当前状态 |
+|---|---|---|---|
+| G-fm-1 | frontmatter 必含 `description`、`description_zh`、`description_en`、`version`、`author` | `/docs/skill` frontmatter 表 | ✅ 4/4 技能实测齐备 |
+| G-fm-2 | `name` 与目录名一致（官方标记为「否」但生态惯例必需，且决定调用路径） | 实测 + 既有 `test_skill_frontmatter_name_matches_dir` | ✅ 6/6 一致 |
+| G-dir-1 | 子目录仅用官方声明的 `references/`、`scripts/`、`templates/` | `/docs/skill` 子资源目录说明 | ✅ 无未申报目录 |
+| G-dir-2 | `SKILL.md` 位于技能根目录（唯一必需文件） | `/docs/skill` 基础结构 | ✅ 4/4 |
+| G-zip-1 | 提交形态为 zip（官方确有 zip 提交与解析失败排查路径） | `/docs/skill` 技能市场 | ✅ 打包器已产出 zip |
+| G-zip-2 | zip 内不含 `__pycache__`/`*.pyc`/本机绝对路径 | R7/R12/R18 | ✅ 实测 `junk=0` |
+| G-cfg-1 | 声明 `minWorkbuddyVersion`（本项目用到的字段均属「基础」，故无需声明） | 版本兼容性表 | ✅ 无需声明 |
+| G-cfg-2 | 连接器类提交才需 `connector-meta.json` + `icon.svg` + 全局唯一 kebab-case `source` | `/docs/connector` | ⛔ 路线 F 未建（见 D20） |
+
 ### 10.2 步骤表
 
 | # | 步骤 | 前置条件（须仍成立） | 状态 | Delta |
@@ -287,9 +308,10 @@ rev.4 的隔离实测推翻了一个更危险的隐含假设：**「5 个 zip �
 | 2g | 核查 Docker/compose/部署文档可行性 | — | ✅ **已完成** | 发现 R15：容器内无 docker CLI，后端不可容器化；已确认 A/F 路径不依赖后端，不阻塞上架 |
 | 2h | **隔离验证发布物闭包**（R16/R17） | — | ✅ **已完成** | 解压后运行报 `No module named 'packager'`；已修 PyYAML 依赖 + 自动 vendoring + 三 runner 路径回退 + 删除静默降级；新增 `tests/test_isolated_package.py` 6 项全绿 |
 | 2i | **仓库层发布卫生**（R18） | — | ✅ **已完成** | `git ls-files` 实测 16 个 `.pyc`/`__pycache__`/`template-1.0.0.zip` 被跟踪；`.gitignore` 补 5 类规则 + `git rm --cached` 16 项（工作区保留）；复测 4 脚本全 PASS，重建 5 zip `junk=0`、vendored 数量准确 |
-| 3 | 挑 1 个零耦合技能（建议 `skill-auditor`）走通技能市场提交流程 | 步骤0 通过 | ⛔ 未开始 | 阻塞于步骤 0 |
+| 2j | **官方 schema 实测核验**（`/docs/skill` + `/docs/connector`） | — | ✅ **已完成**（rev.7） | ① 确认 zip 为正确交付形态（官方有 zip 提交与解析失败排查路径，修正 O1 的过度解读）；② 4 个上架技能官方必填 frontmatter 5/5 齐备、子目录无未申报项；③ `type: skill-only` 确认为合法且属「基础」版本 → R8a 部分闭合；④ 发现 R19/D20：路线 F 缺 `connector-meta.json` + `icon.svg`；⑤ 备案证据：连接器规范全文无 ICP/备案条款（R21）。附注：打包器支持 `assets/`，但官方仅声明 `references`/`scripts`/`templates`——实测 4 个上架技能**均未使用** `assets/`，故无影响 |
+| 3 | 挑 1 个零耦合技能（建议 `skill-auditor`）走通技能市场提交流程 | 步骤0 通过 | ⛔ 未开始 | 阻塞于步骤 0；**但技术侧已就绪**（D19：路线 A 无待补产物，8 项门禁中 7 项已 ✅，仅认证待用户完成） |
 | 4 | 依据步骤 3 的真实反馈，决定是否提交其余技能 | 步骤3 成功 | ⛔ 未开始 | 需实测后判断 |
-| 5 | 向官方确认 `skill-only` 文件结构，随后评估 F（D3/R8） | 步骤4 成功 | ⛔ 未开始 | 结构未知，勿盲打包 |
+| 5 | 向官方确认 `skill-only` 目录结构 + `connector-meta.json` 落地，随后评估 F（D3/R8/R19） | 步骤4 成功 | ⛔ 未开始 | **字段已闭合**（`type: skill-only` 合法且属「基础」）；**目录结构仍缺**，且需新建 `connector-meta.json` + `icon.svg`（含全局唯一 kebab-case `source`、中英 `examples_*`、`minWorkbuddyVersion ≥ 4.24.0`）→ 结构未知，勿盲打包 |
 | 6 | 仅当需要实时数据面 → 新建 stdio MCP 连接器（C） | 步骤4 显示真实需求 | ⛔ 未开始 | — |
 | 7 | 远程方案（B）保持可选，不主动投入（D8） | — | 🚫 不做 | — | |
 
@@ -308,12 +330,13 @@ rev.4 的隔离实测推翻了一个更危险的隐含假设：**「5 个 zip �
 | 4 | 2026-10-05 | **R16（critical）**：隔离实测 `skill-registry` zip 解压后退出码 1，报 `Packaging failed: No module named 'packager'`——runner 依赖仓库级 `tools/`，而打包器只收集 `SKILL_DIRS`；**R17**：早期隔离命令（`--help`）非合法入口，失败结论不可信。新增 D13/D14；G5 理由改写；步骤 2h 完成 | rev.3 把「5 个 zip 卫生全 CLEAN」当成就绪依据，但卫生维度（无 `.pyc`）与闭包维度（依赖是否随包）正交，前者全绿不代表后者成立；且 rev.3 对 auditor/publisher 的失败结论使用了无效 CLI 参数，属未经验证的断言 |
 | 5 | 2026-10-05 | **R18（high）**：`git ls-files` 实测仓库**跟踪了 16 个构建产物**（`.pyc`/`__pycache__` + `skills/template-1.0.0.zip`），根 `.gitignore` 仅覆盖 `dist/`。已补 5 类 `.gitignore` 规则并 `git rm --cached` 16 项；复测 4 脚本全 PASS、5 zip `junk=0`。新增 D15（两层卫生）、步骤 2i | rev.4 修好了「zip 装什么」，却没检查「git 跟踪了什么」——`template-1.0.0.zip` 就躺在 `skills/` 树内，若有人直接打包该目录会**自我包含**；陈旧 `.pyc` 还会泄漏本机路径与 Python 版本。发布卫生必须在 zip 层和仓库层各做一次 |
 | 6 | 2026-10-05 | **决策表纠错**：§5 存在**重复 `D10`**（rev.2「待你确认」与 rev.5「settled」并存，编号冲突）；**D11 与 D16 冲突**（「可上架 5 个」vs「上架 4 个」）；**D12 状态与实现背离**（表内「待你确认」，实测早已落地）。已合并 D10、把 D11 收窄为 `template` 不上架、把 D12 按实测结案为 settled。**新增 D17/D18**：撤销「论文论证 vs 国内合规」伪二选一，确认许可准入层为责任来源，并分离论文合规与部署合规 | rev.5 修内容时未回头审计决策表自身的编号与状态一致性——决策结论正确但登记表内部自相矛盾，后续 grill 会读到两个 D10；D12 则是「代码已改、表未更新」的典型漂移。另：前序把「许可链不能补无许可真空」当作核心矛盾，经核对论文 `:124`/`:126`/`:56`/`:66` 原文，该判断建立在错误前提上（误把问题发生的环境当成论题要求），已撤回 |
+| 7 | 2026-10-05 | **官方 schema 实测核验完成**（`/docs/skill` + `/docs/connector` 全文抓取）。① 确认 **zip 为正确交付形态**——官方确有「提交 zip 后解析失败」排查路径，修正 O1「技能仅能在客户端内对话式创建」的过度解读；② 4 个上架技能官方必填 frontmatter（`description`/`description_zh`/`description_en`/`version`/`author`）**5/5 齐备**，子目录无未申报项 → 新增 8 项提交门禁（7 项已 ✅）；③ `type: skill-only` **确认为合法枚举且属「基础」版本** → R8 字段层面闭合（R8a）；④ **新发现 R19/D20**：路线 F 缺 `connector-meta.json` + `icon.svg`，且 `plugin.json` 无法替代；⑤ 新增 R21：连接器规范全文**无 ICP/备案条款**。新增 D19/D20、步骤 2j | rev.6 结束时「官方 schema 待核实」是最大的未验证假设——它同时决定了 zip 策略是否正确（F 路线成立与否）与路线 A 是否还有技术阻塞。若官方必填字段缺失，4 个技能会**全部**在提交后解析失败；实测证明未发生，故**路线 A 技术侧已无阻塞**，剩余唯一阻塞是步骤 0 的实名认证 |
 
 ---
 
 ## 12. Delta 日志
 
-> **编号说明**：本表的 `D*` 是**修订批次序号**（rev.1→D1、rev.2→D2…），与第 5 节决策表的 `D1~D18`（决策条目编号）**是两套独立命名空间**，不互相引用。决策请以第 5 节为准。
+> **编号说明**：本表的 `D*` 是**修订批次序号**（rev.1→D1、rev.2→D2…），与第 5 节决策表的 `D1~D20`（决策条目编号）**是两套独立命名空间**，不互相引用。决策请以第 5 节为准。
 
 | # | 日期 | 观察事实 | 与本文冲突？ | 是否已更新 |
 |---|---|---|---|---|
@@ -334,3 +357,5 @@ rev.4 的隔离实测推翻了一个更危险的隐含假设：**「5 个 zip �
 | D15 | 2026-10-05 | `audit_runner.py` 的 `from skill_lint import lint_skill` 为**死代码**（实际调用的是本文件 `lint_skill_from_content`）；`publish_runner.py` 在 import 失败时降级为抛 `RuntimeError` 的桩函数 | 是（此前把两者的失败一概归因为「缺 packager」不准确） | 产出 R17；`audit_runner` 改为真正自包含并移除死导入；`publish_runner` 删除静默降级 |
 | D16 | 2026-10-05 | §5 决策表实测存在**两个 `D10`**（rev.2「待你确认」/ rev.5「settled」）；`D11`「可上架 5 个」与 `D16` 决策「上架 4 个」冲突；`plugin.json` 实测 **5 条**（4 上架 + `skill-registry` 保留），`skills/` 实测 **6 目录** | 是（决策表内部自相矛盾，且与 plugin.json 实际条目不一致） | 合并 D10；D11 收窄为「`template` 不上架」；产出决策 D17/D18 |
 | D17 | 2026-10-05 | 实测 6/6 目录 frontmatter `name` 与目录名一致，`agentskills-*` 目录命中 **0** —— D12 的实现早已完成，但决策表状态仍为「待你确认」 | 是（典型的「代码已改、表未更新」状态漂移） | D12 按实测结案为 **settled** |
+| D18 | 2026-10-05 | 官方 `/docs/skill` 全文含「**提交 zip 包后解析失败**」排查指引 → zip 确为官方支持的提交形态；官方必填 frontmatter 为 `description`/`description_zh`/`description_en`/`version`/`author`（`name` 反而标为「否」）；官方声明的子目录仅 `references`/`scripts`/`templates` | 是（**O1「技能仅能在客户端内对话式创建」属过度解读**，据此曾隐含「zip 交付形态可疑」） | 产出决策 **D19**；新增 8 项提交门禁表；步骤 2j 完成 |
+| D19 | 2026-10-05 | 实测 4 个上架技能官方必填 frontmatter **5/5 全齐**（各 9 key），子目录为 `[references, scripts]`/`[references]`，**无未申报目录**；`/docs/connector` 确认 `type: skill-only` 属「基础」版本枚举值，但**未公布其目录结构**；连接器必备 `connector-meta.json` + `icon.svg` 本仓库**皆无**，`.codebuddy-plugin/plugin.json` 为不同 schema | 部分（路线 A 假设成立 → **无阻塞**；路线 F 假设「换个地方放技能即可」不成立） | 产出 **R19/D20** 与 **D20**；`R8` 状态由 `open` 改为 `partially closed`；新增 `R8a`、`R21` |
