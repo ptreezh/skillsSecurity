@@ -1,13 +1,26 @@
 #!/usr/bin/env python3
 """
-技能注册脚本
-将技能注册到 AgentSkills 后端
+技能注册脚本（AgentSkills 后端）
+
+两个阶段：
+
+1) prepare（离线）——打包并计算 SHA256 指纹，不触碰网络。
+2) register（需后端）——以 multipart/form-data 上传至审计队列。
+
+后端地址与访问令牌不再硬编码，必须由调用方提供：
+
+  后端地址   命令行 ``--url``，或环境变量 ``AGENTSKILLS_API_URL``
+  访问令牌   命令行 ``--token``，或环境变量 ``AGENTSKILLS_API_TOKEN``
+
+未提供后端地址时，脚本自动降级为离线 prepare 模式，并明确说明原因。
+``/api/upload`` 与 ``/api/chain`` 均要求 Bearer 令牌，且链上存证是
+独立于上传审计的第二个步骤，本脚本不会隐式代替用户完成它。
 """
 
-import sys
-import os
-import json
 import hashlib
+import json
+import os
+import sys
 from pathlib import Path
 
 try:
@@ -15,16 +28,29 @@ try:
 except ImportError:
     requests = None
 
+ENV_URL = "AGENTSKILLS_API_URL"
+ENV_TOKEN = "AGENTSKILLS_API_TOKEN"
+REQUEST_TIMEOUT = 30
+UPLOAD_FIELD = "file"
+
 
 def _import_packager():
-    import sys
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "..", "tools"))
+    """导入仓库内的打包工具，随包分发时不依赖全局安装。"""
+    # 优先使用随包分发的 tools/（scripts/tools/），回退到仓库内 tools/
+    here = os.path.dirname(os.path.abspath(__file__))
+    for tools_dir in (
+        os.path.join(here, "tools"),
+        os.path.join(here, "..", "..", "..", "tools"),
+    ):
+        if os.path.isdir(tools_dir) and tools_dir not in sys.path:
+            sys.path.insert(0, tools_dir)
     from packager import pack_skill
+
     return pack_skill
 
 
 def compute_sha256(file_path):
-    """计算文件 SHA256"""
+    """计算文件 SHA256。"""
     h = hashlib.sha256()
     with open(file_path, "rb") as f:
         for chunk in iter(lambda: f.read(8192), b""):
@@ -32,105 +58,170 @@ def compute_sha256(file_path):
     return h.hexdigest()
 
 
-def register_skill(skill_path, backend_url="http://localhost:10001", api_key=None):
+def _package(skill_path):
+    """把技能目录打包为 zip；已是文件则原样返回。返回 (路径, 是否临时文件)。"""
+    if not skill_path.is_dir():
+        return skill_path, False
+    pack_skill = _import_packager()
+    zip_path, _ = pack_skill(skill_path)
+    return Path(zip_path), True
+
+
+def _cleanup(path):
+    """删除临时 zip；失败只告警，不影响主流程。"""
+    try:
+        path.unlink()
+    except OSError as exc:
+        print(f"warning: 无法清理临时文件 {path}: {exc}", file=sys.stderr)
+
+
+def prepare_skill(skill_path):
+    """离线准备技能：打包 + 计算指纹。不需要后端。"""
+    skill_path = Path(skill_path)
+    if not skill_path.exists():
+        return {"status": "error", "error": f"Path not found: {skill_path}"}
+
+    try:
+        archive, is_temp = _package(skill_path)
+    except Exception as exc:
+        return {"status": "error", "error": f"Packaging failed: {exc}"}
+
+    try:
+        sha256 = compute_sha256(archive)
+        size_bytes = archive.stat().st_size
+    except OSError as exc:
+        return {"status": "error", "error": f"Cannot read package: {exc}"}
+    finally:
+        if is_temp:
+            _cleanup(archive)
+
+    return {
+        "status": "prepared",
+        "skill_name": skill_path.name,
+        "sha256": sha256,
+        "size_bytes": size_bytes,
+        "registered": False,
+        "next_step": f"设置 ${ENV_URL} 与 ${ENV_TOKEN} 后重跑，以提交至审计队列",
+    }
+
+
+def register_skill(skill_path, backend_url=None, api_key=None):
     """
-    注册技能到后端
+    上传技能至后端审计队列。
 
     Args:
         skill_path: 技能目录或 zip 文件路径
-        backend_url: 后端 API 地址
-        api_key: API 密钥（可选）
+        backend_url: 后端地址；为空时返回错误并提示配置方式
+        api_key: Bearer 令牌；``/api/upload`` 强制要求
 
     Returns:
-        dict: 注册结果
+        dict: 结构化结果，``status`` 为 uploaded / prepared / error
     """
+    if not backend_url:
+        return {
+            "status": "error",
+            "error": f"未提供后端地址：请传入 --url 或设置环境变量 ${ENV_URL}",
+        }
+    if not api_key:
+        return {
+            "status": "error",
+            "error": f"未提供访问令牌：/api/upload 需要 Bearer 令牌，请设置 ${ENV_TOKEN}",
+        }
     if requests is None:
         return {
-            "error": "requests library not installed. Install with: pip install requests",
-            "skill_id": None,
-            "tx_hash": None,
             "status": "error",
+            "error": "requests library not installed. Install with: pip install requests",
         }
 
     skill_path = Path(skill_path)
     if not skill_path.exists():
-        return {"error": f"Path not found: {skill_path}", "status": "error"}
-
-    # 如果是目录，先打包
-    zip_path = None
-    if skill_path.is_dir():
-        try:
-            pack_skill = _import_packager()
-            zip_path, _ = pack_skill(skill_path)
-        except Exception as e:
-            return {"error": f"Packaging failed: {e}", "status": "error"}
-    else:
-        zip_path = skill_path
-
-    # 计算哈希
-    sha256 = compute_sha256(zip_path)
-
-    # 调用后端 API
-    headers = {"Content-Type": "application/json"}
-    if api_key:
-        headers["Authorization"] = f"Bearer {api_key}"
-
-    payload = {
-        "skill_name": skill_path.stem if skill_path.is_file() else skill_path.name,
-        "file_path": str(zip_path),
-        "sha256": sha256,
-    }
+        return {"status": "error", "error": f"Path not found: {skill_path}"}
 
     try:
-        resp = requests.post(
-            f"{backend_url}/api/skills/register",
-            headers=headers,
-            json=payload,
-            timeout=30,
-        )
-        resp.raise_for_status()
-        data = resp.json()
-        return {
-            "skill_id": data.get("skill_id"),
-            "tx_hash": data.get("tx_hash"),
-            "status": data.get("status", "registered"),
-            "message": data.get("message", "Registered successfully"),
-            "sha256": sha256,
-        }
+        archive, is_temp = _package(skill_path)
+    except Exception as exc:
+        return {"status": "error", "error": f"Packaging failed: {exc}"}
+
+    base_url = backend_url.rstrip("/")
+    try:
+        sha256 = compute_sha256(archive)
+        with archive.open("rb") as handle:
+            resp = requests.post(
+                f"{base_url}/api/upload",
+                headers={"Authorization": f"Bearer {api_key}"},
+                files={UPLOAD_FIELD: (archive.name, handle, "application/zip")},
+                timeout=REQUEST_TIMEOUT,
+            )
     except requests.exceptions.ConnectionError:
-        return {
-            "error": f"Cannot connect to backend at {backend_url}",
-            "status": "error",
-            "skill_id": None,
-            "tx_hash": None,
-        }
+        return {"status": "error", "error": f"Cannot connect to backend at {base_url}"}
     except requests.exceptions.Timeout:
-        return {"error": "Request timeout", "status": "error", "skill_id": None, "tx_hash": None}
-    except Exception as e:
-        return {"error": str(e), "status": "error", "skill_id": None, "tx_hash": None}
+        return {"status": "error", "error": f"Request timeout after {REQUEST_TIMEOUT}s"}
+    except requests.exceptions.RequestException as exc:
+        return {"status": "error", "error": f"Request failed: {exc}"}
+    except OSError as exc:
+        return {"status": "error", "error": f"Cannot read package: {exc}"}
     finally:
-        # 清理临时 zip
-        if zip_path and zip_path.suffix == ".zip" and skill_path.is_dir():
-            try:
-                zip_path.unlink()
-            except Exception:
-                pass
+        if is_temp:
+            _cleanup(archive)
+
+    if resp.status_code >= 400:
+        return {
+            "status": "error",
+            "http_status": resp.status_code,
+            "error": resp.text[:500],
+        }
+
+    try:
+        data = resp.json()
+    except ValueError as exc:
+        return {"status": "error", "error": f"响应不是合法 JSON: {exc}"}
+
+    job_id = data.get("jobId") or data.get("job_id")
+    return {
+        "status": "uploaded",
+        "skill_name": skill_path.name,
+        "sha256": sha256,
+        "job_id": job_id,
+        "status_endpoint": f"{base_url}/api/status/{job_id}",
+        "note": "审计通过后仍需单独调用 POST /api/chain 完成链上存证；本脚本不代为执行",
+    }
 
 
-def main():
-    if len(sys.argv) < 2:
-        print("Usage: python register_runner.py <skill-path> [backend-url] [api-key]")
-        sys.exit(1)
+def _flag_value(args, name):
+    """读取 ``--name value`` 形式的参数值。"""
+    if name in args:
+        index = args.index(name)
+        if index + 1 < len(args):
+            return args[index + 1]
+    return None
 
-    skill_path = sys.argv[1]
-    backend_url = sys.argv[2] if len(sys.argv) > 2 else "http://localhost:10001"
-    api_key = sys.argv[3] if len(sys.argv) > 3 else None
 
-    result = register_skill(skill_path, backend_url, api_key)
+USAGE = f"""用法: python register_runner.py <skill-path> [--url URL] [--token TOKEN]
+
+  --url    后端地址（默认取环境变量 ${ENV_URL}）
+  --token  访问令牌（默认取环境变量 ${ENV_TOKEN}）
+
+未提供后端地址时自动降级为离线 prepare：仅打包并计算指纹，不触网。"""
+
+
+def main(argv=None):
+    args = list(sys.argv[1:] if argv is None else argv)
+    if not args:
+        print(USAGE)
+        return 1
+
+    skill_path = args[0]
+    backend_url = _flag_value(args, "--url") or os.environ.get(ENV_URL)
+    api_key = _flag_value(args, "--token") or os.environ.get(ENV_TOKEN)
+
+    if backend_url:
+        result = register_skill(skill_path, backend_url, api_key)
+    else:
+        result = prepare_skill(skill_path)
+
     print(json.dumps(result, ensure_ascii=False, indent=2))
-
-    sys.exit(0 if result.get("status") == "registered" else 1)
+    return 0 if result.get("status") in ("prepared", "uploaded") else 1
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

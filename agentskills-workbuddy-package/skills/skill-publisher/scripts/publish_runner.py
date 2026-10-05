@@ -10,14 +10,15 @@ import json
 import hashlib
 from pathlib import Path
 
-# 添加 tools 目录到路径
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "..", "tools"))
+# 优先使用随包分发的 tools/（scripts/tools/），回退到仓库内 tools/
+_LOCAL_TOOLS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tools")
+_REPO_TOOLS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "tools")
+for _tools_dir in (_LOCAL_TOOLS, _REPO_TOOLS):
+    if os.path.isdir(_tools_dir):
+        sys.path.insert(0, _tools_dir)
 
-try:
-    from packager import pack_skill
-except Exception:
-    def pack_skill(*args, **kwargs):
-        raise RuntimeError("packager not available")
+# 不再静默降级：打包能力缺失必须让发布流程失败，而不是伪装成功
+from packager import pack_skill
 
 
 def generate_manifest(skill_dir):

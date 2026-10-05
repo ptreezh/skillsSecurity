@@ -10,14 +10,10 @@ import json
 import re
 from pathlib import Path
 
-# 确保能导入 tools 下的 skill_lint
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "..", "tools"))
-
-try:
-    from skill_lint import lint_skill
-except Exception:
-    def lint_skill(path):
-        return {"passed": True, "errors": [], "warnings": []}
+# 本脚本完全自包含：所有检查逻辑均在文件内实现，不依赖仓库根的 tools/。
+# 原先的 `sys.path.insert(... "tools")` + `from skill_lint import lint_skill`
+# 是死代码（lint_skill 从未被调用，检查走的是本文件的 lint_skill_from_content），
+# 却会让技能在脱离仓库后 import 失败，故一并移除。
 
 
 def audit_skill(skill_path_or_content, skill_name=None, locale="zh-CN"):
