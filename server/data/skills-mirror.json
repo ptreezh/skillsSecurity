@@ -63,5 +63,18 @@
     "blockHeight": 67,
     "submitter": "0x3737f0d872f386f170c20e2ae73b81cfe6b7ecf3",
     "submittedAt": "2026-09-18T06:50:44.590Z"
+  },
+  "8": {
+    "skillId": 8,
+    "name": "e2e-upload-proof-skill",
+    "description": "E2E upload pipeline verification skill (temporary)",
+    "trigger": "when user asks to verify the upload pipeline end to end",
+    "metadataIPFS": "0x1bd565c1fff8d84aad05dcf0c51cae2fb4999c09",
+    "riskLevel": 0,
+    "version": "1.0.0",
+    "txId": "18d7298ab57a3b84ca902f53b35f4a9a0f8259b6dd0a425ca6235719bc88d33b",
+    "blockHeight": 68,
+    "submitter": "0x3737f0d872f386f170c20e2ae73b81cfe6b7ecf3",
+    "submittedAt": "2026-09-20T22:57:32.677Z"
   }
 }
