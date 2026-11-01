@@ -46,7 +46,7 @@
 | 文件 | 问题 |
 |---|---|
 | WalletService.js | init() demo 模式：随机地址 `'0x'+Math.random()...`、`balance: 100`（Airdrop 100 ASK——代币思维、假连接） |
-| ContractService.jsx | 硬编码 Polygon Amoy（chainId 80002、rpc-amoy.polygon.technology）；引用 8 个 ABI 含未部署的 HealthReporter/Governance；ethers 直连假设（ChainMaker 无标准 JSON-RPC → 永远连不上） |
+| ContractService.jsx | 硬编码公开链 RPC（chainId 80002、EVM RPC 端点）；引用 8 个 ABI 含未部署的 HealthReporter/Governance；ethers 直连假设（ChainMaker 无标准 JSON-RPC → 永远连不上） |
 | DeployerDashboard.jsx | 硬编码假 stats（demo.agent-skills.xyz、totalUsers:23、totalRewards:4500）；handleRegister 是 placeholder alert |
 | ProtocolDemo.jsx | demo mode 默认 true，依赖 WalletService demo |
 
@@ -54,9 +54,9 @@
 
 | 文件 | 问题 |
 |---|---|
-| chain-submit.js | mock 降级路径（未配置 → 假 txHash）；真实路径用 ethers.js JsonRpcProvider 指向 Polygon Amoy（**ChainMaker 无标准 JSON-RPC，永远连不上**） |
+| chain-submit.js | mock 降级路径（未配置 → 假 txHash）；真实路径用 ethers.js JsonRpcProvider 指向公开链 RPC（**ChainMaker 无标准 JSON-RPC，永远连不上**） |
 | audit-trigger.js | zip 提取 TODO → `skillContent = 'ZIP file - needs extraction'` |
-| index.js | health 端点 `network: 'Polygon Amoy'` 硬编码 |
+| index.js | health 端点 `network` 硬编码为公开链名 |
 
 ---
 
@@ -121,7 +121,7 @@
 1. **新增 `server/chainmaker-client.js`**：封装 cmc 调用（`docker exec cmc-debug` 脚本法，复用已验证流程），提供 `submitSkillRegister()` / `querySkill()` / `callView()`；签名用管理员账户配置（admin1 私钥/共识者配置）
 2. **chain-submit.js**：
    - 删除 `submitToChainMock`（未配置 → 明确抛错，绝不假成功）
-   - `submitToChainReal` 改用 chainmaker-client（不再 ethers.js + Amoy）
+   - `submitToChainReal` 改用 chainmaker-client（不再 ethers.js 直连公链）
    - `getSkillFromChain` 改 cmc 真实查询
 3. **audit-trigger.js**：实现 zip 真实提取（adm-zip/unzipper 读 `.SKILL.md` 全文）
 4. **index.js**：health 端点 network → "ChainMaker (chain1)"；地址读 env 真实 ChainMaker 地址；新增 `/api/identity`（返回当前代签身份）与 `/api/chain/*` 读接口
@@ -129,7 +129,7 @@
 ### 3.4 前端层
 
 1. **WalletService.js**：删 demo 随机地址/假 balance/Airdrop → "身份模式"：调后端 `/api/identity` 获取代签身份；未配置 → 明确未连接禁用态
-2. **ContractService.jsx**：删 Polygon Amoy 硬编码；所有链操作改后端 REST（`/api/chain/*` 桥接 cmc）；ABI 收敛到 v2 部署集（移除 HealthReporter/Governance 旧 ABI、ASKToken/DeployerRewards/RevenueDistributor 引用）
+2. **ContractService.jsx**：删公开链 RPC 硬编码；所有链操作改后端 REST（`/api/chain/*` 桥接 cmc）；ABI 收敛到 v2 部署集（移除 HealthReporter/Governance 旧 ABI、ASKToken/DeployerRewards/RevenueDistributor 引用）
 3. **DeployerDashboard.jsx**：删假 stats → 后端真实接口（技能数/质押/声誉）；handleRegister 占位 alert → 真实注册 API（失败显示真实错误）
 4. **ProtocolDemo.jsx**：删 demo mode；未连接明确提示
 

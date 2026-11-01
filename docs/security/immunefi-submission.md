@@ -6,7 +6,7 @@
 **Website:** https://agentskills.xyz
 **Twitter:** @AgentSkills
 **Discord:** (待提供)
-**Chain:** Polygon (Mainnet)
+**Chain:** ChainMaker chain1 (private consortium chain)
 
 ## 联系信息
 
@@ -90,7 +90,7 @@
 ```javascript
 // 部署后填入合约地址
 const CONTRACTS = {
-  Polygon: {
+  ChainMaker: {
     StakingManager: "0x...",
     SkillRegistry: "0x...",
     Attribution: "0x...",

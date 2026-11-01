@@ -417,7 +417,7 @@ contract TreasuryDAO is Ownable, ERC20Votes {
 ### 3.1 部署脚本 (Hardhat)
 
 ```javascript
-// scripts/deploy.js
+// 示例：scripts/deploy.js（该脚本已删除，仅作历史示意）
 async function main() {
     console.log("Deploying AgentSkills Contracts...");
     
@@ -456,15 +456,12 @@ async function main() {
 }
 ```
 
-### 3.2 测试网配置
+### 3.2 链环境配置
 
 ```
-Network: Polygon Mumbai Testnet
-RPC: https://rpc-mumbai.maticvigil.com
-Chain ID: 80001
-Explorer: https://mumbai.polygonscan.com
-
-Faucet: https://faucet.polygon.technology/
+Network: ChainMaker 长安链私有链 chain1
+接入方式: cmc 网关（后端 server/index.js 提交，前端不直连链）
+EVM 兼容: addr_type: 2（ethereum 地址类型）
 ```
 
 ---
@@ -524,7 +521,9 @@ Faucet: https://faucet.polygon.technology/
 import { ethers } from 'ethers';
 
 // Provider
-const provider = new ethers.JsonRpcProvider('https://rpc-mumbai.maticvigil.com');
+// 说明：现架构下前端不直连链，链上数据统一经后端 API 读取。
+// 以下 provider 仅作历史接口示意。
+const provider = new ethers.JsonRpcProvider('<ChainMaker 网关地址>');
 
 // Token合约
 const ASKTokenABI = [...]; // ABI
@@ -580,10 +579,10 @@ type Contribution @entity {
 ### 6.2 L2迁移路径
 
 ```
-Phase 1: Polygon PoS (当前)
-├── Gas: ~0.001 MATIC/tx
-├── Tps: ~65k
-└── 成本: $0.001-0.01/tx
+Phase 1: ChainMaker 长安链私有链 chain1（当前）
+├── Gas: 联盟链内部计费（无代币）
+├── Tps: 联盟链吞吐
+└── 成本: 零 Gas 代币
 
 Phase 2: Arbitrum/Optimism
 ├── Gas: ~0.001-0.01 ETH/tx
@@ -615,7 +614,7 @@ Phase 3: Custom L2
 - **语言**: Solidity 0.8.20+
 - **框架**: Hardhat + Waffle
 - **测试**: Hardhat + Ethers + Waffle
-- **部署**: Polygon PoS (Testnet→Mainnet)
+- **部署**: ChainMaker 长安链私有链 chain1
 - **监控**: Tenderly + Dune
 
 ### 下一步行动

@@ -15,7 +15,7 @@
 | 请求日志 | 无 morgan / winston / pino；只审计认证事件 | `server/auth.js:audit()` 仅覆盖 register / login / logout / locked；`server/index.js` 无 HTTP 访问日志 |
 | 健康检查 | `/api/health` 返回静态 JSON（链连接状态**不**探活） | `server/index.js:142` |
 | Docker 编排 | `docker-compose.yml` 存在但**不可执行** | `Dockerfile` 用 `node:24-alpine` 无 docker CLI；R15 已 mitigates |
-| 备份 | `server/data/{users.json, sessions.json, auth.log.jsonl, skills-mirror.json}` 无任何定时/异地备份 | `.gitignore` 排除运行时产物，**不可仅靠 git 反推恢复** |
+| 备份 | `server/data/` 4 类运行时产物（`users.json`、`sessions.json`、`auth.log.jsonl`、`skills-mirror.json`）无任何定时/异地备份；实测磁盘现存 2 个（`users.json`、`skills-mirror.json`），另 2 个为按需生成 | `.gitignore:36,40,41` 排除 `users.json`/`sessions.json`/`auth.log.jsonl`，**不可仅靠 git 反推恢复**；仅 `skills-mirror.json` 被跟踪 |
 | 监控 | 无 Prometheus exporter / OpenTelemetry / 业务计数器 | 全仓库 grep 无 `prom-client` / `@opentelemetry/*` |
 | 运维主体 | 无指定 owner（研究项目原型） | AGENTS.md |
 | TLS cert 续期 | 无自动化 | — |
@@ -27,7 +27,7 @@
 | **A** 纯技能（zip 提交市场） | 否（平台分发，无我们服务的） | 否 | 用户在 WorkBuddy 平台使用；我们仅打包 |
 | **F** `skill-only` 连接器（提交审核） | 否（审核通过后平台托管 UI） | 否 | 同上 |
 | **C** stdio MCP 连接器（用户机本地进程） | 否（本地进程，无中间人） | 否 | 由 WorkBuddy 在用户机调度；无远程面 |
-| **B** 远程 HTTPS MCP 连接器（可选） | **是**（`/docs/connector` 强制 HTTPS） | **是**（任何第三方都可访问） | **我们自营**一个面向公网的 MCP server |
+| **B** 远程 HTTPS MCP 连接器（可选） | **是**（`/docs/connector` 强制 HTTPS） | **是**（面向公网开放 MCP 面，任何第三方可访问） | **我们自营**一个面向公网的 MCP server |
 
 **结论**：**A / F / C 三条路径的运维面是 0。** 项目自称「上线」从工程意义上看不是「上线服务」，而是「把包交出去」。
 
@@ -41,7 +41,10 @@
 - **cert 监控**：到期前 30 天告警（cert-exporter / uptime-kuma / 自写 cron）
 - **HSTS**（Strict-Transport-Security header）
 
-### 3.2 公网 RPC（链访问）
+### 3.2 链访问（私有容器 → 公网可达 RPC）
+
+> 术语区分：当前后端到链的通信是**内网 shell RPC**（`docker exec cmc-debug cmc`，`server/chainmaker-client.js:78-79`），它既不是公网 RPC，也不是 HTTP/gRPC 端点。B 路线需要的是**第三方可访问的公网链访问路径**，与当前形态是两种不同东西，不能混称。
+
 - **私有 cmc-debug 容器**不可公网：必须切换到 ChainMaker 节点 RPC + SDK
 - 链数据需要可信副本：节点公证 / 浏览器镜像
 - 跨组织治理：当前 `wx-org.chainmaker.org` 单组织不足以承接公网访问（多组织签名、权限模型待评估）
@@ -51,11 +54,11 @@
 - 业务计数：`/api/skills` QPS、注册成功率、链上查询延迟（p50 / p95 / p99）
 - 错误率：5xx / 4xx 比例 + 链上调用失败率
 - 认证事件：现有 `auth.log.jsonl` → 接 Loki / ELK
-- 告警通道：邮件 / 微信（WorkBuddy 团队联系邮箱 `openworkbuddy@tencent.com` 已记录）
+- 告警通道：邮件 / 微信（注意：官方文档仅记录 `openworkbuddy@tencent.com` 作为**技能包解析失败的官方受理邮箱**，见 `docs/workbuddy-onboarding-evidence-2026-10-05.md`；它**不是**运维告警接收方，不可当作自有告警通道使用）
 
 ### 3.4 备份
-- `server/data/` 三个 JSON 每天异地快照（最低 30 天保留）
-- 链上数据：**链本身是 WORM**，无需另存；只有镜像（`skills-mirror.json`）需快照
+- `server/data/` 4 类运行时产物每天异地快照（最低 30 天保留）：`users.json`、`sessions.json`、`auth.log.jsonl`、`skills-mirror.json`（实测磁盘现存前两类中的 `users.json` 与 `skills-mirror.json`，其余按需生成——备份脚本须按 glob 兜底而非硬编码现存文件）
+- 链上数据：**链本身是仅追加（append-only）账本**，历史交易不可篡改，但这**不等于防篡改存储**——节点级数据损坏、索引丢失、共识层故障仍需恢复手段；只有本地镜像（`skills-mirror.json`）需额外快照
 - 备份验证：每月一次的恢复演练
 
 ### 3.5 运维主体
@@ -69,7 +72,7 @@
 
 ### 3.7 访问日志 / 审计
 - 反向代理侧 HTTP 访问日志（IP、method、path、status、duration）
-- 业务关键事件：`/api/upload`、`/api/chain`、所有 `/api/auth/*` 已在审计日志内
+- 业务关键事件：`/api/upload`、`/api/chain`、所有 `/api/auth/*` **均未写入认证审计日志**——实测审计写入点只有 6 处，且全在 `server/auth.js`（`register`、`login_success`、`login_failure`、`login_locked`、`logout`），`server/index.js` 的 `/api/upload`（`:156`）与 `/api/chain`（`:220`）只有 `auth.requireAuth` 前置校验，无审计落盘。B 路线必须为这两个端点补审计事件
 - 失败/错误统一收集
 
 ### 3.8 合规 / 隐私
@@ -96,6 +99,7 @@
 1. **优雅退出**：`process.on('SIGTERM', () => server.close(() => process.exit(0)))`，1 处，约 10 行；可直接做
 2. **HTTP 访问日志**：`morgan('combined')`，1 行（与 `console.log` 重定向）；可直接做，但合约定向 `auth.log.jsonl` 才有审计价值
 3. **`/api/health` 真探活**：调一次 `chainmaker-client` 的最轻查询（已有 `chainVerify()`）5—20 行
+4. **`/api/upload` 与 `/api/chain` 补审计事件**：复用 `auth.js` 的 `audit()` 落盘格式，2 处，各 3—8 行
 5. **`server/data/` 备份**：scripts/backup.sh + cron + S3 / aliyun OSS，零依赖路径可用 `vault` 本地目录 + 异机 rsync
 
 ## 6. 与计划的关系

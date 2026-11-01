@@ -1,22 +1,18 @@
 # AgentSkills 生产部署检查清单
 
-> **当前运行架构（2026-09-16 更新）**: 后端链提交走 **ChainMaker 私有链（chain1）**。
-> 本清单中的钱包/私钥步骤仅适用于**可选公开链部署**（Polygon，手动 workflow_dispatch）。
+> **当前运行架构（2026-09-16 更新）**: 后端链提交走 **ChainMaker 私有链（chain1）**（cmc 网关）。
 > 运行后端链提交只需 `CHAINMAKER_*` + `SKILL_REGISTRY_ADDRESS`，无需私钥。
+> 公开链部署路径已从仓库移除。
 
 ## 📋 部署前准备
 
 ### 环境检查
 - [ ] Node.js >= 18.x 已安装
 - [ ] npm 依赖已安装 (`npm install`)
-- [ ] Hardhat 已配置 (`hardhat.config.js`)
+- [ ] Hardhat 已配置 (`hardhat.config.js`，仅 `hardhat` / `localhost` 网络)
 - [ ] .env 文件已创建并配置
 - [ ] 后端链提交：`CHAINMAKER_*` + `SKILL_REGISTRY_ADDRESS`（chain1）已配置
-
-### 钱包准备（仅公开链部署需要）
-- [ ] 部署者钱包地址已确认
-- [ ] 私钥已安全配置 (`PRIVATE_KEY` in .env)
-- [ ] 钱包余额充足 (>= 0.1 MATIC for testnet, >= 1 MATIC for mainnet)
+- [ ] cmc-debug 容器可访问，`/work` 下 SDK 配置与证书就绪
 
 ### 代码检查
 - [ ] 合约编译成功 (`npx hardhat compile`)
@@ -25,12 +21,10 @@
 - [ ] 代码审查完成
 - [ ] 安全审核通过 (生产必需)
 
-## 🚀 测试网部署 (Polygon Amoy)
+## 🚀 合约部署 (ChainMaker chain1)
 
 ### 步骤 1: 部署核心合约
-```bash
-npx hardhat run scripts/deployCore.js --network polygonAmoy
-```
+在 cmc-debug 容器内使用 `cmc create` 部署合约（EVM 地址类型 `addr_type: 2`）。
 
 - [ ] GovernanceTimelock 部署成功
 - [ ] AgentPausable 部署成功
@@ -41,29 +35,35 @@ npx hardhat run scripts/deployCore.js --network polygonAmoy
 - [ ] AgentVotes 部署成功
 - [ ] AgentGovernor 部署成功
 
-### 步骤 2: 验证部署
+### 步骤 2: 跨合约接线
+- [ ] `setStakingManager()` 接线完成
+- [ ] `setReputationOracle()` / `setReputationBadges()` 接线完成
+- [ ] 授权调用者（authorizedCallers）配置完成
+
+### 步骤 3: 验证部署
 ```bash
-npx hardhat run scripts/verify-deployment.js --network polygonAmoy
+# 在 cmc-debug 容器内重跑接线验证脚本
+docker exec cmc-debug sh -c "sh /work/verify_v3_wiring.sh"
 ```
 
 - [ ] 所有合约验证通过
-- [ ] 合约余额正常
-- [ ] 前端配置已生成 (`public/deployments.json`)
+- [ ] 状态读回全部一致
+- [ ] 链上地址已记录
 
-### 步骤 3: 前端配置
+### 步骤 4: 前端配置
 - [ ] `public/deployments.json` 已更新
 - [ ] 前端重新构建 (`npm run build`)
 - [ ] 前端部署到测试环境
 
-### 步骤 4: 功能测试
-- [ ] 钱包连接测试 (MetaMask)
-- [ ] 合约交互测试 (读取数据)
+### 步骤 5: 功能测试
+- [ ] 钱包连接测试
+- [ ] 链上数据读取测试
 - [ ] 技能注册测试
 - [ ] 技能验证测试
 - [ ] 质押功能测试
 - [ ] 反噬机制测试
 
-### 步骤 5: 集成测试
+### 步骤 6: 集成测试
 - [ ] 技能上传端到端测试
 - [ ] 风险评估测试
 - [ ] 安全审核集成测试
@@ -80,51 +80,16 @@ npx hardhat run scripts/verify-deployment.js --network polygonAmoy
 - [ ] 暂停机制功能正常
 
 ### 部署安全
-- [ ] 私钥安全存储 (未提交到 Git)
+- [ ] 私钥/证书安全存储 (未提交到 Git)
 - [ ] 环境变量正确配置
 - [ ] 部署脚本权限控制
 - [ ] 部署日志已保存
 
 ### 运行安全
-- [ ] 多签钱包配置 (生产必需)
 - [ ] 应急暂停机制测试
 - [ ] 监控系统部署
 - [ ] 异常报警配置
-
-## 🌐 主网部署 (Polygon Mainnet)
-
-### 前置条件
-- [ ] 所有测试网测试通过
-- [ ] 安全审核报告完成
-- [ ] 代码审计完成
-- [ ] 应急方案准备
-- [ ] 团队准备就绪
-
-### 部署步骤
-```bash
-# 1. 切换到主网配置
-export NETWORK=polygon
-
-# 2. 验证余额 (>1 MATIC)
-npx hardhat run scripts/check-balance.js --network polygon
-
-# 3. 部署合约
-npx hardhat run scripts/deployCore.js --network polygon
-
-# 4. 验证部署
-npx hardhat run scripts/verify-deployment.js --network polygon
-
-# 5. 合约验证 (PolygonScan)
-npx hardhat verify --network polygon <CONTRACT_ADDRESS> <CONSTRUCTOR_ARGS>
-```
-
-### 部署后检查
-- [ ] 所有合约在 PolygonScan 可见
-- [ ] 合约源码已验证
-- [ ] 前端配置已更新
-- [ ] DNS 配置完成
-- [ ] 监控系统运行
-- [ ] 用户访问测试
+- [ ] cmc-debug 容器仅内部可访问
 
 ## 📊 部署后验证
 
@@ -143,7 +108,7 @@ npx hardhat verify --network polygon <CONTRACT_ADDRESS> <CONSTRUCTOR_ARGS>
 ### 性能检查
 - [ ] 首屏加载 < 3s
 - [ ] API 响应 < 1s
-- [ ] Gas 费用合理
+- [ ] 链上提交耗时合理
 - [ ] 无内存泄漏
 
 ## 🔄 回滚计划
@@ -169,6 +134,6 @@ npx hardhat verify --network polygon <CONTRACT_ADDRESS> <CONSTRUCTOR_ARGS>
 
 ---
 
-**最后更新**: 2026-08-10
-**版本**: 1.0.0
-**状态**: 测试网部署准备中
+**最后更新**: 2026-09-16
+**版本**: 1.1.0
+**状态**: ChainMaker chain1 部署

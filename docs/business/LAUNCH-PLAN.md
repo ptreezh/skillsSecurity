@@ -32,7 +32,7 @@
 | Week 2 | 创建 Landing Page | Tech | 上线 |
 | Week 2 | 邀请 10 个开发者贡献 | BD | 3 个响应 |
 | Week 3 | 整理技能分类 + 标签 | Content | 200 技能 |
-| Week 3 | 部署 Polygon Amoy | Tech | 合约上线 |
+| Week 3 | 部署 ChainMaker chain1 | Tech | 合约上线 |
 | Week 4 | 招募内测用户 | BD | 20 个邮箱 |
 
 ### 关键指标
@@ -175,7 +175,7 @@
 | 基础收费 | Creator 定价 $0.5-10/月 |
 | 平台费 | 10% (前 3 月免) |
 | 推荐费 | 可选 5% 获得推荐位 |
-| 提现费 | 1% (Polygon Gas) |
+| 提现费 | 1% |
 
 ### 关键指标
 
@@ -262,7 +262,7 @@
 
 ### 本月
 
-1. [ ] 部署 Polygon Amoy
+1. [ ] 部署 ChainMaker chain1
 2. [ ] 上线 Landing Page
 3. [ ] 收集 100 技能
 4. [ ] 招募 20 内测用户

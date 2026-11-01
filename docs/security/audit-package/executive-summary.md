@@ -3,7 +3,7 @@
 **Project:** AgentSkills - Decentralized AI Skill Marketplace
 **Version:** v1.0
 **Date:** 2026-05-22
-**Scope:** Core smart contracts for Polygon mainnet
+**Scope:** Core smart contracts for ChainMaker chain1
 
 ## Project Overview
 

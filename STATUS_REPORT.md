@@ -1,12 +1,12 @@
 # AgentSkills 生产部署状态报告
 
-> **现状更新（2026-09-16）**: 本报告的 Polygon Amoy 网络阻塞已解决——方案是切换到 **ChainMaker 私有链（chain1）**。
+> **现状更新（2026-09-16）**: 本报告的公开链网络阻塞已解决——方案是切换到 **ChainMaker 私有链（chain1）**。
 > 后端链提交现已真实上链（`AS_SkillRegistry` @ `cf089d4bebcdabd13cd6a27ba6c168acac6bc042`，经 cmc 网关），
-> 不再需要 `PRIVATE_KEY` / PolyGON RPC。ChainMaker 仅用于可选公开链部署（Hardhat）。
+> 公开链部署路径已移除。本文件保留为历史记录。
 
 **报告时间**: 2026-08-10 07:05
 **执行模式**: GoSkill 持续运行
-**总体进度**: 65% 完成
+**总体进度**: 65% 完成（历史快照）
 
 ## 📋 任务状态概览
 
@@ -49,7 +49,7 @@
 - ✅ 技能上传界面完成
 
 ### 3. 服务与集成
-- ✅ ContractService 完整实现
+- ✅ 链上数据服务（`ChainDataService`，经后端 API）
 - ✅ WalletService 钱包管理
 - ✅ uploadService 上传服务
 - ✅ IPFS 集成准备
@@ -57,20 +57,18 @@
 ### 4. 文档与脚本
 - ✅ DEPLOYMENT_GUIDE.md 完整部署指南
 - ✅ DEPLOYMENT_CHECKLIST.md 生产检查清单
-- ✅ scripts/deploy-all.sh 一键部署脚本
-- ✅ scripts/verify-deployment.js 验证脚本
+> 说明：公开链时代的部署/验证脚本（`deploy-all.sh`、`verify-deployment.js` 等）已随公开链路径删除。
 
-## ⏳ 待完成项目
+## ⏳ 待完成项目（历史）
 
-### 高优先级 (需要网络环境)
-1. **Polygon Amoy 部署**
-   - 执行: `./scripts/deploy-all.sh testnet`
-   - 验证: `npx hardhat run scripts/verify-deployment.js --network polygonAmoy`
+### 高优先级
+1. **链上部署**
+   - 改用 ChainMaker 私有链 `chain1`，经 cmc 网关部署与提交。
    - 预计时间: 5-10分钟
 
 2. **前端配置更新**
-   - 更新 `public/deployments.json`
-   - 验证钱包连接到测试网
+   - 链上数据经后端 API 读取
+   - 验证钱包连接
    - 测试合约交互
 
 3. **端到端测试**
@@ -91,19 +89,14 @@
 
 ## 🚀 立即可执行命令
 
-### 在有网络环境执行:
-
 ```bash
-# 一键部署到测试网
-cd F:/skillsSecurity
-./scripts/deploy-all.sh testnet
-
-# 验证部署
-npx hardhat run scripts/verify-deployment.js --network polygonAmoy
-
-# 测试前端
+# 本地开发前端
 npm run dev
 # 访问 http://localhost:5173/
+
+# 本地合约编译与测试
+npx hardhat compile
+npm run test
 ```
 
 ## 📊 关键指标
@@ -129,7 +122,6 @@ npm run dev
 ### 前端
 - ✅ React 18.2.0
 - ✅ Vite 5.4.21
-- ✅ Ethers 6.16.0
 - ✅ Recharts 3.8.1
 - ✅ Lucide React 1.31.0
 
@@ -140,28 +132,24 @@ npm run dev
 - ✅ 32个合约编译成功
 
 ### 网络
-- ⏳ Polygon Amoy (待部署)
+- ✅ ChainMaker 私有链 `chain1`（后端经 cmc 网关提交）
 - ✅ Hardhat 本地 (已验证)
 
 ## 📝 交接清单
 
 ### 文件位置
-- 部署脚本: `scripts/deploy-all.sh`
-- 验证脚本: `scripts/verify-deployment.js`
-- 环境配置: `.env`
+- 环境配置: `.env`（`CHAINMAKER_*` + `SKILL_REGISTRY_ADDRESS`）
 - 部署文档: `DEPLOYMENT_GUIDE.md`
 - 检查清单: `DEPLOYMENT_CHECKLIST.md`
-- 进度日志: `progress.log`
 
 ### 环境要求
 - Node.js >= 18.x
 - npm 包已安装
-- .env 文件配置 (PRIVATE_KEY)
-- 网络访问到 Polygon Amoy RPC
-- 钱包余额 >= 0.01 MATIC
+- `.env` 文件配置（`CHAINMAKER_*` + `SKILL_REGISTRY_ADDRESS`）
+- cmc 网关可访问 `chain1`
 
 ### 执行顺序
-1. 部署合约到测试网
+1. 部署合约到 `chain1`
 2. 验证部署并更新配置
 3. 构建前端
 4. 运行端到端测试
@@ -169,18 +157,13 @@ npm run dev
 
 ## 🎯 下一步行动
 
-**立即执行** (有网络环境):
 ```bash
-./scripts/deploy-all.sh testnet
+# 本地构建与测试
+npm run build
+npm run test
 ```
-
-**监控自动任务**:
-- Cron 任务 ID: 470a702e
-- 频率: 每30分钟
-- 持久化: 已启用
 
 ---
 
 **报告生成**: GoSkill 自动执行系统
-**状态**: 持续运行中
-**完成度**: 65% (准备完成，部署待执行)
+**状态**: 历史快照（公开链路径已废弃）

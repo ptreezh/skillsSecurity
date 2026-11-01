@@ -259,7 +259,7 @@ freeskill-upgrade (自动)
 | 第三条：反噬机制 | Anti-Slash + 惩罚通知 |
 | 第三条：声誉优先排序 | 声望等级系统 |
 | 第二条：低摩擦参与 | 自动升级 ≤3 次点击 |
-| 第五条：技术实施准则 | Polygon + IPFS + React |
+| 第五条：技术实施准则 | ChainMaker chain1 + IPFS + React |
 
 ---
 

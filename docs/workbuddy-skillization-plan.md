@@ -311,7 +311,7 @@ agentskills-workbuddy-package/
 **反驳**：
 - 直接调 HTTP 会让每个 SKILL 都耦合后端 URL、认证方式、错误处理
 - 连接器把「如何与 AgentSkills 系统交互」封装为统一接口
-- 未来后端迁移（如从 ChainMaker 迁到 Polygon），只需改连接器，不动 SKILL
+- 未来后端迁移（如从 ChainMaker chain1 迁到其他链），只需改连接器，不动 SKILL
 - WorkBuddy 官方推荐用 MCP/CLI 连接器封装外部系统
 
 ### 质疑 4：后端代码怎么复用？

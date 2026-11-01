@@ -106,7 +106,7 @@
 ### ⏳ 待测试网部署后可用
 
 #### 1. 链上功能
-- 技能注册到 Polygon Amoy
+- 技能注册到 ChainMaker chain1
 - 实时声望统计
 - 在线技能市场
 - 去中心化治理
@@ -168,7 +168,7 @@
 - **构建**: Vite (Bundle 优化完成)
 
 ### 后端技术栈
-- **区块链**: Polygon Amoy 测试网
+- **区块链**: ChainMaker chain1 私有链
 - **智能合约**: Solidity 0.8.20
 - **合约框架**: Hardhat 2.28
 - **合约库**: OpenZeppelin 4.9
@@ -192,7 +192,7 @@
 - ✅ 本地测试
 
 ### Phase 2: 协议运营 ⏳ (进行中)
-- ⏳ Polygon Amoy 测试网部署 (60%)
+- ⏳ ChainMaker chain1 私有链部署 (60%)
 - ⏳ 协议采用推广
 - ⏳ 社区建设
 - ⏳ 早期用户接入

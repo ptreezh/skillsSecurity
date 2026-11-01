@@ -479,7 +479,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const CONFIG = {
   DEPLOYER_REWARDS_ADDRESS: process.env.DEPLOYER_REWARDS_ADDRESS,
   ASK_TOKEN_ADDRESS: process.env.ASK_TOKEN_ADDRESS,
-  RPC_URL: process.env.POLYGON_AMOY_RPC || 'https://rpc-amoy.polygon.technology',
+  RPC_URL: process.env.CHAIN_RPC || '',
 }
 
 // 解析参数

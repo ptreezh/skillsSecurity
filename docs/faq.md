@@ -16,8 +16,7 @@ We chose a token-free architecture for:
 
 ### What network is it on?
 
-**Polygon Mainnet** (Chain ID: 137)
-Testnet: Polygon Amoy (80002)
+**ChainMaker chain1** (private/consortium chain, accessed through the backend gateway)
 
 ---
 
@@ -86,11 +85,11 @@ Any EVM-compatible wallet:
 
 ### How long does a transaction take?
 
-Polygon typically confirms in 2-3 seconds. Complex transactions may take longer.
+ChainMaker chain1 confirms transactions within a few seconds. Complex operations may take longer.
 
 ### What's the gas cost?
 
-Gas costs on Polygon are very low (~$0.01-0.10 per transaction).
+ChainMaker chain1 is a private chain with no gas market, so there are no gas fees.
 
 ---
 
@@ -100,14 +99,12 @@ Gas costs on Polygon are very low (~$0.01-0.10 per transaction).
 
 **Common causes:**
 1. User rejected in wallet
-2. Insufficient MATIC for gas
-3. Wrong network (switch to Polygon)
-4. Insufficient reputation for action
+2. Insufficient reputation for action
 
 ### Can't connect wallet
 
 1. Check MetaMask is unlocked
-2. Ensure you're on Polygon network
+2. Ensure the backend gateway is reachable
 3. Try refreshing the page
 4. Clear browser cache if issues persist
 

@@ -1,11 +1,11 @@
 # AgentSkills 部署就绪状态报告
 
-> **现状更新（2026-09-16）**: 本报告的 Polygon Amoy RPC 阻塞已被 **ChainMaker 私有链（chain1）** 方案解决。
-> 后端链提交真实上链（cmc 网关），本次 W2 E2E 已验证 skill 0–4（最高 block 60）。本文件保留为历史记录。
+> **现状更新（2026-09-16）**: 本报告的公开链 RPC 阻塞已解决——项目改用 **ChainMaker 私有链（chain1）**，
+> 后端经 cmc 网关真实上链（W2 E2E 已验证 skill 0–4，最高 block 60）。公开链部署路径已移除。本文件保留为历史记录。
 
 **生成时间**: 2026-08-10 08:00 UTC
 **版本**: v1.5
-**目标网络**: Polygon Amoy Testnet (Chain ID: 80002)
+**目标网络（历史）**: 公开链测试网
 
 ---
 
@@ -19,15 +19,11 @@
 
 ### 2. 环境配置 (100%)
 - ✅ .env 文件已配置
-- ✅ PRIVATE_KEY 已设置
-- ✅ RPC endpoints 已配置
-- ✅ Hardhat 配置正确
+- ✅ Hardhat 配置正确（现仅含 `hardhat` / `localhost` 两个网络）
 
 ### 3. 部署脚本 (100%)
-- ✅ `scripts/deploy-all.sh` 一键部署脚本
-- ✅ `scripts/verify-deployment.js` 验证脚本
-- ✅ `scripts/deployCore.js` 核心合约部署
-- ✅ 前端配置模板准备完成
+- ✅ 前端配置准备完成
+> 说明：公开链时代的部署/验证脚本（`deploy-all.sh`、`verify-deployment.js`、`deployCore.js` 等）已随公开链路径删除。
 
 ### 4. 文档准备 (100%)
 - ✅ DEPLOYMENT_GUIDE.md 部署指南
@@ -38,39 +34,28 @@
 ### 5. 前端功能 (95%)
 - ✅ ProtocolDemo.jsx 协议演示页面
 - ✅ WalletService 钱包集成
-- ✅ ContractService 合约交互服务
+- ✅ 链上数据经后端 API 读取（`ChainDataService`）
 - ⚠️ 测试网连接验证（待部署后完成）
 
 ---
 
-## ❌ 当前阻塞项
+## ❌ 当前阻塞项（历史）
 
 ### 1. 网络连接问题 (BLOCKER)
-**状态**: ❌ 无法连接到 Polygon Amoy RPC
+**状态**: ❌ 无法连接到公开链 RPC。
 
-**尝试的 RPC 端点**:
-- `https://rpc-amoy.polygon.technology` - TIMEOUT
-- `https://polygon-amoy.blockpi.network/v1/rpc/public` - TIMEOUT  
-- `https://rpc.ankr.com/polygon_amoy` - 需要认证
-- `https://amoy-rpc.publicnode.com` - 404 Not Found
+**尝试的 RPC 端点**: 多个公共端点均超时 / 404 / 需认证。
 
-**原因分析**:
-当前网络环境可能存在防火墙限制或网络策略阻止了对外 RPC 的访问。
+**原因分析**: 当前网络环境可能存在防火墙限制或网络策略，阻止了对外部 RPC 的访问。
 
-**影响**:
-- 无法部署合约到测试网
--无法验证部署状态
-- 无法进行端到端测试
+**解决**: 已切换到 **ChainMaker 私有链（chain1）**，后端经 cmc 网关提交，无需外部 RPC。
 
 ---
 
 ## 🔧 待完成任务
 
-### P0 - 部署核心 (阻塞中)
-等待网络恢复后执行:
-```bash
-./scripts/deploy-all.sh testnet
-```
+### P0 - 部署核心（已解决）
+改用 ChainMaker 私有链 `chain1`，经 cmc 网关部署与提交。
 
 ### P1 - 验证测试 (75% 准备就绪)
 - [ ] 合约功能验证
@@ -85,7 +70,7 @@
 
 ---
 
-## 📊 部署就绪度评分
+## 📊 部署就绪度评分（历史）
 
 | 类别 | 完成度 | 状态 |
 |------|--------|------|
@@ -99,40 +84,6 @@
 
 ---
 
-## 🚀 一旦网络恢复的执行计划
-
-### 步骤 1: 验证网络连接
-```bash
-node scripts/test-rpc.js
-```
-
-### 步骤 2: 检查钱包余额
-```bash
-node scripts/check-balance.js
-```
-如余额不足，访问: https://faucet.polygon.technology/
-
-### 步骤 3: 部署合约
-```bash
-./scripts/deploy-all.sh testnet
-```
-
-### 步骤 4: 验证部署
-```bash
-npx hardhat run scripts/verify-deployment.js --network polygonAmoy
-```
-
-### 步骤 5: 构建和测试
-```bash
-npm run build
-npm run test:e2e
-```
-
-**预计时间**: 15-20分钟
-**预计 Gas 费用**: ~0.01 MATIC
-
----
-
 ## 📝 日志记录
 
 ### 2026-08-10 08:00
@@ -140,18 +91,6 @@ npm run test:e2e
 - ✅ 构建状态正常 (30.74s)
 - ❌ RPC 连接仍然失败
 - ⚠️ 等待网络环境恢复
-
-### 下次检查: 2026-08-10 08:30 (30分钟后)
-
----
-
-## 🔄 备选方案
-
-如 RPC 连接问题持续:
-
-1. **使用 VPN/代理**: 尝试通过不同网络环境访问
-2. **使用第三方部署服务**: 考虑使用 Tenderly 或 Remix 进行远程部署
-3. **团队协作**: 请在网络环境不同的团队成员执行部署
 
 ---
 

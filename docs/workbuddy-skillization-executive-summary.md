@@ -63,7 +63,7 @@
 
 ### 为什么需要连接器？
 1. 隔离后端细节，SKILL 不耦合 URL、认证、错误处理
-2. 未来后端迁移（如从 ChainMaker 迁到 Polygon），只需改连接器，不动 SKILL
+2. 未来后端迁移（如从 ChainMaker chain1 迁到其他链），只需改连接器，不动 SKILL
 3. WorkBuddy 官方推荐用 MCP/CLI 连接器封装外部系统
 
 ### Phase 1 为什么只上架 3 个 SKILL + Team？

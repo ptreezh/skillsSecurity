@@ -27,7 +27,7 @@
 │                        ▼                                    │
 │              ┌──────────────────┐                          │
 │              │   共享合约地址   │                          │
-│              │ (Polygon Amoy)  │                          │
+│              │ (ChainMaker)    │                          │
 │              └──────────────────┘                          │
 │                                                              │
 └─────────────────────────────────────────────────────────────┘
@@ -53,8 +53,7 @@
 {
   "version": "1.4.0",
   "network": {
-    "chainId": 80002,
-    "chainName": "Polygon Amoy",
+    "chainName": "ChainMaker chain1",
     "contracts": {
       "ASKToken": "0x...",
       "SkillRegistry": "0x...",
@@ -228,7 +227,7 @@ npm run build && gh-pages -d dist
 ├─────────────────────────────────────────────────────────────┤
 │                                                              │
 │   前端 A (中文) ──┐                                         │
-│                   ├──► 共享合约 (Polygon Amoy) ──► 全局数据   │
+│                   ├──► 共享合约 (ChainMaker) ──► 全局数据     │
 │   前端 B (English)─┘                                         │
 │                                                              │
 │   前端 C (日文) ──┐                                         │
@@ -327,31 +326,33 @@ vercel --prod
 
 ---
 
-## 10. Polygon Amoy 测试网 + 后端部署实操
+## 10. 链上部署 + 后端部署实操
 
-> **注（2026-09-16 更新）**: 后端链提交路径已切换到 **ChainMaker 私有链（chain1）**，通过 cmc 网关真实提交，不再需要 RPC 钱包。
-> 本节的 Polygon 合约部署（10.1）仅用于**公开链合约部署**（可选），后端运行（10.2）请使用 ChainMaker 配置。
+> **注（2026-09-16 更新）**: 合约与后端链提交均使用 **ChainMaker 私有链（chain1）**，通过 cmc 网关真实提交，不再需要 RPC 钱包。
+> 公开链部署路径已从仓库移除。
 
 GitHub Pages 只能托管静态前端，上传技能、AI 审计、上链提交需要单独运行后端服务。
 
-### 10.1 部署合约到 Polygon Amoy（可选，公开链）
+### 10.1 部署合约到 ChainMaker chain1
+
+合约部署与接线在 **cmc-debug 容器**内完成：
 
 ```bash
-# 1. 配置环境变量
-cp .env.example .env
-# 编辑 .env：填入 PRIVATE_KEY、POLYGON_AMOY_RPC（仅公开链部署需要）
+# 1. 编译合约，生成 .bin / .abi
+npx hardhat compile
 
-# 2. 部署核心合约
-npm run deploy:amoy
+# 2. 将产物挂载或拷贝到 cmc-debug 容器 /work
+# 3. 在容器内使用 cmc create 部署合约（EVM 地址类型 addr_type: 2）
+# 4. 执行跨合约接线，并重跑容器内验证脚本
 
-# 本地测试网快速验证
+# 本地快速验证（Hardhat 本地网络）
 npm run deploy:hardhat
 ```
 
 部署成功后会生成：
 - `deployments/core-latest.json`：完整部署信息
 - `deployments.json`：根目录配置
-- `public/deployments.json`：前端读取的合约地址
+- `public/deployments.json`：前端读取的链上地址
 
 ### 10.2 运行后端服务（ChainMaker 提交）
 
@@ -400,9 +401,7 @@ curl https://api.yourdomain.com/api/health
 
 ### 10.5 安全提示
 
-- `PRIVATE_KEY` 仅用于**公开链合约部署**（Hardhat），**不要提交到 GitHub**。
 - 后端链提交使用 ChainMaker，无需私钥；cmc-debug 容器需为仅内部可访问的受信环境。
-- 生产环境建议使用专用低权限钱包（公开链部署时），而非部署者主钱包。
 - 后端服务器需通过 HTTPS 暴露，避免上传流量被中间人窃取。
 
 ---

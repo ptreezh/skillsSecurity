@@ -37,7 +37,7 @@
 - [ ] Deploy AgentGovernor
 
 ### Post-Deployment
-- [ ] Verify source code on Polygonscan
+- [ ] Verify source code via ChainMaker contract management (cmc)
 - [ ] Update contract addresses in frontend
 - [ ] Update ABIs in src/abi/
 - [ ] Update environment variables
@@ -60,9 +60,9 @@ TELEGRAM_CHAT_ID=...
 ```
 
 ### Network Settings
-- Polygon Mainnet: Chain ID 137
-- RPC: https://polygon-rpc.com
-- Explorer: https://polygonscan.com
+- Chain: ChainMaker chain1 (private/consortium chain)
+- Access: backend REST gateway (`server/index.js`)
+- Gas: none (no gas market)
 
 ---
 

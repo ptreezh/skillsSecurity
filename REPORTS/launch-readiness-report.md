@@ -121,7 +121,7 @@
 ## 四、公网部署方案落地（ChainMaker）
 
 ### 4.1 背景
-原方案（Polygon Amoy 测试网）受国内网络环境限制（11 个公共 RPC 端点均无法直连/代理不稳定）。经调研，改用**长安链 ChainMaker**——国内自主研发、官方开源、合法合规、全球可访问。
+原方案（公开链测试网）受国内网络环境限制（11 个公共 RPC 端点均无法直连/代理不稳定）。经调研，改用**长安链 ChainMaker**——国内自主研发、官方开源、合法合规、全球可访问；公开链部署路径随后已整体移除。
 
 ### 4.2 已实施（✅ 完成）
 | 步骤 | 说明 | 状态 |
@@ -186,8 +186,8 @@ SKILL_REGISTRY_ADDRESS=0xcf089d4bebcdabd13cd6a27ba6c168acac6bc042
 npm run dev
 # 访问: http://localhost:5173/skillsSecurity/
 
-# 注意：前端 ContractService 目前硬编码 Polygon Amoy RPC (80002)，
-# 对接 ChainMaker 链需将 rpcUrl/chainId 切换为 ChainMaker 网关（待接线）
+# 注意：前端链上数据经后端 API（ChainDataService）读取，不直连链，
+# 无需在前端配置 RPC 网关。
 ```
 
 ---
@@ -223,7 +223,7 @@ npm run dev
 ## 九、下一步行动建议
 
 1. ~~**高优先级**：W1.8 ts-test —— TypeScript 语义化端到端测试~~ ✅ 已完成（`npm run test:chain`，13/13 链上验证全绿）
-2. **高优先级**：前端 ContractService 接线 ChainMaker（切换 RPC 网关配置，v2 合约地址，替换 Polygon Amoy 硬编码）
+2. **高优先级**：前端接线 ChainMaker（经后端网关，v2 合约地址）
 3. **中优先级**：后端 server/index.js 对接 ChainMaker（SKILL_REGISTRY_ADDRESS → AS_SkillRegistry 链上地址，接 ChainMaker SDK 网关）
 4. **中优先级**：运行 Slither/Mythril 安全扫描，补充安全审计报告
 5. **中优先级**：完善 Playwright E2E 测试（针对 ChainMaker 合约地址）

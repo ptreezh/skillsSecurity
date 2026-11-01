@@ -7,16 +7,24 @@ REQ-36：open.workbuddy.cn 上架
 ## 目标
 完成实名认证，打包提交至少 1 个 SKILL + AgentSkills Team 专家智能体，通过审核并成功上架。
 
+已完成：
+- agentskills-auditor-1.0.0.zip 提交审核（审核中）
+- agentskills-publisher-1.0.0.zip 提交审核（审核中）
+- 新增 workbuddy-skill-deployer 技能（上架流程沉淀）
+- 新增 attribution-auditor 技能（链上责任审计）
+- 更新 skill-auditor 加入 Tier 5 链上责任检查
+
 ---
 
 ## Task 36-01：准备上架材料
 
 ### 材料清单
-1. **Skill 包**：skill-auditor + skill-publisher + AgentSkills Team
-2. **icon.svg**：技能图标（512x512）
-3. **README.md**：使用说明、触发词、示例
-4. **分类选择**：IT 科技 / 开发工具
-5. **服务类目**：不选金融、政务等敏感类目
+1. **Skill 包**：skill-auditor + skill-publisher + attribution-auditor + workbuddy-skill-deployer
+2. **AgentSkills Team 专家智能体**
+3. **icon.svg**：技能图标（512x512）
+4. **README.md**：使用说明、触发词、示例
+5. **分类选择**：IT 科技 / 开发工具
+6. **服务类目**：工具 > 计算器/查件
 
 ### 验收标准
 1. 所有材料准备齐全
@@ -39,7 +47,25 @@ REQ-36：open.workbuddy.cn 上架
 
 ---
 
-## Task 36-03：提交审核
+## Task 36-03：更新已提交技能（如需要）
+
+### 背景
+已提交的 skill-auditor 和 skill-publisher 缺少详细介绍，需更新后重新提交。
+
+### 步骤
+1. 更新 skill-auditor SKILL.md（加入 Tier 5 链上责任检查）
+2. 更新 skill-publisher SKILL.md（加入 manifest.yaml 详解）
+3. 重新打包
+4. 通过 bsk 重新上传
+
+### 验收标准
+1. SKILL.md 包含完整的技能介绍和使用示例
+2. 链上责任检查维度已加入
+3. 包可正常上传和解析
+
+---
+
+## Task 36-04：提交审核
 
 ### 步骤
 1. 进入「发布团队 Skill」
@@ -101,6 +127,8 @@ REQ-36：open.workbuddy.cn 上架
 | 审核周期长（7 个工作日） | 高 | 中 | 提前准备材料，尽早提交 |
 | 审核不通过 | 中 | 高 | 先提交 skill-auditor（纯分析，无写操作），降低门槛 |
 | 实名认证失败 | 低 | 高 | 确保个人信息真实有效 |
+| 服务类目选择困难 | 中 | 中 | 使用键盘操作 ArrowDown/Right/Enter |
+| name 冲突 | 中 | 低 | 加前缀如 agentskills-xxx |
 
 ## 工时估算
 - Task 36-01：2 小时
@@ -109,3 +137,9 @@ REQ-36：open.workbuddy.cn 上架
 - Task 36-04：4 小时（含可能的修改重提）
 - Task 36-05：2 小时
 - **总计：10 小时（不含审核等待时间）**
+
+## 后续迭代
+- 审计师增加 Tier 5 链上责任检查
+- 新增 attribution-auditor 技能
+- 新增 workbuddy-skill-deployer 技能（沉淀上架流程）
+- 更新 skill-publisher 增加 manifest.yaml 生成

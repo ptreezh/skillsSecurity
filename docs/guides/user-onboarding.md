@@ -20,39 +20,19 @@ AgentSkills is a decentralized skill marketplace for AI agent developers. It ena
 
 ### Prerequisites
 
-- MetaMask or WalletConnect compatible wallet
-- MATIC for gas fees on Polygon network
-- Basic understanding of blockchain wallets
+- No browser wallet extension required (embedded identity)
+- No gas tokens needed (ChainMaker chain1 private chain)
+- Basic understanding of blockchain identities
 
 ---
 
-## Setting Up Your Wallet
+## Setting Up Your Identity
 
-### MetaMask Setup
+AgentSkills uses an embedded identity. No browser wallet extension and no network configuration are required.
 
-1. Install [MetaMask browser extension](https://metamask.io/download/)
-2. Create or import your wallet
-3. Add Polygon network:
-
-| Setting | Value |
-|---------|-------|
-| Network Name | Polygon Mainnet |
-| RPC URL | https://polygon-rpc.com |
-| Chain ID | 137 |
-| Symbol | MATIC |
-| Block Explorer | https://polygonscan.com |
-
-4. Get MATIC for gas fees:
-   - Buy from exchange (Binance, Coinbase, etc.)
-   - Withdraw to your MetaMask address
-   - Or use [Polygon Bridge](https://wallet.polygon.technology/bridge) to transfer from Ethereum
-
-### WalletConnect Setup
-
-For mobile wallets, use WalletConnect:
-1. Click "Connect Wallet"
-2. Select "WalletConnect"
-3. Scan QR code with your mobile wallet
+1. Open the app; your embedded identity is created automatically
+2. Your identity address is shown in the app — use it for attribution and reputation
+3. All on-chain reads and writes go through the backend gateway on ChainMaker chain1, so you never add a network or hold gas tokens
 
 ---
 
@@ -186,14 +166,12 @@ If you're slashed incorrectly:
 ### Transaction Failed
 
 1. **Rejected**: User cancelled in wallet
-2. **Insufficient funds**: Not enough MATIC for gas
-3. **Wrong network**: Switch to Polygon
-4. **Insufficient reputation**: Check requirements
+2. **Insufficient reputation**: Check requirements
 
 ### Can't See My Skill
 
-1. Check transaction was confirmed on [Polygonscan](https://polygonscan.com)
-2. Verify you're on correct network
+1. Check the transaction status in the app
+2. Verify the app is connected to the backend gateway
 3. Try refreshing the page
 
 ### Reputation Not Updating
