@@ -21,6 +21,9 @@ __pycache__/
 # Generated skill zip artifacts (R18: skills/template-1.0.0.zip was tracked,
 # letting a stale release artifact ship inside the skills/ tree)
 agentskills-workbuddy-package/skills/*.zip
+# skill-packager 的 test-*/test-output-*.zip 同属打包生成物
+# （实测内容为 coze-package.bin 之类的产物，非源文件）
+tools/skill-packager-universal/*.zip
 
 # Logs
 progress.log
