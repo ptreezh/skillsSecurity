@@ -13,10 +13,10 @@
     "coverage": "hardhat coverage",
     "start": "node server/index.js",
     "server": "node server/index.js",
-    "deploy:hardhat": "npx hardhat run scripts/deploy-all.js --network hardhat",
-    "deploy:amoy": "npx hardhat run scripts/deploy-all.js --network polygonAmoy"
+    "deploy:hardhat": "npx hardhat run scripts/deploy-core-v2.js --network hardhat"
   },
   "dependencies": {
+    "adm-zip": "^0.4.16",
     "cors": "^2.8.5",
     "dotenv": "^17.4.2",
     "ethers": "^6.16.0",

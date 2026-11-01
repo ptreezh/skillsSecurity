@@ -60,9 +60,9 @@ describe("Integration Tests", function() {
     it("should complete full reputation flow: register -> verify -> positive contribution", async function() {
       const { registry, staking, owner, user1, user2 } = await deploy();
 
-      // Step 1: user1 registers LOW skill (no reputation threshold)
-      const tx = await registry.connect(user1).registerSkill(
-        "RepFlowSkill", "Test", "trigger", "QmRepFlow", 0, "v1"
+      // Step 1: gateway (owner) registers LOW skill for creator user1 (no reputation threshold)
+      const tx = await registry.connect(owner).registerSkill(
+        "RepFlowSkill", "Test", "trigger", "QmRepFlow", 0, "v1", user1.address
       );
       const receipt = await tx.wait();
       // Get skillId from SkillRegistered event
@@ -88,8 +88,8 @@ describe("Integration Tests", function() {
     it("should not trigger positive contribution when verify with pass=false", async function() {
       const { registry, staking, owner, user1, user2 } = await deploy();
 
-      const tx = await registry.connect(user1).registerSkill(
-        "FailVerify", "Test", "trigger", "QmFail", 0, "v1"
+      const tx = await registry.connect(owner).registerSkill(
+        "FailVerify", "Test", "trigger", "QmFail", 0, "v1", user1.address
       );
       const receipt = await tx.wait();
       const event = receipt.logs.find(log => log.fragment?.name === "SkillRegistered");
@@ -130,11 +130,11 @@ describe("Integration Tests", function() {
     it("should verify reputation flow with MEDIUM skill requiring 500 reputation", async function() {
       const { registry, staking, owner, user1, user2 } = await deploy();
 
-      // Give user1 500 effective reputation to register MEDIUM skill
+      // Give user1 500 effective reputation as creator to register MEDIUM skill
       await giveEffectiveReputation(staking, owner, user1, 500);
 
-      await registry.connect(user1).registerSkill(
-        "MediumSkill", "Test", "trigger", "QmMedium", 1, "v1" // RiskLevel.MEDIUM
+      await registry.connect(owner).registerSkill(
+        "MediumSkill", "Test", "trigger", "QmMedium", 1, "v1", user1.address // RiskLevel.MEDIUM, creator=user1
       );
 
       // user2 verifies with pass=true
@@ -147,8 +147,8 @@ describe("Integration Tests", function() {
     it("should emit SkillRegistered and SkillVerified events in reputation flow", async function() {
       const { registry, staking, owner, user1, user2 } = await deploy();
 
-      await expect(registry.connect(user1).registerSkill(
-        "EventTest", "Test", "trigger", "QmEvent", 0, "v1"
+      await expect(registry.connect(owner).registerSkill(
+        "EventTest", "Test", "trigger", "QmEvent", 0, "v1", user1.address
       )).to.emit(registry, "SkillRegistered");
 
       await giveEffectiveReputation(staking, owner, user2, 100);
@@ -300,9 +300,9 @@ describe("Integration Tests", function() {
     it("should trigger cross-contract notification on verifySkill (pass=true)", async function() {
       const { registry, staking, owner, user1, user2 } = await deploy();
 
-      // user1 registers LOW skill
-      const tx = await registry.connect(user1).registerSkill(
-        "SyncTest", "Test", "trigger", "QmSync", 0, "v1"
+      // gateway registers LOW skill for creator user1
+      const tx = await registry.connect(owner).registerSkill(
+        "SyncTest", "Test", "trigger", "QmSync", 0, "v1", user1.address
       );
       const receipt = await tx.wait();
       const event = receipt.logs.find(log => log.fragment?.name === "SkillRegistered");
@@ -376,9 +376,9 @@ describe("Integration Tests", function() {
     it("should verify all events emitted in cross-contract flow", async function() {
       const { registry, staking, owner, user1, user2 } = await deploy();
 
-      // user1 registers a skill
-      const tx = await registry.connect(user1).registerSkill(
-        "EventFlow", "Test", "trigger", "QmEvent", 0, "v1"
+      // gateway registers a skill for creator user1
+      const tx = await registry.connect(owner).registerSkill(
+        "EventFlow", "Test", "trigger", "QmEvent", 0, "v1", user1.address
       );
       const receipt = await tx.wait();
       const event = receipt.logs.find(log => log.fragment?.name === "SkillRegistered");

@@ -8,7 +8,6 @@ RUN npm ci --omit=dev
 
 # 复制后端运行所需文件
 COPY server ./server
-COPY src/abi ./src/abi
 COPY deployments.json ./
 
 ENV NODE_ENV=production

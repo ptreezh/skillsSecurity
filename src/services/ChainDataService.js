@@ -13,7 +13,7 @@
  *   - skills 1-2 等无镜像旧行的字符串字段为 null → UI 层兜底（skill-<id>）
  *   - 链上无"点赞/逐技能声誉"概念（v1 代币经济遗留 UI 字段）→ 映射为 0，
  *     排序降级为稳定排序（id 序），符合"浏览 UI 不含治理字段"的论文核心发现
- *   - 网络标识统一 ChainMaker chain1（去 Polygon Amoy 化，28-03）
+ *   - 网络标识统一 ChainMaker chain1（28-03 迁移完成）
  */
 
 import { getApiBase as resolveApiBase } from './apiConfig.js'
@@ -151,7 +151,7 @@ export async function healthCheck() {
   return request('/api/health', { timeoutMs: 8000 })
 }
 
-// ── 网络标识（去 Amoy 化统一出口）──
+// ── 网络标识（ChainMaker chain1 统一出口）──
 
 /** 网络配置：唯一真链 ChainMaker chain1，经后端网关访问 */
 export function getNetworkConfig() {

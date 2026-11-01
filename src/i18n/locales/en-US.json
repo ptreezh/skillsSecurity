@@ -674,7 +674,7 @@
     "toNextTier": "{{count}} users to {{tier}}",
     "maxTier": "Max tier reached",
     "partialError": "Partial data load failed, using demo data",
-    "registerUnavailable": "Registration will be enabled after contract deployment\n\nPlease use: node scripts/deploy-with-rewards.js --register --domain your-site.com",
+    "registerUnavailable": "Registration will be enabled after contract deployment",
     "tiers": {
       "bronze": {
         "name": "Bronze",

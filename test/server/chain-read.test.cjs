@@ -202,3 +202,117 @@ test('getLeaderboard merges submitter-only addresses (mirror 独有地址)', asy
   const deployer = leaderboard.find((e) => e.address === DEPLOYER);
   assert.equal(deployer.skillsOwned, 3); // 3 个 owner 技能（mirror skillId=1 已计入）
 });
+
+// ── getSkillLineage：祖先 / 后代 / 贡献者 ──
+
+function makeLineageDeps() {
+  const mirror = {
+    1: { skillId: 1, name: 'root', creator: DEPLOYER, owner: DEPLOYER, parentSkillId: null, forkType: 'original', contributors: [] },
+    2: { skillId: 2, name: 'fork-a', creator: '0x' + 'a'.repeat(40), owner: '0x' + 'a'.repeat(40), parentSkillId: 1, forkType: 'fork', contributors: [
+      { address: DEPLOYER, role: 'originator', weight: 1.0, skillId: 1, contribution: 'Original creation', timestamp: 1000 },
+      { address: '0x' + 'a'.repeat(40), role: 'forker', weight: 0.3, skillId: 2, contribution: 'Forked', timestamp: 2000 },
+    ]},
+    3: { skillId: 3, name: 'fork-b', creator: '0x' + 'b'.repeat(40), owner: '0x' + 'b'.repeat(40), parentSkillId: 1, forkType: 'modify', contributors: [] },
+    4: { skillId: 4, name: 'sub-fork', creator: '0x' + 'c'.repeat(40), owner: '0x' + 'c'.repeat(40), parentSkillId: 2, forkType: 'extension', contributors: [] },
+  };
+  const skillDetails = {
+    1: { skillId: 1, name: 'root', owner: DEPLOYER, createdAt: 1000 },
+    2: { skillId: 2, name: 'fork-a', owner: '0x' + 'a'.repeat(40), createdAt: 2000 },
+    3: { skillId: 3, name: 'fork-b', owner: '0x' + 'b'.repeat(40), createdAt: 3000 },
+    4: { skillId: 4, name: 'sub-fork', owner: '0x' + 'c'.repeat(40), createdAt: 4000 },
+  };
+  return {
+    get: async (contractKey, method) => {
+      if (method === 'nextSkillId') return { result: 5 };
+      throw new Error('unexpected method: ' + method);
+    },
+    getSkillFromChain: async (id) => skillDetails[id] || { skillId: id, name: 'unknown', owner: null },
+    loadMirror: () => mirror,
+  };
+}
+
+beforeEach(() => {
+  chainRead.__setDependenciesForTest(makeLineageDeps());
+});
+
+test('getSkillLineage returns ancestors and descendants', async () => {
+  const lineage = await chainRead.getSkillLineage(2);
+  assert.equal(lineage.skillId, 2);
+  assert.equal(lineage.name, 'fork-a');
+  assert.deepEqual(lineage.ancestors.map((a) => a.skillId), [1]);
+  assert.deepEqual(lineage.descendants.map((d) => d.skillId), [4]);
+  assert.equal(lineage.depth, 1);
+  assert.equal(lineage.branchCount, 1);
+});
+
+test('getSkillLineage handles skill with multiple descendants', async () => {
+  const lineage = await chainRead.getSkillLineage(1);
+  assert.equal(lineage.skillId, 1);
+  assert.deepEqual(lineage.ancestors, []);
+  assert.deepEqual(lineage.descendants.map((d) => d.skillId), [2, 3]);
+  assert.equal(lineage.depth, 0);
+  assert.equal(lineage.branchCount, 2);
+});
+
+test('getSkillLineage returns contributors from mirror', async () => {
+  const lineage = await chainRead.getSkillLineage(2);
+  assert.equal(lineage.contributors.length, 2);
+  assert.equal(lineage.contributors[0].address, DEPLOYER);
+  assert.equal(lineage.contributors[0].role, 'originator');
+  assert.equal(lineage.contributors[0].weight, 1.0);
+  assert.equal(lineage.contributors[1].address, '0x' + 'a'.repeat(40));
+  assert.equal(lineage.contributors[1].role, 'forker');
+});
+
+test('getSkillLineage auto-adds originator when contributors empty', async () => {
+  const lineage = await chainRead.getSkillLineage(1);
+  assert.equal(lineage.contributors.length, 1);
+  assert.equal(lineage.contributors[0].address, DEPLOYER);
+  assert.equal(lineage.contributors[0].role, 'originator');
+  assert.equal(lineage.contributors[0].weight, 1.0);
+});
+
+test('getSkillLineage 404 for invalid id', async () => {
+  await assert.rejects(chainRead.getSkillLineage(999), (err) => err.status === 404);
+  await assert.rejects(chainRead.getSkillLineage('abc'), (err) => err.status === 404);
+});
+
+// ── getSkillReceipt：存证回执 ──
+
+test('getSkillReceipt returns verification data', async () => {
+  const receipt = await chainRead.getSkillReceipt(1);
+  assert.equal(receipt.skillId, 1);
+  assert.equal(receipt.creator, DEPLOYER);
+  assert.equal(receipt.txHash, null); // mirror 未设置 txId
+  assert.equal(receipt.blockNumber, null);
+  assert.equal(receipt.platform, 'chainmaker');
+  assert.ok(receipt.verification);
+  assert.equal(receipt.verification.fingerprintMatch, false);
+  assert.equal(receipt.verification.chainVerified, false);
+});
+
+test('getSkillReceipt 404 for invalid id', async () => {
+  await assert.rejects(chainRead.getSkillReceipt(999), (err) => err.status === 404);
+});
+
+// ── getSkillContributors：贡献者 attribution ──
+
+test('getSkillContributors returns contributor list', async () => {
+  const contributors = await chainRead.getSkillContributors(2);
+  assert.equal(contributors.length, 2);
+  assert.equal(contributors[0].address, DEPLOYER);
+  assert.equal(contributors[0].role, 'originator');
+  assert.equal(contributors[1].address, '0x' + 'a'.repeat(40));
+  assert.equal(contributors[1].role, 'forker');
+  assert.equal(contributors[1].weight, 0.3);
+});
+
+test('getSkillContributors auto-adds originator when empty', async () => {
+  const contributors = await chainRead.getSkillContributors(1);
+  assert.equal(contributors.length, 1);
+  assert.equal(contributors[0].role, 'originator');
+});
+
+test('getSkillContributors 404 for invalid id', async () => {
+  await assert.rejects(chainRead.getSkillContributors(999), (err) => err.status === 404);
+});

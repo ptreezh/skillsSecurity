@@ -87,8 +87,7 @@ ${this.getSocialProof()}
   async getSystemStatus() {
     return `
 **System Status:** ✅ Operational
-- Network: Polygon Amoy
-- Gas: Low
+- Network: ChainMaker chain1
 - Skills: 150+ available
 `
   }

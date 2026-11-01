@@ -1,7 +1,9 @@
 /**
- * Chain submission - submit approved skill to AS_SkillRegistry on ChainMaker (chain1)
+ * Chain submission - submit approved skill to AS2_SkillRegistry on ChainMaker (chain1)
  *
  * 完全基于真实长安链 cmc 网关（server/chainmaker-client.js），无 mock / 无 ethers。
+ * P1-7：registerSkill 归属参数化（G2-a）——creator 为真实用户链上地址，
+ * 由调用方（/api/chain）传入；未提供时诚实回退为网关地址（平台代签，见 PLAN G2-a 标注）。
  *
  * 环境变量（见 chainmaker-client.js）：
  *   CHAINMAKER_CONTAINER_CMD - 容器命令前缀（默认 docker exec cmc-debug）
@@ -99,8 +101,12 @@ function parseSkillFromJob(job, locale = 'zh-CN') {
  * 真实链上提交（ChainMaker invoke registerSkill）
  * 返回 { skillId, txId, blockHeight, submitter, events }
  * skillId 来自 registerSkill 的 uint256 返回值（精确，无需 nextSkillId-1）。
+ * @param {Object} job 已审核通过的作业
+ * @param {string} locale 语言环境
+ * @param {string} creator 真实用户链上地址（0x...，registerSkill 的 _creator；缺省=网关地址平台代签）
+ * @param {Object} forkMetadata 溯源元数据（parentSkillId, parentFingerprint, forkType, contributors）
  */
-async function submitToChain(job, locale = 'zh-CN') {
+async function submitToChain(job, locale = 'zh-CN', creator = null, forkMetadata = {}) {
   if (!isConfigured()) {
     throw new Error(t(locale, 'chain.notConfigured'));
   }
@@ -108,8 +114,14 @@ async function submitToChain(job, locale = 'zh-CN') {
   const skill = parseSkillFromJob(job, locale);
   console.log(`[Chain] Submitting skill: ${skill.name} (risk=${skill.riskLevel})`);
 
+  // P1-7 G2-a：creator 归属参数化。给定则用真实用户地址；否则平台代签（网关地址）。
+  if (!creator || !/^0x[0-9a-fA-F]{40}$/.test(creator)) {
+    console.warn('[Chain] 未提供合法 creator，回退网关地址（平台代签，P2 身份层后将强制真实地址）');
+    creator = '0x3737f0d872f386f170c20e2ae73b81cfe6b7ecf3'; // ChainMaker admin1 网关
+  }
+
   const inv = await chainmaker.invoke(
-    'AS_SkillRegistry',
+    'AS2_SkillRegistry',
     'registerSkill',
     [
       skill.name,
@@ -117,7 +129,8 @@ async function submitToChain(job, locale = 'zh-CN') {
       skill.trigger,
       skill.metadataIPFS,
       skill.riskLevel,
-      skill.version
+      skill.version,
+      creator
     ],
     { sync: true }
   );
@@ -146,7 +159,14 @@ async function submitToChain(job, locale = 'zh-CN') {
     txId: inv.txId,
     blockHeight: inv.blockHeight,
     submitter,
-    submittedAt: new Date().toISOString()
+    creator,
+    submittedAt: new Date().toISOString(),
+    // 溯源链字段（不禁止二创，但记录 fork 关系与贡献者 attribution）
+    parentSkillId: forkMetadata.parentSkillId || null,
+    parentFingerprint: forkMetadata.parentFingerprint || null,
+    forkType: forkMetadata.forkType || 'original',
+    contributors: Array.isArray(forkMetadata.contributors) ? forkMetadata.contributors : [],
+    creditChain: Array.isArray(forkMetadata.creditChain) ? forkMetadata.creditChain : []
   };
   saveMirror(mirror);
 

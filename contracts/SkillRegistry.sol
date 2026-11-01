@@ -58,20 +58,25 @@ contract SkillRegistry is Ownable {
         return keccak256(abi.encodePacked(_ipfsHash, _creator, _timestamp));
     }
     
+    /// @notice 注册技能（归属参数化到真实用户地址 creator，调用仅限平台网关 onlyOwner）
+    /// @dev P1 grill-down G2-a：ChainMaker 单网关签名（cmc 无 --sender），permissionless 无现实意义且引入冒名漏洞 → onlyOwner；归属/门槛/指纹/ownerSkills 全部基于 creator
+    /// @param _creator 真实用户链上地址（P2 身份层派生；此处由网关代签，诚实标注"平台代签"）
     function registerSkill(
         string memory _name,
         string memory _description,
         string memory _trigger,
         string memory _metadataIPFS,
         RiskLevel _riskLevel,
-        string memory _version
-    ) external returns (uint256) {
+        string memory _version,
+        address _creator
+    ) external onlyOwner returns (uint256) {
+        require(_creator != address(0), "Invalid creator");
         require(!nameTaken[_name], "Name taken");
 
         uint256 stakeAmount = _getStakeAmount(_riskLevel);
 
-        // Check effective reputation (exclude locked) based on risk level
-        int256 effectiveRep = stakingManager.getUserReputation(msg.sender);
+        // Check effective reputation (exclude locked) based on risk level —— 门槛基于真实用户 creator
+        int256 effectiveRep = stakingManager.getUserReputation(_creator);
 
         // MEDIUM skill requires 500+ effective reputation
         if (_riskLevel == RiskLevel.MEDIUM && effectiveRep < 500) {
@@ -88,7 +93,7 @@ contract SkillRegistry is Ownable {
 
         uint256 skillId = nextSkillId++;
         Skill storage skill = skills[skillId];
-        skill.owner = msg.sender;
+        skill.owner = _creator;
         skill.name = _name;
         skill.description = _description;
         skill.trigger = _trigger;
@@ -100,13 +105,13 @@ contract SkillRegistry is Ownable {
         skill.updatedAt = block.timestamp;
         skill.version = _version;
         
-        // 生成指纹（宪法第三条）
-        skill.fingerprint = computeFingerprint(_metadataIPFS, msg.sender, block.timestamp);
+        // 生成指纹（宪法第三条）——基于真实用户 creator
+        skill.fingerprint = computeFingerprint(_metadataIPFS, _creator, block.timestamp);
         
         nameTaken[_name] = true;
-        ownerSkills[msg.sender].push(skillId);
+        ownerSkills[_creator].push(skillId);
         
-        emit SkillRegistered(msg.sender, skillId, _name);
+        emit SkillRegistered(_creator, skillId, _name);
         emit FingerprintGenerated(skillId, skill.fingerprint);
         return skillId;
     }

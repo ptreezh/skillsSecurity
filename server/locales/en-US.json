@@ -14,8 +14,7 @@
     "submitting": "Submitting to chain...",
     "onChain": "On chain",
     "notConfigured": "ChainMaker gateway unavailable, cannot submit",
-    "configHint": "Ensure cmc-debug container is running and CHAINMAKER_* config is correct to enable real submission",
-    "balanceTooLow": "Submit wallet balance too low: {{balance}} MATIC"
+    "configHint": "Ensure cmc-debug container is running and CHAINMAKER_* config is correct to enable real submission"
   },
   "audit": {
     "auditing": "Security audit in progress (AI Agent scan)...",

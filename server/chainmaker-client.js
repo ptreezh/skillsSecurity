@@ -32,18 +32,20 @@ const { execFile } = require('child_process');
 const { promisify } = require('util');
 const execFileAsync = promisify(execFile);
 
-// ── 合约注册表（链上真实地址，来自 deployments.json，已 13/13 验证）──
-// 地址统一去 0x 存储（cmc 的 --contract-address 不接受 0x 前缀）
+// ── 合约注册表（链上真实地址，P1-5 wire 10/10 + verify 15/15 验证）──
+// 地址统一去 0x 存储（cmc 的 --contract-address 不接受 0x 前缀）。
+// v3 新合约（P1 部署）：AS2_SkillRegistry（块 70）、AS2_SSE（块 71）；v2 复用其余 4 个。
+// key 名 = 链上真实合约名（--contract-name 直接使用）。
 const CONTRACTS = {
   AS_Staking: {
     chainName: 'AS_Staking',
     abiFile: 'StakingManager.abi',
     address: '95f2f001a4f65e8652bbdae34487ed9596fe19e7', // blk 38
   },
-  AS_SkillRegistry: {
-    chainName: 'AS_SkillRegistry',
+  AS2_SkillRegistry: {
+    chainName: 'AS2_SkillRegistry',
     abiFile: 'SkillRegistry.abi',
-    address: 'cf089d4bebcdabd13cd6a27ba6c168acac6bc042', // blk 39
+    address: '4f60b9d9e3bc739e619757e43ca699d3ada3c2a6', // blk 70（P1 新部署）
   },
   AS_Attribution: {
     chainName: 'AS_Attribution',
@@ -55,10 +57,10 @@ const CONTRACTS = {
     abiFile: 'Governance.abi',
     address: '106d3686d2492ce75d1e4a01e799d22e7d2c9e74', // blk 41
   },
-  AgentEcosystem: {
-    chainName: 'AgentEcosystem',
+  AS2_SSE: {
+    chainName: 'AS2_SSE',
     abiFile: 'SelfSustainingEcosystem.abi',
-    address: '17f57b0722260ae6a3cabd33e0e9f5300c189f13', // blk 42
+    address: '9c755215c30c88a84930b09ef5112797a19134fe', // blk 71（P1，CM 注册条目权威地址）
   },
   ReputationBadges: {
     chainName: 'ReputationBadges',
@@ -358,7 +360,7 @@ async function loadAbi(contractKey) {
 
 /**
  * 查询（只读）：cmc client contract user get
- * @param {string} contractKey CONTRACTS 的 key（如 'AS_SkillRegistry'）
+ * @param {string} contractKey CONTRACTS 的 key（如 'AS2_SkillRegistry'）
  * @param {string} method 方法名
  * @param {Array} params 裸值数组（按 ABI 参数顺序）
  * @param {Object} opts { timeout }
@@ -406,7 +408,7 @@ async function invoke(contractKey, method, params = [], opts = {}) {
  * 用一次最轻量的查询（nextSkillId）确认 cmc + 容器 + 链三者在位。
  */
 async function health() {
-  const out = await get('AS_SkillRegistry', 'nextSkillId', []);
+  const out = await get('AS2_SkillRegistry', 'nextSkillId', []);
   return {
     chainId: CHAIN_ID,
     orgId: ORG_ID,
@@ -469,7 +471,7 @@ async function queryTx(txId) {
  * 返回 { exists, raw, owner, fingerprint, verified, createdAt, updatedAt, version }
  */
 async function getSkill(skillId) {
-  const s = await get('AS_SkillRegistry', 'skills', [skillId]);
+  const s = await get('AS2_SkillRegistry', 'skills', [skillId]);
   const raw = String(s.raw || '');
   const numsToHex = (numsText) => {
     const nums = String(numsText || '').trim().split(/\s+/).filter(Boolean).map(Number);
@@ -481,7 +483,7 @@ async function getSkill(skillId) {
   const tail = raw.match(
     /(true|false)\s+(\d+)\s+(\d+)\s+(\S+)\s*\[\s*((?:\d+\s+){0,31}\d+)\s*\]\s*\]\s*$/
   );
-  const v = await get('AS_SkillRegistry', 'verifiedSkills', [skillId]);
+  const v = await get('AS2_SkillRegistry', 'verifiedSkills', [skillId]);
   return {
     exists: true, // skills(id) 不存在会 revert，能回包即存在
     raw,

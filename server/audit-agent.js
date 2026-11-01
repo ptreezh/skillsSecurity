@@ -25,7 +25,13 @@ async function processAuditJob(
   updateJob(jobId, { status: "auditing", message: _t("audit.auditing") });
 
   try {
-    const skillContent = fs.readFileSync(filePath, "utf-8");
+    // P3：zip 已在 /api/upload 真实解包并校验 → 优先用 job.skillContent；
+    // 直读 .md 或测试直调时回退到 readFileSync（不会把 zip 二进制当文本）
+    const job = getJob(jobId);
+    let skillContent = job && job.skillContent;
+    if (!skillContent) {
+      skillContent = fs.readFileSync(filePath, "utf-8");
+    }
     const result = await runAudit(skillContent, originalName, locale);
 
     // Localize user-facing audit messages

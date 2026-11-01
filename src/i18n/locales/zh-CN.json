@@ -650,7 +650,7 @@
     "toNextTier": "距离{{tier}}还差 {{count}} 用户",
     "maxTier": "已达最高等级",
     "partialError": "数据加载部分失败，使用演示数据",
-    "registerUnavailable": "注册功能将在合约部署后启用\n\n请使用: node scripts/deploy-with-rewards.js --register --domain your-site.com",
+    "registerUnavailable": "注册功能将在合约部署后启用",
     "tiers": {
       "bronze": {
         "name": "青铜",

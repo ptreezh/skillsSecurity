@@ -95,6 +95,7 @@ contract SelfSustainingEcosystem is Ownable, ReentrancyGuard, IReputationIncenti
     event ReportSubmitted(address indexed reporter, uint256 indexed skillId, bytes32 reportHash, uint256 reward);
     event GovernanceSet(address indexed governance);
     event StakingManagerSet(address indexed stakingManager);
+    event ReputationGranted(address indexed user, uint256 amount, uint256 total);
 
     modifier onlyGovernance() {
         require(msg.sender == governance, "Not governance");
@@ -368,6 +369,22 @@ contract SelfSustainingEcosystem is Ownable, ReentrancyGuard, IReputationIncenti
     /// @param amount The reward amount（纯声誉分数标量）
     function addRewards(address user, ReputationRole role, uint256 amount) external onlyOwner {
         roleRewards[user][role] += amount;
+    }
+
+    /// @notice 平台授信：直接为真实用户写入声誉（P1 grill-down G4-a 冷启动解锁 + 审计通过奖励）
+    /// @dev 权限 onlyOwner（部署账户=网关）；仅正向加分（amount>0）；直调声誉权威源 StakingManager.addReputation（本合约是 REPUTATION_ORACLE，权限链天然满足）
+    ///      冷启动场景：部署后授首笔 rep≥100 解锁 verifySkill LOW 档验证（诚实标注：平台冷启动授信）
+    /// @param user 真实用户链上地址
+    /// @param amount 声誉分数（正整数，≤ int256 上限防溢出；实际业务量级 < 5000）
+    function grantReputation(address user, uint256 amount) external onlyOwner {
+        require(user != address(0), "Invalid user");
+        require(amount > 0, "Amount must be positive");
+        require(amount <= uint256(type(int256).max), "Amount exceeds int256 max");
+        require(address(stakingManager) != address(0), "StakingManager not set");
+        stakingManager.addReputation(user, int256(amount));
+        uint256 total = stakingManager.getUserReputation(user) > 0
+            ? uint256(stakingManager.getUserReputation(user)) : 0;
+        emit ReputationGranted(user, amount, total);
     }
 
     // Internal helpers

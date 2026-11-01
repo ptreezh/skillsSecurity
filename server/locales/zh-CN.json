@@ -14,8 +14,7 @@
     "submitting": "正在提交到链上...",
     "onChain": "已上链",
     "notConfigured": "ChainMaker 网关不可用，无法提交",
-    "configHint": "确保 cmc-debug 容器运行且 CHAINMAKER_* 配置正确以启用真实提交",
-    "balanceTooLow": "提交钱包余额过低：{{balance}} MATIC"
+    "configHint": "确保 cmc-debug 容器运行且 CHAINMAKER_* 配置正确以启用真实提交"
   },
   "audit": {
     "auditing": "安全审核中 (AI Agent 扫描)...",

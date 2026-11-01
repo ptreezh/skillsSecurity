@@ -249,6 +249,94 @@ describe("SelfSustainingEcosystem (ReputationIncentives)", function() {
     });
   });
 
+  describe("Reputation Grant (P1: grantReputation)", function() {
+    it("should grant reputation and emit ReputationGranted with updated total", async function() {
+      const { sse, staking, owner, user1 } = await deploy();
+
+      await expect(sse.grantReputation(user1.address, 100))
+        .to.emit(sse, "ReputationGranted")
+        .withArgs(user1.address, 100, 100);
+
+      // Reputation written to authoritative StakingManager (REPUTATION_ORACLE path)
+      const rep = await staking.getUserReputation(user1.address);
+      expect(rep).to.equal(100);
+    });
+
+    it("should accumulate on multiple grants and report cumulative total", async function() {
+      const { sse, staking, owner, user1 } = await deploy();
+
+      await sse.grantReputation(user1.address, 100);
+      await expect(sse.grantReputation(user1.address, 50))
+        .to.emit(sse, "ReputationGranted")
+        .withArgs(user1.address, 50, 150);
+
+      expect(await staking.getUserReputation(user1.address)).to.equal(150);
+    });
+
+    it("should revert for non-owner caller", async function() {
+      const { sse, user1, user2 } = await deploy();
+
+      await expect(sse.connect(user1).grantReputation(user2.address, 100))
+        .to.be.revertedWith("Ownable: caller is not the owner");
+    });
+
+    it("should revert for zero-address user", async function() {
+      const { sse, owner } = await deploy();
+
+      await expect(sse.grantReputation(ethers.ZeroAddress, 100))
+        .to.be.revertedWith("Invalid user");
+    });
+
+    it("should revert for zero amount", async function() {
+      const { sse, owner, user1 } = await deploy();
+
+      await expect(sse.grantReputation(user1.address, 0))
+        .to.be.revertedWith("Amount must be positive");
+    });
+
+    it("should revert for amount exceeding int256 max (overflow guard)", async function() {
+      const { sse, owner, user1 } = await deploy();
+      const tooBig = BigInt(2) ** BigInt(255); // 2^255 > int256.max (2^255-1)
+
+      await expect(sse.grantReputation(user1.address, tooBig))
+        .to.be.revertedWith("Amount exceeds int256 max");
+    });
+
+    it("should revert when stakingManager not set", async function() {
+      const SSE = await ethers.getContractFactory("SelfSustainingEcosystem");
+      const sse2 = await SSE.deploy();
+      await sse2.waitForDeployment();
+      const [owner, user1] = await ethers.getSigners();
+
+      await expect(sse2.grantReputation(user1.address, 100))
+        .to.be.revertedWith("StakingManager not set");
+    });
+
+    it("P1 G4-a closed loop: gateway-registered LOW skill becomes verifiable after first grant unlocks verifier", async function() {
+      const { sse, staking, registry, owner, user1, user2 } = await deploy();
+
+      // Cold-start: no one has reputation yet. Gateway registers LOW skill for creator user1
+      // (LOW has no registration threshold).
+      await registry.connect(owner).registerSkill(
+        "ColdStartSkill", "Test", "trigger", "QmCold", 0, "v1", user1.address
+      );
+      const skillId = 0;
+
+      // Before grant: user2 has 0 rep -> verifySkill would revert (deadlock per G4-a)
+      await expect(registry.connect(user2).verifySkill(skillId, true))
+        .to.be.revertedWith("Insufficient effective reputation");
+
+      // First grant (platform cold-start credit): unlocks verifier
+      await sse.grantReputation(user2.address, 100);
+
+      // Now verification succeeds
+      await expect(registry.connect(user2).verifySkill(skillId, true))
+        .to.emit(registry, "SkillVerified")
+        .withArgs(user2.address, skillId);
+      expect(await staking.hasPositiveContribution(user2.address)).to.be.true;
+    });
+  });
+
   describe("Owner Setters", function() {
     it("setReputationBadges / setGovernance / setSkillRegistry / setAttribution revert on zero address", async function() {
       const { sse, owner } = await deploy();

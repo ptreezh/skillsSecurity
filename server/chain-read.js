@@ -116,7 +116,7 @@ async function getSkillCount() {
   ensureDeps();
   const cached = cacheGet('skillCount');
   if (cached !== undefined) return cached;
-  const res = await deps.get('AS_SkillRegistry', 'nextSkillId', []);
+  const res = await deps.get('AS2_SkillRegistry', 'nextSkillId', []);
   const total = Math.max(0, Number(res.result) - 1);
   cacheSet('skillCount', total);
   return total;
@@ -279,15 +279,15 @@ async function getStats() {
     ecosystem,
     attributionContributions,
   ] = await Promise.all([
-    deps.get('AS_SkillRegistry', 'nextSkillId', []),
+    deps.get('AS2_SkillRegistry', 'nextSkillId', []),
     deps.get('AS_Staking', 'stakerCount', []),
     deps.get('AS_Staking', 'getTotalReputation', []),
     deps.get('AS_Staking', 'totalEffectiveReputation', []),
     Promise.all([
-      deps.get('AgentEcosystem', 'totalUsers', []),
-      deps.get('AgentEcosystem', 'activeRoles', []),
-      deps.get('AgentEcosystem', 'totalContributions', []),
-      deps.get('AgentEcosystem', 'totalRewardsDistributed', []),
+      deps.get('AS2_SSE', 'totalUsers', []),
+      deps.get('AS2_SSE', 'activeRoles', []),
+      deps.get('AS2_SSE', 'totalContributions', []),
+      deps.get('AS2_SSE', 'totalRewardsDistributed', []),
     ]),
     deps.get('AS_Attribution', 'totalContributions', []),
   ]);
@@ -317,6 +317,196 @@ async function getStats() {
   return result;
 }
 
+// ── 技能存证链服务：溯源链 / 证据包 / 贡献者 attribution ──
+
+/**
+ * 构建技能溯源链（祖先 + 后代 + 贡献者）
+ * 不禁止二创，但每次 fork/modify/translation/extension 都记录在镜像中
+ */
+async function getSkillLineage(skillId) {
+  ensureDeps();
+  const id = parseIntId(skillId);
+  if (!id) {
+    throw Object.assign(new Error('skill.notFound'), { status: 404 });
+  }
+
+  const total = await getSkillCount();
+  if (id > total) {
+    throw Object.assign(new Error('skill.notFound'), { status: 404 });
+  }
+
+  // 获取当前技能详情
+  const current = await getSkillCached(id);
+  const mirror = deps.loadMirror ? deps.loadMirror() : {};
+  const currentMirror = mirror[id] || {};
+
+  // 构建祖先链（walk parentSkillId）
+  const ancestors = [];
+  let parentId = currentMirror.parentSkillId;
+  let depth = 0;
+  const visited = new Set([id]);
+
+  while (parentId && !visited.has(parentId) && depth < 50) {
+    visited.add(parentId);
+    try {
+      const parent = await getSkillCached(parentId);
+      const parentMirror = mirror[parentId] || {};
+      ancestors.push({
+        skillId: parentId,
+        name: parent.name || parentMirror.name || 'unknown',
+        creator: parent.owner || null,
+        forkType: parentMirror.forkType || null
+      });
+      parentId = parentMirror.parentSkillId;
+      depth++;
+    } catch (e) {
+      break;
+    }
+  }
+
+  // 构建后代链（全量扫描，按 nextSkillId 遍历）
+  const descendants = [];
+  const pageSize = 50;
+  const totalPages = Math.ceil(total / pageSize);
+  for (let page = 1; page <= totalPages; page++) {
+    const allSkills = await listSkills({ page, pageSize });
+    for (const s of allSkills.skills) {
+      if (s.skillId === id) continue;
+      const sMirror = mirror[s.skillId] || {};
+      if (sMirror.parentSkillId === id) {
+        descendants.push({
+          skillId: s.skillId,
+          name: s.name || sMirror.name || 'unknown',
+          creator: s.owner || null,
+          forkType: sMirror.forkType || null
+        });
+      }
+    }
+  }
+
+  // 贡献者 attribution
+  const contributors = (currentMirror.contributors || []).map(c => ({
+    address: c.address,
+    role: c.role,
+    weight: c.weight,
+    skillId: c.skillId,
+    contribution: c.contribution,
+    timestamp: c.timestamp
+  }));
+
+  // 如果贡献者为空，至少记录创建者
+  if (contributors.length === 0 && currentMirror.creator) {
+    contributors.push({
+      address: currentMirror.creator,
+      role: 'originator',
+      weight: 1.0,
+      skillId: id,
+      contribution: 'Original creation',
+      timestamp: current.createdAt ? Number(current.createdAt) : Date.now()
+    });
+  }
+
+  return {
+    skillId: id,
+    name: current.name || currentMirror.name || 'unknown',
+    ancestors,
+    descendants,
+    contributors,
+    depth: ancestors.length,
+    branchCount: descendants.length
+  };
+}
+
+/**
+ * 技能存证回执（用于司法存证 / 第三方验证）
+ */
+async function getSkillReceipt(skillId) {
+  ensureDeps();
+  const id = parseIntId(skillId);
+  if (!id) {
+    throw Object.assign(new Error('skill.notFound'), { status: 404 });
+  }
+
+  const total = await getSkillCount();
+  if (id > total) {
+    throw Object.assign(new Error('skill.notFound'), { status: 404 });
+  }
+
+  const current = await getSkillCached(id);
+  const mirror = deps.loadMirror ? deps.loadMirror() : {};
+  const currentMirror = mirror[id] || {};
+
+  const originalHash = currentMirror.metadataIPFS || current.fingerprint || '';
+  const verification = {
+    originalHash: originalHash ? `sha256:${originalHash}` : null,
+    fingerprintMatch: !!current.fingerprint,
+    chainVerified: !!current.txId || !!currentMirror.txId
+  };
+
+  return {
+    skillId: id,
+    fingerprint: current.fingerprint || null,
+    parentFingerprint: currentMirror.parentFingerprint || null,
+    creator: currentMirror.creator || current.owner || null,
+    contributors: (currentMirror.contributors || []).map(c => ({
+      address: c.address,
+      role: c.role,
+      weight: c.weight,
+      skillId: c.skillId,
+      contribution: c.contribution,
+      timestamp: c.timestamp
+    })),
+    txHash: currentMirror.txId || current.txId || null,
+    blockNumber: currentMirror.blockHeight || current.blockNumber || null,
+    timestamp: currentMirror.submittedAt ? new Date(currentMirror.submittedAt).getTime() : (current.createdAt ? Number(current.createdAt) : null),
+    platform: 'chainmaker',
+    receiptUrl: `${process.env.BACKEND_API_URL || 'http://localhost:10001'}/api/chain/skills/${id}/receipt`,
+    verification
+  };
+}
+
+/**
+ * 技能贡献者列表
+ */
+async function getSkillContributors(skillId) {
+  ensureDeps();
+  const id = parseIntId(skillId);
+  if (!id) {
+    throw Object.assign(new Error('skill.notFound'), { status: 404 });
+  }
+
+  const total = await getSkillCount();
+  if (id > total) {
+    throw Object.assign(new Error('skill.notFound'), { status: 404 });
+  }
+
+  const mirror = deps.loadMirror ? deps.loadMirror() : {};
+  const currentMirror = mirror[id] || {};
+
+  const contributors = (currentMirror.contributors || []).map(c => ({
+    address: c.address,
+    role: c.role,
+    weight: c.weight,
+    skillId: c.skillId,
+    contribution: c.contribution,
+    timestamp: c.timestamp
+  }));
+
+  // 如果贡献者为空，至少记录创建者
+  if (contributors.length === 0 && currentMirror.creator) {
+    contributors.push({
+      address: currentMirror.creator,
+      role: 'originator',
+      weight: 1.0,
+      skillId: id,
+      contribution: 'Original creation',
+      timestamp: currentMirror.submittedAt ? new Date(currentMirror.submittedAt).getTime() : Date.now()
+    });
+  }
+
+  return contributors;
+}
+
 module.exports = {
   listSkills,
   getSkillById,
@@ -324,6 +514,9 @@ module.exports = {
   getLeaderboard,
   getStats,
   getSkillCount,
+  getSkillLineage,
+  getSkillReceipt,
+  getSkillContributors,
   // 纯函数（单测）与运维钩子
   validateAddress,
   parseIntId,
