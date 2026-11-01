@@ -24,7 +24,6 @@
  *
  * Environment variables required:
  *   PRIVATE_KEY - Deployer wallet private key (real chain)
- *   (POLYGON_*) - network RPC only; not required for localhost/hardhat
  */
 
 import './env-setup.js'

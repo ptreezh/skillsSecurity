@@ -1,6 +1,6 @@
 # Contract API Reference
 
-**Network:** Polygon Mainnet
+**Network:** ChainMaker chain1
 **Version:** 1.0.0
 
 ## StakingManager
@@ -284,7 +284,7 @@ Queue a transaction for execution.
 
 **Parameters:**
 - `_target` (address): Target contract
-- `_value` (uint256): MATIC amount
+- `_value` (uint256): native value amount
 - `_data` (bytes): Call data
 - `_description` (bytes32): Description hash
 

@@ -1,43 +1,40 @@
 # FRONTEND
 
-**React + Vite · JSX · Embedded wallet · Chinese UI**
+**React + Vite · JSX · Embedded identity · Chinese UI · Browser never touches the chain**
 
 ## OVERVIEW
-Frontend MVP for the AgentSkills ecosystem — skill browser, reputation dashboards, governance visualization, and self-operations panel. Serves as the user-facing interface for the "Responsibility Vacuum" prototype.
+Frontend for the AgentSkills ecosystem — skill browser, reputation dashboards, protocol demo, and operations panel. User-facing interface for the "Responsibility Vacuum" prototype.
+
+## CHAIN ACCESS (READ FIRST)
+ChainMaker `chain1` has **no browser-reachable JSON-RPC**. Therefore:
+- All on-chain reads/writes go through the backend gateway. The browser never connects to the chain directly.
+- `services/ChainDataService.js` is the **only** chain data layer (REST: `/api/skills`, `/api/reputation/:address`, `/api/leaderboard`, `/api/stats`, `/api/health`).
+- Writes reuse the existing upload pipeline (`/api/upload` → `/api/status/:jobId` → `/api/chain`).
+- `services/WalletService.js` is an **identity layer only** — no provider, no signer, no contract instances, no token balance.
+
+Do not reintroduce `ethers` providers, ABIs, or contract instances into `src/`. That path was removed in the ChainMaker migration and cannot work.
 
 ## STRUCTURE
 ```
 src/
-├── main.jsx                 # Entry point (routing, wallet init)
-├── server.js                # Dev server
+├── main.jsx                     # Entry point (routing, identity init)
 ├── components/
-│   ├── SkillBrowser.jsx     # Skill browsing + reputation sort
-│   ├── charts/              # GovernancePieChart, RevenueChart, etc.
-│   ├── common/              # ChartContainer, EmptyState
-│   └── leaderboard/         # Leaderboard view
+│   ├── LanguageSwitcher.jsx     # zh-CN / en-US toggle
+│   ├── SkillBrowser.jsx         # Skill browsing + reputation sort
+│   └── common/                  # ChartContainer, EmptyState
 ├── pages/
-│   ├── UserProfile.jsx      # User reputation center (Art.2)
-│   ├── Leaderboard.jsx      # Global reputation board (Art.3)
-│   ├── ProtocolDemo.jsx     # Protocol interaction demo
-│   ├── DeployerDashboard.jsx # Deployer incentive dashboard
-│   ├── SelfOpsPanel.jsx     # Self-operations panel
-│   └── OpsDashboard.jsx     # Operations dashboard
+│   ├── LandingPage.jsx          # Entry / overview
+│   ├── UserProfile.jsx          # User reputation center (Art.2)
+│   ├── Leaderboard.jsx          # Global reputation board (Art.3)
+│   ├── ProtocolDemo.jsx         # Protocol interaction demo
+│   └── DeployerDashboard.jsx    # Deployer incentive dashboard
 ├── services/
-│   ├── WalletService.js     # Embedded wallet (low-friction, Art.2)
-│   ├── ContractService.jsx  # Contract interaction layer
-│   ├── alertService.js      # Alerts/notifications
-│   ├── eventWatcher.js      # On-chain event watcher
-│   ├── gasMonitor.js        # Gas price monitoring
-│   └── uploadService.js     # File upload service
-├── hooks/
-│   └── usePolling.js        # Polling hook
-├── i18n/
-│   └── index.jsx            # Internationalization (Chinese)
-├── styles/
-│   ├── tokens.css           # Design tokens
-│   ├── components.css       # Component styles
-│   └── enhanced.css         # Enhanced UI styles
-└── abi/                     # Compiled contract ABIs (8 contracts)
+│   ├── ChainDataService.js      # ONLY chain data layer (backend REST gateway)
+│   ├── WalletService.js         # Embedded identity (no provider/signer)
+│   ├── uploadService.js         # Skill upload pipeline
+│   └── apiConfig.js             # API base resolution
+├── i18n/                        # i18next (zh-CN default, en-US present)
+└── styles/                      # tokens.css, components.css, enhanced.css
 ```
 
 ## WHERE TO LOOK
@@ -47,18 +44,22 @@ src/
 | Skill browsing | components/SkillBrowser.jsx |
 | User reputation | pages/UserProfile.jsx |
 | Leaderboard | pages/Leaderboard.jsx |
-| Wallet connection | services/WalletService.js |
-| Contract calls | services/ContractService.jsx |
-| Charts | components/charts/ |
+| Identity / connection | services/WalletService.js |
+| **Chain reads** | services/ChainDataService.js |
+| **Chain writes** | services/uploadService.js |
 | Design tokens | styles/tokens.css |
 
 ## CONVENTIONS
 - JSX with React hooks (useState, useEffect)
 - Chinese UI labels (宪法 references inline)
-- CSS modules via separate stylesheets
-- Embedded wallet (no MetaMask required)
+- CSS via separate stylesheets
+- Embedded identity — no MetaMask, no browser extension
 
 ## ANTI-PATTERNS
-- Avoid adding governance fields to skill browsing UI
-- Don't bypass WalletService for wallet operations
-- Keep i18n Chinese-only (target research demo)
+- Do not add governance fields to skill browsing UI (paper core finding)
+- Do not bypass `WalletService` for identity operations
+- Do not add `ethers` / RPC / ABI / contract-instance code to `src/` — chain access is backend-only
+- Keep i18n Chinese-first (research demo target)
+
+## KNOWN DEVIATION
+`i18n/locales/en-US.json` and `LanguageSwitcher.jsx` exist despite the Chinese-first convention. Needs a decision: keep as demo affordance, or drop to honor the convention. Not yet resolved.
