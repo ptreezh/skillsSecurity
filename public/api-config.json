@@ -1,4 +1,4 @@
 {
-  "apiUrl": "https://matches-earning-pmid-dramatic.trycloudflare.com",
+  "apiUrl": "https://api.trycloudflare.com",
   "_note": "由 prod-supervisor 自动维护；push 触发 Pages 自动重部署"
 }
